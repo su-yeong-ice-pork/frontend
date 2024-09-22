@@ -1,4 +1,4 @@
-import React, {useRef} from 'react';
+import React, {useRef, useState, useEffect} from 'react';
 import {
   View,
   Text,
@@ -32,6 +32,8 @@ const {width, height} = Dimensions.get('window');
 
 const LandingScreen = ({navigation}: any) => {
   const scrollX = useRef(new Animated.Value(0)).current;
+  const scrollViewRef = useRef<Animated.ScrollView>(null);
+  const [currentIndex, setCurrentIndex] = useState(0);
 
   // 슬라이드 데이터 배열
   const slides = [
@@ -120,6 +122,27 @@ const LandingScreen = ({navigation}: any) => {
     </View>
   );
 
+  // 자동 슬라이드 효과
+  useEffect(() => {
+    const interval = setInterval(() => {
+      let nextIndex = currentIndex + 1;
+      if (nextIndex >= slides.length) {
+        nextIndex = 0; // 마지막 슬라이드 다음에 첫 번째 슬라이드로 돌아감
+      }
+      setCurrentIndex(nextIndex);
+      scrollViewRef.current?.scrollTo({x: nextIndex * width, animated: true});
+    }, 3000); // 3초마다 슬라이드 전환
+
+    return () => clearInterval(interval); // 컴포넌트 언마운트 시 타이머 정리
+  }, [currentIndex, slides.length]);
+
+  // 스크롤이 끝났을 때 현재 인덱스 업데이트
+  const handleScrollEnd = (e: any) => {
+    const contentOffset = e.nativeEvent.contentOffset.x;
+    const index = Math.round(contentOffset / width);
+    setCurrentIndex(index);
+  };
+
   return (
     <LinearGradient
       colors={['rgba(0, 255, 150, 1)', 'rgba(31, 209, 245, 1)']}
@@ -139,16 +162,17 @@ const LandingScreen = ({navigation}: any) => {
 
       {/* 캐러셀 */}
       <Animated.ScrollView
+        ref={scrollViewRef}
         horizontal
         pagingEnabled
         showsHorizontalScrollIndicator={false}
         scrollEventThrottle={16}
-        // eslint-disable-next-line react-native/no-inline-styles
         contentContainerStyle={{flexGrow: 1}}
         onScroll={Animated.event(
           [{nativeEvent: {contentOffset: {x: scrollX}}}],
           {useNativeDriver: false},
-        )}>
+        )}
+        onMomentumScrollEnd={handleScrollEnd}>
         {slides.map((item, index) => renderSlide({item, index}))}
       </Animated.ScrollView>
 
@@ -243,8 +267,8 @@ const styles = StyleSheet.create({
     paddingTop: height * 0.02, // 위쪽 여백을 줄이기 위해 수정
   },
   mainText: {
-    marginTop: height * 0.05,
-    fontSize: 28,
+    marginTop: height * 0.08,
+    fontSize: 30,
     lineHeight: 31,
     color: '#FFFFFF',
     textShadowColor: 'rgba(0, 0, 0, 0.4)',
