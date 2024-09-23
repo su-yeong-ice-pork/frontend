@@ -4,9 +4,11 @@ import {
   Text,
   Image,
   StyleSheet,
-  Dimensions,
   Animated,
   TouchableOpacity,
+  ScrollView,
+  Dimensions,
+  TextInput,
 } from 'react-native';
 import LinearGradient from 'react-native-linear-gradient';
 
@@ -14,28 +16,20 @@ const IMAGES = {
   blueGrass:
     'https://image-resource.creatie.ai/137927998611751/137927998611753/35fcb8e3152553006e3d0339a4456494.png',
   slide1Image: require('../../assets/images/illustration/intro.png'),
-  rectangle53x1:
-    'https://image-resource.creatie.ai/137927998611751/137927998611753/b81f376c20ff49c357f4b45953dfdd74.png',
   slide2Image: require('../../assets/images/illustration/introTwo.png'),
-  rectangle63x1:
-    'https://image-resource.creatie.ai/137927998611751/137927998611753/a8f0e1025308ecab34789ac809ac18b1.png',
-  rectangle83x1:
-    'https://image-resource.creatie.ai/137927998611751/137927998611753/09caefc30e12368050d9cbe39a5e5986.png',
-  rectangle73x1:
-    'https://image-resource.creatie.ai/137927998611751/137927998611753/1bcbb9376e44033d25d027cb0985f209.png',
-
   slide3Image: require('../../assets/images/illustration/introThree.png'),
   slide4Image: require('../../assets/images/illustration/introFour.png'),
 };
 
 const {width, height} = Dimensions.get('window');
 
-const LandingScreen = ({navigation}: any) => {
+const LandingScreen = ({navigation}) => {
   const scrollX = useRef(new Animated.Value(0)).current;
-  const scrollViewRef = useRef<Animated.ScrollView>(null);
+  const scrollViewRef = useRef(null);
   const [currentIndex, setCurrentIndex] = useState(0);
+  const [showLoginForm, setShowLoginForm] = useState(false);
+  const [isAutoLogin, setIsAutoLogin] = useState(false); // 자동 로그인 상태
 
-  // 슬라이드 데이터 배열
   const slides = [
     {
       key: 'slide1',
@@ -49,8 +43,7 @@ const LandingScreen = ({navigation}: any) => {
         '매일 도서관에 출석할 때마다\n성장하는 나만의 잔디밭을 완성해 보세요!',
       additionalElements: (
         <>
-          {/* 슬라이드 1 이미지 */}
-          <Image source={IMAGES.slide1Image} style={styles.slide1Image} />
+          <Image source={IMAGES.slide1Image} style={styles.slideImage} />
         </>
       ),
     },
@@ -66,9 +59,7 @@ const LandingScreen = ({navigation}: any) => {
         '위치 인증과 스터디원들의 상호 인증으로,\n재미있고 꾸준한 도서관 생활을 만들어가요!',
       additionalElements: (
         <>
-          <View style={styles.slide2ImageContainer}>
-            <Image source={IMAGES.slide2Image} style={styles.slide2Image} />
-          </View>
+          <Image source={IMAGES.slide2Image} style={styles.slideImage} />
         </>
       ),
     },
@@ -86,8 +77,7 @@ const LandingScreen = ({navigation}: any) => {
         '도서관 출석으로 나만의 티어를 쌓고,\n목표를 향한 여정을 재미있게 꾸며보세요!',
       additionalElements: (
         <>
-          {/* 슬라이드 3 이미지 */}
-          <Image source={IMAGES.slide3Image} style={styles.slide3Image} />
+          <Image source={IMAGES.slide3Image} style={styles.slideImage} />
         </>
       ),
     },
@@ -103,43 +93,39 @@ const LandingScreen = ({navigation}: any) => {
         '하루하루 쌓이는 잔디와 함께 도서관에서\n목표를 이루는 나를 만나세요!',
       additionalElements: (
         <>
-          {/* 슬라이드 4 이미지 */}
-          <Image source={IMAGES.slide4Image} style={styles.slide4Image} />
+          <Image source={IMAGES.slide4Image} style={styles.slideImage} />
         </>
       ),
     },
   ];
 
-  // 슬라이드 렌더링 함수
-  const renderSlide = ({item, index}: any) => (
+  const renderSlide = ({item, index}) => (
     <View style={styles.slide} key={index}>
-      {/* 메인 텍스트 */}
       <Text style={styles.mainText}>{item.mainText}</Text>
-      {/* 서브 텍스트 */}
       <Text style={styles.subText}>{item.subText}</Text>
-      {/* 이미지 */}
       {item.additionalElements}
     </View>
   );
 
-  // 자동 슬라이드 효과
   useEffect(() => {
     const interval = setInterval(() => {
       let nextIndex = currentIndex + 1;
       if (nextIndex >= slides.length) {
-        nextIndex = 0; // 마지막 슬라이드 다음에 첫 번째 슬라이드로 돌아감
+        nextIndex = 0;
       }
       setCurrentIndex(nextIndex);
-      scrollViewRef.current?.scrollTo({x: nextIndex * width, animated: true});
-    }, 3000); // 3초마다 슬라이드 전환
+      scrollViewRef.current?.scrollTo({
+        x: nextIndex * Dimensions.get('window').width,
+        animated: true,
+      });
+    }, 3000);
 
-    return () => clearInterval(interval); // 컴포넌트 언마운트 시 타이머 정리
+    return () => clearInterval(interval);
   }, [currentIndex, slides.length]);
 
-  // 스크롤이 끝났을 때 현재 인덱스 업데이트
-  const handleScrollEnd = (e: any) => {
+  const handleScrollEnd = e => {
     const contentOffset = e.nativeEvent.contentOffset.x;
-    const index = Math.round(contentOffset / width);
+    const index = Math.round(contentOffset / Dimensions.get('window').width);
     setCurrentIndex(index);
   };
 
@@ -149,19 +135,7 @@ const LandingScreen = ({navigation}: any) => {
       start={{x: 0, y: 0}}
       end={{x: 0, y: 1}}
       style={styles.container}>
-      {/* 절대 위치 요소들 */}
-      <View style={styles.absoluteContainer}>
-        {/* 상단 블루 그래스 이미지 */}
-        <Image source={{uri: IMAGES.blueGrass}} style={styles.blueGrass} />
-        {/* 투명한 회전 사각형들 */}
-        <View style={styles.rectangle4443} />
-        <View style={styles.rectangle4442} />
-        {/* 하단 블루 그래스 이미지 */}
-        <Image source={{uri: IMAGES.blueGrass}} style={styles.blueGrass1} />
-      </View>
-
-      {/* 캐러셀 */}
-      <Animated.ScrollView
+      <ScrollView
         ref={scrollViewRef}
         horizontal
         pagingEnabled
@@ -174,13 +148,16 @@ const LandingScreen = ({navigation}: any) => {
         )}
         onMomentumScrollEnd={handleScrollEnd}>
         {slides.map((item, index) => renderSlide({item, index}))}
-      </Animated.ScrollView>
+      </ScrollView>
 
-      {/* 페이지네이션 */}
       <View style={styles.paginationContainer}>
         {slides.map((_, i) => {
           let opacity = scrollX.interpolate({
-            inputRange: [(i - 1) * width, i * width, (i + 1) * width],
+            inputRange: [
+              (i - 1) * Dimensions.get('window').width,
+              i * Dimensions.get('window').width,
+              (i + 1) * Dimensions.get('window').width,
+            ],
             outputRange: [0.3, 1, 0.3],
             extrapolate: 'clamp',
           });
@@ -188,24 +165,83 @@ const LandingScreen = ({navigation}: any) => {
         })}
       </View>
 
-      {/* 버튼들 */}
-      <View style={styles.buttonsContainer}>
-        <TouchableOpacity
-          style={styles.rectangle4380}
-          onPress={() => navigation.navigate('SignUp')}>
-          <Text style={styles.signUpText}>회원가입</Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.rectangle4381}>
-          <Text style={styles.loginText}>기존 계정으로 로그인하기</Text>
-        </TouchableOpacity>
-      </View>
+      {!showLoginForm && (
+        // 로그인 폼이 보이지 않을 때만 버튼들을 렌더링합니다.
+        <>
+          <View style={styles.buttonsContainer}>
+            <TouchableOpacity
+              style={styles.rectangle4380}
+              onPress={() => navigation.navigate('SignUp')}>
+              <Text style={styles.signUpText}>회원가입</Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={styles.rectangle4381}
+              onPress={() => setShowLoginForm(true)}>
+              <Text style={styles.loginText}>기존 계정으로 로그인하기</Text>
+            </TouchableOpacity>
+          </View>
 
-      {/* 하단 텍스트 */}
-      <Text style={styles.footerText} numberOfLines={1} adjustsFontSizeToFit>
-        계정 생성 시 잔디의{' '}
-        <Text style={styles.underline}>개인정보 처리방침</Text> 및{' '}
-        <Text style={styles.underline}>이용약관</Text>에 동의하게 됩니다.
-      </Text>
+          <Text
+            style={styles.footerText}
+            numberOfLines={1}
+            adjustsFontSizeToFit>
+            계정 생성 시 잔디의{' '}
+            <Text style={styles.underline}>개인정보 처리방침</Text> 및{' '}
+            <Text style={styles.underline}>이용약관</Text>에 동의하게 됩니다.
+          </Text>
+        </>
+      )}
+
+      {showLoginForm && (
+        // 로그인 폼이 보일 때 해당 컴포넌트를 렌더링합니다.
+        <View style={styles.loginFormContainer}>
+          <View style={styles.inputContainer}>
+            <Text style={styles.inputLabel}>아이디</Text>
+            <TextInput
+              style={styles.input}
+              placeholder="아이디를 입력해주세요."
+              placeholderTextColor="#B9B9B9"
+            />
+            <TouchableOpacity style={styles.findTextContainer}>
+              <Text style={styles.findText}>아이디 찾기</Text>
+            </TouchableOpacity>
+          </View>
+          <View style={styles.inputContainer}>
+            <Text style={styles.inputLabel}>비밀번호</Text>
+            <TextInput
+              style={styles.input}
+              placeholder="비밀번호를 입력해주세요."
+              placeholderTextColor="#B9B9B9"
+              secureTextEntry
+            />
+            <TouchableOpacity style={styles.findTextContainer}>
+              <Text style={styles.findText}>비밀번호 찾기</Text>
+            </TouchableOpacity>
+
+            {/* 자동 로그인 체크박스와 텍스트를 비밀번호 입력 필드의 좌측 하단에 배치 */}
+            <View style={styles.autoLoginContainer}>
+              <TouchableOpacity
+                style={styles.customCheckboxContainer}
+                onPress={() => setIsAutoLogin(!isAutoLogin)}>
+                <View
+                  style={[
+                    styles.customCheckbox,
+                    isAutoLogin && styles.customCheckboxChecked,
+                  ]}>
+                  {isAutoLogin && <Text style={styles.checkmark}>✓</Text>}
+                </View>
+              </TouchableOpacity>
+              <TouchableOpacity onPress={() => setIsAutoLogin(!isAutoLogin)}>
+                <Text style={styles.optionText}>자동 로그인</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+
+          <TouchableOpacity style={styles.loginButton}>
+            <Text style={styles.loginButtonText}>잔디 심기</Text>
+          </TouchableOpacity>
+        </View>
+      )}
     </LinearGradient>
   );
 };
@@ -216,184 +252,50 @@ const styles = StyleSheet.create({
   container: {
     width: width,
     height: height,
-  },
-  absoluteContainer: {
-    ...StyleSheet.absoluteFillObject,
-  },
-  blueGrass: {
-    position: 'absolute',
-    top: height * 0.0972,
-    left: width * 0.8355,
-    width: width * (1 - 0.8355 + 0.2011),
-    height: height * (1 - 0.0972 - 0.8103),
-    transform: [{rotate: '18.56deg'}],
-    resizeMode: 'contain',
-    opacity: 0.5,
-  },
-  rectangle4443: {
-    position: 'absolute',
-    top: -height * 0.0083,
-    left: width * 0.0279,
-    width: width * (1 - 0.0279 - 0.6131),
-    height: height * (1 + 0.0083 - 0.8424),
-    transform: [{rotate: '20.44deg'}],
-    borderRadius: 13,
-    backgroundColor: 'rgba(255, 255, 255, 0.21)',
-  },
-  rectangle4442: {
-    position: 'absolute',
-    top: height * 0.2725,
-    left: width * 0.851,
-    width: width * (1 - 0.851 + 0.21),
-    height: height * (1 - 0.2725 - 0.5616),
-    transform: [{rotate: '20.44deg'}],
-    borderRadius: 13,
-    backgroundColor: 'rgba(255, 255, 255, 0.09)',
-  },
-  blueGrass1: {
-    position: 'absolute',
-    top: height * 0.4471,
-    left: width * 0.6308,
-    width: width * (1 - 0.6308 + 0.141),
-    height: height * (1 - 0.4471 - 0.4237),
-    transform: [{rotate: '-17.36deg'}],
-    resizeMode: 'contain',
-    opacity: 0.5,
+    flex: 1,
+    justifyContent: 'flex-start',
+    paddingHorizontal: 10,
   },
   slide: {
     width: width,
-    alignItems: 'center',
-    paddingHorizontal: width * 0.1,
-    paddingTop: height * 0.02, // 위쪽 여백을 줄이기 위해 수정
+    justifyContent: 'center',
+    paddingTop: 0,
+    marginBottom: 0,
   },
   mainText: {
-    marginTop: height * 0.08,
-    fontSize: 30,
-    lineHeight: 31,
+    fontSize: 28,
     color: '#FFFFFF',
-    textShadowColor: 'rgba(0, 0, 0, 0.4)',
-    textShadowOffset: {width: 0, height: 1},
-    textShadowRadius: 2.5,
     fontFamily: 'NanumSquareNeo-dEb',
-    letterSpacing: 1,
     textAlign: 'left',
+    paddingHorizontal: 20,
+    alignSelf: 'flex-start',
+  },
+  subText: {
+    fontSize: 16,
+    color: '#378260',
+    fontFamily: 'NanumSquareNeo-cBd',
+    textAlign: 'left',
+    paddingHorizontal: 20,
+    marginTop: 10,
     alignSelf: 'flex-start',
   },
   highlight: {
     color: '#00470D',
   },
-  subText: {
-    marginTop: height * 0.015,
-    fontSize: 14,
-    lineHeight: 18,
-    color: '#378260',
-    fontFamily: 'NanumSquareNeo-cBd',
-    letterSpacing: 0.5,
-    textAlign: 'left',
-    alignSelf: 'flex-start',
-  },
-  // 슬라이드별 이미지 스타일
-  slide1Image: {
-    marginTop: height * 0.03,
-    width: width * 0.9, // 너비 증가
-    height: height * 0.4, // 높이 증가
+  slideImage: {
+    width: '90%',
+    height: '35%',
     resizeMode: 'contain',
-    shadowColor: '#000',
-    shadowOffset: {width: 0, height: 4},
-    shadowOpacity: 0.25,
-    shadowRadius: 4,
-    elevation: 4,
-  },
-  slide3Image: {
-    marginTop: height * 0.03,
-    width: width * 0.9, // 너비 증가
-    height: height * 0.4, // 높이 증가
-    resizeMode: 'contain',
-    shadowColor: '#000',
-    shadowOffset: {width: 0, height: 4},
-    shadowOpacity: 0.25,
-    shadowRadius: 4,
-    elevation: 4,
-  },
-  slide4Image: {
-    marginTop: height * 0.03,
-    width: width * 0.85, // 너비 증가
-    height: height * 0.4, // 높이 증가
-    resizeMode: 'contain',
-    shadowColor: '#000',
-    shadowOffset: {width: 6, height: 4},
-    shadowOpacity: 0.13,
-    shadowRadius: 5.9,
-    elevation: 4,
-  },
-  slide2ImageContainer: {
-    marginTop: height * 0.03,
-    width: width * 0.9, // 너비 증가
-    height: height * 0.45, // 높이 증가
-    position: 'relative',
-  },
-  slide2Image: {
-    marginTop: height * 0.03,
-    width: width * 0.9, // 너비 증가
-    height: height * 0.4, // 높이 증가
-    resizeMode: 'contain',
-    shadowColor: '#000',
-    shadowOffset: {width: 0, height: 4},
-    shadowOpacity: 0.25,
-    shadowRadius: 4,
-    elevation: 4,
-  },
-  rectangle103x1: {
-    position: 'absolute',
-    top: height * 0.03,
-    left: width * 0.55,
-    width: width * 0.2,
-    height: height * 0.12,
-    transform: [{rotate: '19.58deg'}],
-    resizeMode: 'cover',
-    shadowColor: '#000',
-    shadowOffset: {width: 1, height: 2},
-    shadowOpacity: 0.25,
-    shadowRadius: 2,
-    elevation: 2,
-  },
-  rectangle83x1: {
-    position: 'absolute',
-    top: 0,
-    left: width * 0.6,
-    width: width * 0.1,
-    height: height * 0.06,
-    transform: [{rotate: '27.15deg'}],
-    resizeMode: 'cover',
-  },
-  rectangle73x1: {
-    position: 'absolute',
-    top: height * 0.04,
-    left: width * 0.45,
-    width: width * 0.1,
-    height: height * 0.06,
-    transform: [{rotate: '-7.73deg'}],
-    resizeMode: 'cover',
-  },
-  rectangle53x1: {
-    position: 'absolute',
-    top: height * 0.15,
-    left: width * 0.3,
-    width: width * 0.25,
-    height: height * 0.18,
-    transform: [{rotate: '-13.02deg'}],
-    resizeMode: 'cover',
-    shadowColor: '#000',
-    shadowOffset: {width: 3, height: 4},
-    shadowOpacity: 0.21,
-    shadowRadius: 7.1,
-    elevation: 4,
+    marginTop: 10,
+    marginBottom: 0,
+    alignSelf: 'center',
   },
   paginationContainer: {
-    position: 'absolute',
-    bottom: height * 0.25, // 페이지네이션 위치 조정
     flexDirection: 'row',
-    alignSelf: 'center',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginTop: 0,
+    marginBottom: 10,
   },
   dot: {
     width: 10,
@@ -403,57 +305,140 @@ const styles = StyleSheet.create({
     marginHorizontal: 5,
   },
   buttonsContainer: {
-    position: 'absolute',
-    bottom: height * 0.08,
-    width: '100%',
+    justifyContent: 'center',
     alignItems: 'center',
+    marginBottom: 30,
   },
   rectangle4380: {
     backgroundColor: '#FFFFFF',
     borderRadius: 32,
     alignItems: 'center',
     justifyContent: 'center',
-    height: height * 0.06,
-    width: width * 0.8,
-    marginBottom: height * 0.02,
+    height: 50,
+    width: 250,
+    marginTop: 20,
+    marginBottom: 20,
   },
   rectangle4381: {
     backgroundColor: '#009499',
     borderRadius: 32,
     alignItems: 'center',
     justifyContent: 'center',
-    height: height * 0.06,
-    width: width * 0.8,
+    height: 50,
+    width: 250,
   },
   signUpText: {
     fontSize: 16,
     color: '#014939',
-    fontFamily: 'NanumSquareNeo-dEb',
-    letterSpacing: 1,
   },
   loginText: {
     fontSize: 16,
     color: '#FFFFFF',
-    fontFamily: 'NanumSquareNeo-dEb',
-    letterSpacing: 1,
   },
   footerText: {
-    position: 'absolute',
-    bottom: height * 0.02,
-    fontSize: 10,
+    fontSize: 12,
     color: '#888888',
-    fontFamily: 'NanumSquareNeo-dEb',
-    fontWeight: '500',
     textAlign: 'center',
-    marginHorizontal: width * 0.05,
-    lineHeight: 18,
-    letterSpacing: 1,
+    paddingHorizontal: 20,
+    marginBottom: 10,
   },
   underline: {
     textDecorationLine: 'underline',
   },
-  text: {
+  loginFormContainer: {
+    width: '100%',
+    alignItems: 'center',
+    paddingHorizontal: 20,
+    marginTop: 10,
+    marginBottom: 10,
+  },
+  inputContainer: {
+    width: '100%',
+    marginBottom: 20, // 아래 여백 추가
+  },
+  inputLabel: {
+    color: '#454545',
+    fontFamily: 'NanumSquareNeo-eHv',
+    fontSize: 13,
+    lineHeight: 40,
+    letterSpacing: 3,
+  },
+  input: {
+    width: '100%',
+    height: 50,
+    borderRadius: 6,
+    backgroundColor: '#F4F4F4',
+    paddingHorizontal: 10,
+    fontSize: 12,
+    fontFamily: 'NanumSquareNeo-cBd',
+    letterSpacing: 3,
+    color: '#000000',
+  },
+  findTextContainer: {
+    position: 'absolute',
+    bottom: -15, // 입력 필드 바로 아래에 위치하도록 조정
+    right: 0,
+  },
+  findText: {
+    color: '#5D5D5D',
+    fontFamily: 'NanumSquareNeo-eHv',
+    fontSize: 9,
+    textDecorationLine: 'underline',
+    letterSpacing: 3,
+  },
+  // 자동 로그인 컨테이너
+  autoLoginContainer: {
+    position: 'absolute',
+    bottom: -20, // 입력 필드 바로 아래에 위치하도록 조정
+    left: 0, // 좌측에 위치
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  customCheckboxContainer: {
+    width: 16,
+    height: 16,
+    borderWidth: 1,
+    borderColor: '#5D5D5D',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginRight: 5,
+    backgroundColor: '#FFFFFF', // 기본 흰색 배경
+    borderRadius: 2, // 약간의 둥글게
+  },
+  customCheckbox: {
+    width: 12,
+    height: 12,
+    backgroundColor: 'transparent',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  customCheckboxChecked: {
+    backgroundColor: '#009499', // 체크되었을 때 색상
+  },
+  checkmark: {
+    color: '#FFFFFF',
+    fontSize: 10,
+    fontWeight: 'bold',
+  },
+  optionText: {
+    color: '#5D5D5D',
     fontFamily: 'NanumSquareNeo-dEb',
-    fontSize: 16,
+    fontSize: 11,
+    letterSpacing: 3,
+  },
+  loginButton: {
+    marginTop: 20,
+    width: '60%',
+    height: 50,
+    borderRadius: 23.5,
+    backgroundColor: '#009499',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  loginButtonText: {
+    color: '#FFFFFF',
+    fontFamily: 'NanumSquareNeo-eHv',
+    fontSize: 18,
+    letterSpacing: 3,
   },
 });
