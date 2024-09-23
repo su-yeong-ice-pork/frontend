@@ -5,7 +5,6 @@ import {
   StyleSheet,
   Image,
   ScrollView,
-  TouchableOpacity,
   Dimensions,
 } from 'react-native';
 import StudyList from '../components/StudyList';
