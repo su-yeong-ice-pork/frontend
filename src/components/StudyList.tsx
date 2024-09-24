@@ -1,4 +1,3 @@
-//src/components/StudyList.tsx
 import React from 'react';
 import {View, StyleSheet, Dimensions} from 'react-native';
 import StudyItem from './StudyItem';
@@ -9,7 +8,9 @@ const studyData = [
   {name: '디자인 동아리', totalStudyTime: 35, memberCount: 4},
   {name: 'CPA 메이트', totalStudyTime: 64, memberCount: 12},
 ];
+
 const {width} = Dimensions.get('window');
+
 const StudyList = () => {
   return (
     <View style={styles.container}>
@@ -27,13 +28,13 @@ export default StudyList;
 
 const styles = StyleSheet.create({
   container: {
-    width: width, // 약 90% 너비
-    backgroundColor: '#ffff', // bg-neutral-100
+    width: width,
+    backgroundColor: '#ffff',
     alignItems: 'center',
   },
   separator: {
     height: 1,
     width: '100%',
-    backgroundColor: '#d1d5db', // border-zinc-300
+    backgroundColor: '#d1d5db',
   },
 });
