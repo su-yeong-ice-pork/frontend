@@ -1,3 +1,4 @@
+import {useNavigation} from '@react-navigation/native';
 import React from 'react';
 import {
   View,
@@ -23,8 +24,8 @@ const StudyItem: React.FC<StudyItemProps> = ({
   name,
   totalStudyTime,
   memberCount,
-  onPress,
 }) => {
+  const navigation = useNavigation();
   const onLeaveStudy = () => {
     // 스터디에서 나가기 로직을 여기에 추가 (추후 axios 연결 예정)
     console.log(`Leaving study: ${name}`);
@@ -52,7 +53,9 @@ const StudyItem: React.FC<StudyItemProps> = ({
       overshootLeft={false}
       friction={2}>
       <View style={styles.container}>
-        <TouchableOpacity onPress={onPress} activeOpacity={0.7}>
+        <TouchableOpacity
+          onPress={() => navigation.navigate('StudyDetail')}
+          activeOpacity={0.7}>
           {/* 스터디 이름 및 멤버 수 */}
           <View style={styles.studyInfoContainer}>
             <View style={styles.studyNameContainer}>
