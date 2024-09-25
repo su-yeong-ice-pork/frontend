@@ -87,7 +87,7 @@ const CalendarScreen = () => {
       ) : (
         <View style={styles.yearlyView}>
           {/* 연간 잔디밭 구현 */}
-          <Text style={styles.yearlyTitle}>연간 잔디밭</Text>
+          <Text style={styles.yearlyTitle}>연간 ~잔디밭</Text>
          
 
 
