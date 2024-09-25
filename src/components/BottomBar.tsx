@@ -20,7 +20,7 @@ const BottomBar = () => {
 
   const images = {
     note:
-      currentScreen === 'Note'
+      currentScreen === 'Log'
         ? require('../../assets/images/icons/noteOn.png')
         : require('../../assets/images/icons/note.png'),
     study:
@@ -53,9 +53,9 @@ const BottomBar = () => {
     <View style={styles.container}>
       <TouchableOpacity
         style={styles.iconContainer}
-        onPress={() => navigateTo('Note')}>
+        onPress={() => navigateTo('Log')}>
         <Image source={images.note} style={styles.icon} />
-        <Text style={getLabelStyle('Note')}>기록장</Text>
+        <Text style={getLabelStyle('Log')}>기록장</Text>
       </TouchableOpacity>
       <TouchableOpacity
         style={styles.iconContainer}

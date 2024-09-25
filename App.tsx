@@ -8,6 +8,7 @@ import StudyScreen from './src/screens/StudyScreen';
 import StudyDetailScreen from './src/screens/StudyDetailScreen';
 import AlarmScreen from './src/screens/AlarmScreen';
 import HomeScreen from './src/screens/HomeScreen';
+import StudyRecordScreen from './src/screens/StudyRecordScreen';
 
 const Stack = createStackNavigator();
 
@@ -23,6 +24,7 @@ const App = () => {
         <Stack.Screen name="StudyDetail" component={StudyDetailScreen} />
         <Stack.Screen name="Alarm" component={AlarmScreen} />
         <Stack.Screen name="Home" component={HomeScreen} />
+        <Stack.Screen name="Log" component={StudyRecordScreen} />
       </Stack.Navigator>
     </NavigationContainer>
   );
