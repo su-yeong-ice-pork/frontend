@@ -195,8 +195,11 @@ const LandingScreen = ({navigation}: any) => {
           onPress={() => navigation.navigate('SignUp')}>
           <Text style={styles.signUpText}>회원가입</Text>
         </TouchableOpacity>
-        <TouchableOpacity style={styles.rectangle4381}>
+        <TouchableOpacity style={styles.rectangle4381}
+         onPress={() => navigation.navigate('Home')}>
+        
           <Text style={styles.loginText}>기존 계정으로 로그인하기</Text>
+          
         </TouchableOpacity>
       </View>
 
