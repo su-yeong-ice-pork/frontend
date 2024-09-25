@@ -7,6 +7,7 @@ import {
   Image,
   StyleSheet,
   ScrollView,
+  SafeAreaView,
 } from 'react-native';
 import {Calendar, DateData, LocaleConfig} from 'react-native-calendars';
 const {width, height} = Dimensions.get('window');
@@ -25,84 +26,90 @@ const HomeScreen = () => {
   };
   return (
     <>
-      <ScrollView style={styles.container}>
-        {/* 상단 프로필 영역 */}
+      <SafeAreaView style={{flex: 1}}>
+        <ScrollView
+          style={styles.container}
+          contentContainerStyle={{paddingBottom: 80}}>
+          {/* 상단 프로필 영역 */}
 
-        <View style={styles.logoSection}>
-          <View style={styles.logoInfo}>
-            <Image source={IMAGES.logo} style={styles.logoImage} />
-          </View>
-        </View>
-
-        <View style={styles.upperSection}>
-          <View style={styles.profileInfo}>
-            <Image
-              source={IMAGES.profile} // 프로필 이미지 URL 대체 가능
-              style={styles.profileImage}
-            />
-          </View>
-        </View>
-
-        <View style={styles.profileTextContainer}>
-          <Text style={styles.nickname}>새도의 신</Text>
-          <Text style={styles.username}>이은솔</Text>
-          <View style={styles.badgeContainer}>
-            <Text style={styles.badgeText}>보유 뱃지</Text>
-            <Image source={IMAGES.badge1} style={styles.badge} />
-            <Image source={IMAGES.badge2} style={styles.badge} />
-            <Image source={IMAGES.badge3} style={styles.badge} />
+          <View style={styles.logoSection}>
+            <View style={styles.logoInfo}>
+              <Image source={IMAGES.logo} style={styles.logoImage} />
+            </View>
           </View>
 
-          <TouchableOpacity style={styles.moreButton}>
-            <Text style={styles.moreText}>...</Text>
-          </TouchableOpacity>
-        </View>
+          <View style={styles.upperSection}>
+            <View style={styles.profileInfo}>
+              <Image
+                source={IMAGES.profile} // 프로필 이미지 URL 대체 가능
+                style={styles.profileImage}
+              />
+            </View>
+          </View>
 
-        {/* 인증하기 버튼들 */}
-        <View style={styles.buttonSection}>
-          <TouchableOpacity style={styles.certifyButton}>
-            <Text style={styles.buttonText}>혼자 인증하기</Text>
-            <Image source={IMAGES.self} style={styles.buttons} />
-          </TouchableOpacity>
+          <View style={styles.profileTextContainer}>
+            <Text style={styles.nickname}>새도의 신</Text>
+            <Text style={styles.username}>이은솔</Text>
+            <View style={styles.badgeContainer}>
+              <Text style={styles.badgeText}>보유 뱃지</Text>
+              <Image source={IMAGES.badge1} style={styles.badge} />
+              <Image source={IMAGES.badge2} style={styles.badge} />
+              <Image source={IMAGES.badge3} style={styles.badge} />
+            </View>
 
-          <TouchableOpacity style={styles.certifyButton2}>
-            <Text style={styles.buttonText}>함께 인증하기</Text>
-            <Image source={IMAGES.together} style={styles.buttons} />
-          </TouchableOpacity>
-        </View>
-
-        {/* 보유 콘텐츠 및 현재 일수 */}
-        <View style={styles.frozenSection}>
-          <Text style={styles.frozenTitle}>보유 프리즈</Text>
-          <View style={styles.frozenDetailContainer}>
-            <Text style={styles.frozenDetailText}>
-              현재 총 <Text style={styles.frozenCount}>12</Text> 개의 프리즈를
-              보유하고 있습니다.
-            </Text>
-            <TouchableOpacity style={styles.useFrozenButton}>
-              <View style={styles.frozenText}>
-                <Image source={IMAGES.freeze} style={styles.freeze} />
-                <Text style={styles.useFrozenButtonText}>프리즈 사용하기</Text>
-              </View>
+            <TouchableOpacity style={styles.moreButton}>
+              <Text style={styles.moreText}>...</Text>
             </TouchableOpacity>
           </View>
-          <Text style={styles.frozenNote}>
-            ※ 프리즈는 잔다를 대신 채워줄 수 있는 잔디 채우기권입니다!
-          </Text>
-        </View>
-        {/* 현재 일수 표시 */}
-        <View style={styles.currentDaySection}>
-          <Text style={styles.currentDayText}>
-            현재<Text style={styles.dayCount}> 43</Text>일 째!
-          </Text>
-        </View>
 
-        {/* 달력 부분 */}
-        <View style={styles.calendarContainer}>
-          <CalendarScreen />
-        </View>
-      </ScrollView>
-      <BottomBar />
+          {/* 인증하기 버튼들 */}
+          <View style={styles.buttonSection}>
+            <TouchableOpacity style={styles.certifyButton}>
+              <Text style={styles.buttonText}>혼자 인증하기</Text>
+              <Image source={IMAGES.self} style={styles.buttons} />
+            </TouchableOpacity>
+
+            <TouchableOpacity style={styles.certifyButton2}>
+              <Text style={styles.buttonText}>함께 인증하기</Text>
+              <Image source={IMAGES.together} style={styles.buttons} />
+            </TouchableOpacity>
+          </View>
+
+          {/* 보유 콘텐츠 및 현재 일수 */}
+          <View style={styles.frozenSection}>
+            <Text style={styles.frozenTitle}>보유 프리즈</Text>
+            <View style={styles.frozenDetailContainer}>
+              <Text style={styles.frozenDetailText}>
+                현재 총 <Text style={styles.frozenCount}>12</Text> 개의 프리즈를
+                보유하고 있습니다.
+              </Text>
+              <TouchableOpacity style={styles.useFrozenButton}>
+                <View style={styles.frozenText}>
+                  <Image source={IMAGES.freeze} style={styles.freeze} />
+                  <Text style={styles.useFrozenButtonText}>
+                    프리즈 사용하기
+                  </Text>
+                </View>
+              </TouchableOpacity>
+            </View>
+            <Text style={styles.frozenNote}>
+              ※ 프리즈는 잔다를 대신 채워줄 수 있는 잔디 채우기권입니다!
+            </Text>
+          </View>
+          {/* 현재 일수 표시 */}
+          <View style={styles.currentDaySection}>
+            <Text style={styles.currentDayText}>
+              현재<Text style={styles.dayCount}> 43</Text>일 째!
+            </Text>
+          </View>
+
+          {/* 달력 부분 */}
+          <View style={styles.calendarContainer}>
+            <CalendarScreen />
+          </View>
+        </ScrollView>
+        <BottomBar />
+      </SafeAreaView>
     </>
   );
 };
