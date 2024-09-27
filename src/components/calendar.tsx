@@ -1,21 +1,56 @@
 // CalendarScreen.js
-import React, { useState } from 'react';
-import { View, Text, TouchableOpacity, Image, StyleSheet, Modal } from 'react-native';
-import { Calendar, LocaleConfig } from 'react-native-calendars';
+import React, {useState} from 'react';
+import {
+  View,
+  Text,
+  TouchableOpacity,
+  Image,
+  StyleSheet,
+  Modal,
+} from 'react-native';
+import {Calendar, LocaleConfig} from 'react-native-calendars';
 import YearlyCalendar from './YearCalendar';
 import moment from 'moment';
 
 // Locale 설정
 LocaleConfig.locales['kr'] = {
   monthNames: [
-    '1월', '2월', '3월', '4월', '5월', '6월',
-    '7월', '8월', '9월', '10월', '11월', '12월',
+    '1월',
+    '2월',
+    '3월',
+    '4월',
+    '5월',
+    '6월',
+    '7월',
+    '8월',
+    '9월',
+    '10월',
+    '11월',
+    '12월',
   ],
   monthNamesShort: [
-    '1월', '2월', '3월', '4월', '5월', '6월',
-    '7월', '8월', '9월', '10월', '11월', '12월',
+    '1월',
+    '2월',
+    '3월',
+    '4월',
+    '5월',
+    '6월',
+    '7월',
+    '8월',
+    '9월',
+    '10월',
+    '11월',
+    '12월',
   ],
-  dayNames: ['일요일', '월요일', '화요일', '수요일', '목요일', '금요일', '토요일'],
+  dayNames: [
+    '일요일',
+    '월요일',
+    '화요일',
+    '수요일',
+    '목요일',
+    '금요일',
+    '토요일',
+  ],
   dayNamesShort: ['일', '월', '화', '수', '목', '금', '토'],
   today: '오늘',
 };
@@ -33,12 +68,14 @@ const CalendarScreen = () => {
   const [selectedDateData, setSelectedDateData] = useState(null);
   const [modalVisible, setModalVisible] = useState(false);
   const [viewMode, setViewMode] = useState('yearly'); // 'monthly' 또는 'yearly'
-  const [displayedDate, setDisplayedDate] = useState(moment().format('YYYY-MM-DD'));
+  const [displayedDate, setDisplayedDate] = useState(
+    moment().format('YYYY-MM-DD'),
+  );
 
   const activityData = {
-    '2024-09-10': { studyTime: 2, grassScore: 5, color: '#B5DD89' },
-    '2024-09-11': { studyTime: 4, grassScore: 10, color: '#A5DC1B' },
-    '2024-09-12': { studyTime: 0, grassScore: 0 },
+    '2024-09-10': {studyTime: 2, grassScore: 5, color: '#B5DD89'},
+    '2024-09-11': {studyTime: 4, grassScore: 10, color: '#A5DC1B'},
+    '2024-09-12': {studyTime: 0, grassScore: 0},
   };
 
   const statData = [
@@ -48,7 +85,7 @@ const CalendarScreen = () => {
     },
   ];
 
-  const onDayPress = (day) => {
+  const onDayPress = day => {
     setSelectedDate(day.dateString);
     setSelectedDateData(activityData[day.dateString]);
     setModalVisible(true);
@@ -74,7 +111,7 @@ const CalendarScreen = () => {
     return markedDates;
   };
 
-  const getColorForActivity = (grassScore) => {
+  const getColorForActivity = grassScore => {
     // 잔디 점수에 따른 색상 설정
     if (grassScore === 0) return '#ebedf0'; // 연한 회색
     else if (grassScore <= 2) return '#c6e48b'; // 연한 초록
@@ -89,17 +126,21 @@ const CalendarScreen = () => {
       <View style={styles.tabContainer}>
         <TouchableOpacity
           style={[styles.tabButton, viewMode === 'monthly' && styles.activeTab]}
-          onPress={() => setViewMode('monthly')}
-        >
-          <Text style={viewMode === 'monthly' ? styles.activeTabText : styles.tabText}>
+          onPress={() => setViewMode('monthly')}>
+          <Text
+            style={
+              viewMode === 'monthly' ? styles.activeTabText : styles.tabText
+            }>
             월간 잔디밭
           </Text>
         </TouchableOpacity>
         <TouchableOpacity
           style={[styles.tabButton, viewMode === 'yearly' && styles.activeTab]}
-          onPress={() => setViewMode('yearly')}
-        >
-          <Text style={viewMode === 'yearly' ? styles.activeTabText : styles.tabText}>
+          onPress={() => setViewMode('yearly')}>
+          <Text
+            style={
+              viewMode === 'yearly' ? styles.activeTabText : styles.tabText
+            }>
             연간 잔디밭
           </Text>
         </TouchableOpacity>
@@ -113,7 +154,7 @@ const CalendarScreen = () => {
             markedDates={getMarkedDates()}
             markingType={'custom'}
             renderArrow={() => null} // 기본 화살표 숨기기
-            onMonthChange={(date) => {
+            onMonthChange={date => {
               setDisplayedDate(date.dateString);
             }}
             renderHeader={() => {
@@ -136,8 +177,7 @@ const CalendarScreen = () => {
                           .subtract(1, 'months')
                           .format('YYYY-MM-DD');
                         setDisplayedDate(newDate);
-                      }}
-                    >
+                      }}>
                       <Text style={styles.arrowText}>{'<'}</Text>
                     </TouchableOpacity>
                     <TouchableOpacity
@@ -146,8 +186,7 @@ const CalendarScreen = () => {
                           .add(1, 'months')
                           .format('YYYY-MM-DD');
                         setDisplayedDate(newDate);
-                      }}
-                    >
+                      }}>
                       <Text style={styles.arrowText}>{'>'}</Text>
                     </TouchableOpacity>
                   </View>
@@ -166,12 +205,15 @@ const CalendarScreen = () => {
             {statData.map((id, index) => (
               <View key={index}>
                 <Text style={styles.statsText}>
-                  <Image source={IMAGES.calendar} style={styles.statsCalendar} />
+                  <Image
+                    source={IMAGES.calendar}
+                    style={styles.statsCalendar}
+                  />
                   최장 <Text style={styles.highlight}>{id.day}</Text>일 유지
                 </Text>
                 <Text style={styles.statsText}>
-                  <Image source={IMAGES.studyTime} style={styles.statsTime} />
-                  총 공부시간 <Text style={styles.highlight}>{id.time}</Text>시간
+                  <Image source={IMAGES.studyTime} style={styles.statsTime} />총
+                  공부시간 <Text style={styles.highlight}>{id.time}</Text>시간
                 </Text>
               </View>
             ))}
@@ -198,8 +240,7 @@ const CalendarScreen = () => {
         visible={modalVisible}
         transparent={true}
         animationType="slide"
-        onRequestClose={() => setModalVisible(false)}
-      >
+        onRequestClose={() => setModalVisible(false)}>
         <View style={styles.modalBackground}>
           <View style={styles.modalContainer}>
             <Text style={styles.modalTitle}>{selectedDate}</Text>
@@ -211,7 +252,9 @@ const CalendarScreen = () => {
             ) : (
               <Text>데이터가 없습니다.</Text>
             )}
-            <TouchableOpacity style={styles.closeButton} onPress={() => setModalVisible(false)}>
+            <TouchableOpacity
+              style={styles.closeButton}
+              onPress={() => setModalVisible(false)}>
               <Text style={styles.closeButtonText}>닫기</Text>
             </TouchableOpacity>
           </View>

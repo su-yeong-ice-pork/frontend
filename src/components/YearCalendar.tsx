@@ -1,12 +1,11 @@
-import React, { useState, useEffect } from 'react';
-import { View, StyleSheet, ScrollView, Text } from 'react-native';
+import React, {useState, useEffect} from 'react';
+import {View, StyleSheet, ScrollView, Text} from 'react-native';
 
 // 컨트리뷰션 데이터
 const contributions = [
   {
     date: '2023-10-01',
     count: 5,
-   
   },
   {
     date: '2023-10-02',
@@ -21,16 +20,22 @@ const YearlyCalendar = () => {
 
   // 시작 날짜 설정 (예: 저번 주 금요일)
   const START_DATE = new Date();
-  START_DATE.setDate(START_DATE.getDate() - ((START_DATE.getDay() + 2) % 7 + 1)); // 저번 주 금요일
+  START_DATE.setDate(
+    START_DATE.getDate() - (((START_DATE.getDay() + 2) % 7) + 1),
+  ); // 저번 주 금요일
   START_DATE.setHours(0, 0, 0, 0); // 시간 초기화
 
   useEffect(() => {
     const generateDates = () => {
       const today = new Date();
       today.setHours(0, 0, 0, 0); // 시간 초기화
-      const endDate = new Date(today.getFullYear(), today.getMonth(), today.getDate());
+      const endDate = new Date(
+        today.getFullYear(),
+        today.getMonth(),
+        today.getDate(),
+      );
       const startDate = new Date(endDate);
-      startDate.setDate(startDate.getDate() - (52 * 7)); // 52주 전으로 이동
+      startDate.setDate(startDate.getDate() - 52 * 7); // 52주 전으로 이동
 
       // 시작 날짜를 가장 가까운 일요일로 조정
       startDate.setDate(startDate.getDate() - startDate.getDay());
@@ -54,11 +59,11 @@ const YearlyCalendar = () => {
           // 매월 첫째 날에 월 레이블 추가
           if (
             dateCopy.getDate() === 1 &&
-            monthsMap.every((m) => m.month !== dateCopy.getMonth())
+            monthsMap.every(m => m.month !== dateCopy.getMonth())
           ) {
             monthsMap.push({
               index: weeksArray.length,
-              month: dateCopy.toLocaleString('ko-KR', { month: 'short' }),
+              month: dateCopy.toLocaleString('ko-KR', {month: 'short'}),
             });
           }
 
@@ -77,17 +82,17 @@ const YearlyCalendar = () => {
     generateDates();
   }, []);
 
-  const isDateAfterStartDate = (date) => {
+  const isDateAfterStartDate = date => {
     return date >= START_DATE;
   };
 
-  const getColorForDate = (date) => {
+  const getColorForDate = date => {
     if (!isDateAfterStartDate(date)) {
       return '#ebedf0'; // 시작 날짜 이전은 기본 색상
     }
 
     const dateString = date.toISOString().split('T')[0];
-    const contribution = contributions.find((c) => c.date === dateString);
+    const contribution = contributions.find(c => c.date === dateString);
 
     const count = contribution ? contribution.count : 0;
 
@@ -102,7 +107,9 @@ const YearlyCalendar = () => {
   const renderDayLabels = () => (
     <View style={styles.dayLabelsContainer}>
       {dayLabels.map((day, index) => (
-        <Text key={index} style={[styles.dayLabelText, { marginTop: index === 0 ? 15 : 0 }]}>
+        <Text
+          key={index}
+          style={[styles.dayLabelText, {marginTop: index === 0 ? 15 : 0}]}>
           {day}
         </Text>
       ))}
@@ -117,10 +124,11 @@ const YearlyCalendar = () => {
           style={[
             styles.monthLabelText,
             {
-              left: month.index * (styles.dayBox.width + styles.dayBox.margin * 2) + 30,
+              left:
+                month.index * (styles.dayBox.width + styles.dayBox.margin * 2) +
+                30,
             },
-          ]}
-        >
+          ]}>
           {month.month}
         </Text>
       ))}
@@ -131,7 +139,7 @@ const YearlyCalendar = () => {
     <ScrollView horizontal>
       <View style={styles.container}>
         {renderMonthLabels()}
-        <View style={{ flexDirection: 'row' }}>
+        <View style={{flexDirection: 'row'}}>
           {renderDayLabels()}
           <View style={styles.calendarContainer}>
             {weeks.map((week, weekIndex) => (
@@ -162,7 +170,6 @@ const styles = StyleSheet.create({
     paddingLeft: 30,
   },
   calendarContainer: {
-    
     backgroundColor: '#F5F5F5',
     flexDirection: 'row',
   },
@@ -177,8 +184,7 @@ const styles = StyleSheet.create({
   },
   dayLabelsContainer: {
     marginRight: 5,
-    marginTop:-15
-
+    marginTop: -15,
   },
   dayLabelText: {
     fontSize: 10,

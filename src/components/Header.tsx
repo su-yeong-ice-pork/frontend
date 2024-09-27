@@ -11,7 +11,7 @@ import {
 
 const {width, height} = Dimensions.get('window');
 
-const Header = ({Title}) => {
+const Header = ({Title}: any) => {
   const navigation = useNavigation();
   return (
     <View style={styles.headerContainer}>
