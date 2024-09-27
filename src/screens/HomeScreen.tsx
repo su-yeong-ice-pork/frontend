@@ -9,6 +9,7 @@ import {
   ScrollView,
   SafeAreaView,
 } from 'react-native';
+import BottomBar from '../components/BottomBar';
 import {Calendar, DateData, LocaleConfig} from 'react-native-calendars';
 const {width, height} = Dimensions.get('window');
 import CalendarScreen from '../components/calendar';

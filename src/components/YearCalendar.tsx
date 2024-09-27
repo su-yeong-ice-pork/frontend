@@ -162,6 +162,8 @@ const styles = StyleSheet.create({
     paddingLeft: 30,
   },
   calendarContainer: {
+    
+    backgroundColor: '#F5F5F5',
     flexDirection: 'row',
   },
   weekColumn: {
