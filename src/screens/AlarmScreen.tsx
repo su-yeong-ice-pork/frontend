@@ -57,7 +57,7 @@ const previousNotifications: NotificationData[] = [
 const AlarmScreen = () => {
   return (
     <View style={styles.container}>
-      <Header />
+      <Header Title={'알림'} />
       <ScrollView contentContainerStyle={styles.contentContainer}>
         <View style={styles.content}>
           <NotificationList

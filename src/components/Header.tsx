@@ -1,12 +1,31 @@
+import {useNavigation} from '@react-navigation/native';
 import React from 'react';
-import {View, Text, StyleSheet, Dimensions} from 'react-native';
+import {
+  View,
+  Text,
+  StyleSheet,
+  Dimensions,
+  TouchableOpacity,
+  Image,
+} from 'react-native';
 
 const {width, height} = Dimensions.get('window');
 
-const Header = () => {
+const Header = ({Title}) => {
+  const navigation = useNavigation();
   return (
     <View style={styles.headerContainer}>
-      <Text style={styles.headerText}>스터디</Text>
+      <TouchableOpacity
+        style={styles.backButtonWrapper}
+        onPress={() => navigation.goBack()}>
+        <Image
+          source={require('../../assets/images/icons/backButton.png')}
+          style={styles.backButtonIcon}
+        />
+      </TouchableOpacity>
+      <View style={styles.titleWrapper}>
+        <Text style={styles.headerText}>{Title}</Text>
+      </View>
     </View>
   );
 };
@@ -15,16 +34,31 @@ export default Header;
 
 const styles = StyleSheet.create({
   headerContainer: {
-    width: width,
-    height: height * 0.08, // 화면 높이의 10%
+    height: height * 0.08,
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: width * 0.03,
     backgroundColor: '#fff',
+  },
+  backButtonWrapper: {
     justifyContent: 'center',
     alignItems: 'center',
-    // 그림자나 추가 스타일이 필요하면 여기에 작성
+  },
+  backButtonIcon: {
+    width: width * 0.06,
+    height: width * 0.06,
+    resizeMode: 'contain',
+  },
+  titleWrapper: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   headerText: {
-    fontSize: 18, // 적절한 크기로 조정
-    color: '#000',
-    fontFamily: 'NanumSquareNeo-dEb', // 커스텀 폰트 적용
+    fontFamily: 'NanumSquareNeo-cBd',
+    fontSize: 17,
+    color: '#454545',
+    fontWeight: 'bold',
+    textAlign: 'center',
   },
 });

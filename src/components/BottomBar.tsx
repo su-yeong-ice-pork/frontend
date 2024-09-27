@@ -24,7 +24,7 @@ const BottomBar = () => {
         ? require('../../assets/images/icons/noteOn.png')
         : require('../../assets/images/icons/note.png'),
     study:
-      currentScreen === 'Study'
+      currentScreen === 'Study' || currentScreen === 'StudyDetail'
         ? require('../../assets/images/icons/studyOn.png')
         : require('../../assets/images/icons/study.png'),
     home:

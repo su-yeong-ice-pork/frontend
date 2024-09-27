@@ -66,7 +66,7 @@ const StudyRecordScreen = () => {
     <>
       <SafeAreaView style={{flex: 1, backgroundColor: '#F5F5F5'}}>
         <View style={styles.container}>
-          <Header />
+          <Header Title={'기록장 / 랭킹'} />
           <ScrollView
             style={styles.main}
             contentContainerStyle={{paddingBottom: 80}}>

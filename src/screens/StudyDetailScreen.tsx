@@ -59,7 +59,7 @@ const StudyDetailScreen = () => {
 
   return (
     <View style={styles.container}>
-      <Header />
+      <Header Title={'스터디'} />
       <ScrollView contentContainerStyle={styles.main}>
         {/* 스터디 이름과 함께 인증하기 버튼 */}
         <View style={styles.studyHeader}>

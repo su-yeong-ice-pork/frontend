@@ -16,7 +16,7 @@ const {width} = Dimensions.get('window');
 const StudyScreen = () => {
   return (
     <View style={styles.container}>
-      <Header />
+      <Header Title={'스터디'} />
       <ScrollView contentContainerStyle={styles.main}>
         <View style={styles.headerSection}>
           <Text style={styles.title}>
