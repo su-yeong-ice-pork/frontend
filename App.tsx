@@ -4,10 +4,11 @@ import {createStackNavigator} from '@react-navigation/stack';
 
 import LandingScreen from './src/screens/LandingScreen';
 import SignUpScreen from './src/screens/SignUpScreen';
-
-import HomeScreen from './src/screens/HomeScreen.tsx';
 import StudyScreen from './src/screens/StudyScreen';
 import StudyDetailScreen from './src/screens/StudyDetailScreen';
+import AlarmScreen from './src/screens/AlarmScreen';
+import HomeScreen from './src/screens/HomeScreen';
+import StudyRecordScreen from './src/screens/StudyRecordScreen';
 
 const Stack = createStackNavigator();
 
@@ -19,9 +20,11 @@ const App = () => {
         screenOptions={{headerShown: false}}>
         <Stack.Screen name="Landing" component={LandingScreen} />
         <Stack.Screen name="SignUp" component={SignUpScreen} />
-        <Stack.Screen name="Home" component={HomeScreen}/>
         <Stack.Screen name="Study" component={StudyScreen} />
         <Stack.Screen name="StudyDetail" component={StudyDetailScreen} />
+        <Stack.Screen name="Alarm" component={AlarmScreen} />
+        <Stack.Screen name="Home" component={HomeScreen} />
+        <Stack.Screen name="Log" component={StudyRecordScreen} />
       </Stack.Navigator>
     </NavigationContainer>
   );
