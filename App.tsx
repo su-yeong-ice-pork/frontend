@@ -4,7 +4,10 @@ import {createStackNavigator} from '@react-navigation/stack';
 
 import LandingScreen from './src/screens/LandingScreen';
 import SignUpScreen from './src/screens/SignUpScreen';
+
 import HomeScreen from './src/screens/HomeScreen.tsx';
+import StudyScreen from './src/screens/StudyScreen';
+import StudyDetailScreen from './src/screens/StudyDetailScreen';
 
 const Stack = createStackNavigator();
 
@@ -12,11 +15,13 @@ const App = () => {
   return (
     <NavigationContainer>
       <Stack.Navigator
-        initialRouteName="Landing"
+        initialRouteName="Study"
         screenOptions={{headerShown: false}}>
         <Stack.Screen name="Landing" component={LandingScreen} />
         <Stack.Screen name="SignUp" component={SignUpScreen} />
         <Stack.Screen name="Home" component={HomeScreen}/>
+        <Stack.Screen name="Study" component={StudyScreen} />
+        <Stack.Screen name="StudyDetail" component={StudyDetailScreen} />
       </Stack.Navigator>
     </NavigationContainer>
   );
