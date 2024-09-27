@@ -214,7 +214,7 @@ const LandingScreen = ({navigation}) => {
               placeholderTextColor="#B9B9B9"
               secureTextEntry
             />
-            <TouchableOpacity style={styles.findTextContainer}>
+            <TouchableOpacity style={styles.findTextContainer} onPress={() => navigation.navigate('FindPassword')}>
               <Text style={styles.findText}>비밀번호 찾기</Text>
             </TouchableOpacity>
 

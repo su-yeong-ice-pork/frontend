@@ -4,6 +4,7 @@ import {createStackNavigator} from '@react-navigation/stack';
 
 import LandingScreen from './src/screens/LandingScreen';
 import SignUpScreen from './src/screens/SignUpScreen';
+import FindPassword from './src/screens/FindPassword';
 
 const Stack = createStackNavigator();
 
@@ -15,6 +16,7 @@ const App = () => {
         screenOptions={{headerShown: false}}>
         <Stack.Screen name="Landing" component={LandingScreen} />
         <Stack.Screen name="SignUp" component={SignUpScreen} />
+        <Stack.Screen name="FindPassword" component={FindPassword} />
       </Stack.Navigator>
     </NavigationContainer>
   );
