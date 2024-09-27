@@ -2,7 +2,7 @@
 import React, { useState } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 import { Calendar, LocaleConfig } from 'react-native-calendars';
-import {Picker} from '@react-native-picker/picker';
+import YearlyCalendar from './YearCalendar';
 // Locale 설정
 LocaleConfig.locales['kr'] = {
   monthNames: [
@@ -53,18 +53,7 @@ const CalendarScreen = () => {
 
         </TouchableOpacity>
         
-        {viewMode === 'yearly' && (
-          <Picker
-            selectedValue={selectedYear}
-            style={styles.yearPicker}
-            onValueChange={(itemValue) => setSelectedYear(itemValue)}
-          >
-            
-            <Picker.Item label="2023년" value="2023" />
-            <Picker.Item label="2024년" value="2024" />
-            <Picker.Item label="2025년" value="2025" />
-          </Picker>
-        )}
+        
       </View>
 
 
@@ -89,7 +78,7 @@ const CalendarScreen = () => {
           {/* 연간 잔디밭 구현 */}
           <Text style={styles.yearlyTitle}>연간 ~잔디밭</Text>
          
-
+        <YearlyCalendar/>
 
 
          

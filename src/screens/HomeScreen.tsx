@@ -3,7 +3,11 @@ import { View, Text, TouchableOpacity,   Dimensions,Image, StyleSheet, ScrollVie
 import { Calendar,DateData, LocaleConfig} from 'react-native-calendars';
 const {width, height} = Dimensions.get('window');
 import CalendarScreen from '../components/calendar';
+import YearlyCalendar from '../components/YearCalendar';
 const HomeScreen = () => {
+
+
+  
 
 
   const IMAGES = {
@@ -24,6 +28,28 @@ const HomeScreen = () => {
     freeze:
     require('../../assets/images/illustration/freeze.png'),
   }
+  // 프로필 데이터 배열
+const profiles = [
+  {
+    id: 1,
+    name: '김태영',
+    nickName: '새도의 신',
+    image: null, // 이미지가 없을 경우 기본 이미지 사용
+    badge: [
+      { image: IMAGES.badge1 },
+      { image: IMAGES.badge2 },
+      { image: IMAGES.badge3 },
+    ],
+  },
+];
+
+const freezes = [
+  {
+    num: 12,
+  }
+]
+
+
   return (
     <ScrollView style={styles.container}>
       {/* 상단 프로필 영역 */}
@@ -37,11 +63,16 @@ const HomeScreen = () => {
         </View>
     </View>
 
+<View >
+  {profiles.map((profile, index)=>(
+
+
+<View key={profile.id}>
 
       <View style={styles.upperSection}>
         <View style={styles.profileInfo}>
           <Image
-            source={IMAGES.profile} // 프로필 이미지 URL 대체 가능
+            source={profile.image ? {uri: profile.image} : IMAGES.profile}// 프로필 이미지 URL 대체 가능
             style={styles.profileImage}
           />
           
@@ -51,29 +82,26 @@ const HomeScreen = () => {
 
 
       <View style={styles.profileTextContainer}>
-            <Text style={styles.nickname}>새도의 신</Text>
-            <Text style={styles.username}>이은솔</Text>
+            <Text style={styles.nickname}>{profile.nickName}</Text>
+            <Text style={styles.username}>{profile.name}</Text>
             <View style={styles.badgeContainer}>
-              <Text style={styles.badgeText}>보유 뱃지</Text>
-              <Image
-            source={IMAGES.badge1} 
-            style={styles.badge}
-          />
-           <Image
-            source={IMAGES.badge2} 
-            style={styles.badge}
-          />
-           <Image
-            source={IMAGES.badge3} 
-            style={styles.badge}
-          />
+            <Text style={styles.badgeText}>보유 뱃지</Text>
+              {profile.badge.map((badge, index) => (
+                <Image key={index} source={badge.image} style={styles.badge} />
+              ))}
             </View>
 
             <TouchableOpacity style={styles.moreButton}>
           <Text style={styles.moreText}>...</Text>
         </TouchableOpacity>
           </View>
+          </View>
+          
+  )
 
+
+)}
+          </View>
       {/* 인증하기 버튼들 */}
       <View style={styles.buttonSection}>
     
@@ -100,9 +128,20 @@ const HomeScreen = () => {
       <View style={styles.frozenSection}>
   <Text style={styles.frozenTitle}>보유 프리즈</Text>
   <View style={styles.frozenDetailContainer}>
+    
+  {freezes.map((freeze, index)=> (
+
+
+<View>
+
     <Text style={styles.frozenDetailText}>
-      현재 총 <Text style={styles.frozenCount}>12</Text> 개의 프리즈를 보유하고 있습니다.
+      
+        
+      현재 총 <Text style={styles.frozenCount}>{freeze.num}</Text> 개의 프리즈를 보유하고 있습니다.
+  
     </Text>
+</View>
+  ))}
     <TouchableOpacity style={styles.useFrozenButton}>
       <View style={styles.frozenText}>
     <Image
@@ -110,8 +149,11 @@ const HomeScreen = () => {
             style={styles.freeze}
           />
       <Text style={styles.useFrozenButtonText}>프리즈 사용하기</Text>
+     
+     
       </View>
     </TouchableOpacity>
+   
   </View>
   <Text style={styles.frozenNote}>
     ※ 프리즈는 잔다를 대신 채워줄 수 있는 잔디 채우기권입니다!
