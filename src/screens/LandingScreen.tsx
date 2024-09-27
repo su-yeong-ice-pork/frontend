@@ -11,6 +11,7 @@ import {
   TextInput,
 } from 'react-native';
 import LinearGradient from 'react-native-linear-gradient';
+import handleLogin from '../api/login';
 
 const IMAGES = {
   blueGrass:
@@ -29,6 +30,8 @@ const LandingScreen = ({navigation}) => {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [showLoginForm, setShowLoginForm] = useState(false);
   const [isAutoLogin, setIsAutoLogin] = useState(false); // 자동 로그인 상태
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
 
   const slides = [
     {
@@ -193,7 +196,6 @@ const LandingScreen = ({navigation}) => {
       )}
 
       {showLoginForm && (
-        // 로그인 폼이 보일 때 해당 컴포넌트를 렌더링합니다.
         <View style={styles.loginFormContainer}>
           <View style={styles.inputContainer}>
             <Text style={styles.inputLabel}>아이디</Text>
@@ -201,6 +203,8 @@ const LandingScreen = ({navigation}) => {
               style={styles.input}
               placeholder="아이디를 입력해주세요."
               placeholderTextColor="#B9B9B9"
+              value={email}
+              onChangeText={setEmail}
             />
             <TouchableOpacity style={styles.findTextContainer}>
               <Text style={styles.findText}>아이디 찾기</Text>
@@ -213,12 +217,15 @@ const LandingScreen = ({navigation}) => {
               placeholder="비밀번호를 입력해주세요."
               placeholderTextColor="#B9B9B9"
               secureTextEntry
+              value={password}
+              onChangeText={setPassword}
             />
-            <TouchableOpacity style={styles.findTextContainer}>
+            <TouchableOpacity
+              style={styles.findTextContainer}
+              onPress={() => navigation.navigate('FindPassword')}>
               <Text style={styles.findText}>비밀번호 찾기</Text>
             </TouchableOpacity>
 
-            {/* 자동 로그인 체크박스와 텍스트를 비밀번호 입력 필드의 좌측 하단에 배치 */}
             <View style={styles.autoLoginContainer}>
               <TouchableOpacity
                 style={styles.customCheckboxContainer}
@@ -237,7 +244,9 @@ const LandingScreen = ({navigation}) => {
             </View>
           </View>
 
-          <TouchableOpacity style={styles.loginButton}>
+          <TouchableOpacity
+            style={styles.loginButton}
+            onPress={() => handleLogin(email, password)}>
             <Text style={styles.loginButtonText}>잔디 심기</Text>
           </TouchableOpacity>
         </View>
