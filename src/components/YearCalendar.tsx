@@ -163,7 +163,6 @@ const styles = StyleSheet.create({
   },
   calendarContainer: {
     
-    backgroundColor: '#F5F5F5',
     flexDirection: 'row',
   },
   weekColumn: {
