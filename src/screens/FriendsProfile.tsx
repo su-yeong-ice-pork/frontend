@@ -37,7 +37,7 @@ const FriendsProfile = () => {
         {image: IMAGES.badge2},
         {image: IMAGES.badge3},
       ],
-      message: '흑흑 살려줘 ㅠ',
+      message: '기말고사 힘들다..',
     },
   ];
 
