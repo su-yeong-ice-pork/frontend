@@ -37,6 +37,7 @@ const HomeScreen = () => {
     require('../../assets/images/badge/badge3.png'),
     freeze:
     require('../../assets/images/illustration/freeze.png'),
+    
   }
   // 프로필 데이터 배열
 const profiles = [
