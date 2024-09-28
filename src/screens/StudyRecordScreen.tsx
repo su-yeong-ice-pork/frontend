@@ -1,6 +1,6 @@
 // src/screens/StudyRecordScreen.tsx
 
-import React from 'react';
+import React, {useEffect, useState, useRef} from 'react';
 import {
   View,
   Text,
@@ -10,6 +10,8 @@ import {
   TouchableOpacity,
   Dimensions,
   SafeAreaView,
+  AppState,
+  Modal,
 } from 'react-native';
 import Header from '../components/Header';
 import BottomBar from '../components/BottomBar';
@@ -62,6 +64,81 @@ const friends = [
 ];
 
 const StudyRecordScreen = () => {
+  const [isRecording, setIsRecording] = useState(false);
+  const [timeElapsed, setTimeElapsed] = useState(0);
+  const intervalRef = useRef<NodeJS.Timer | null>(null);
+  const startTimeRef = useRef<number>(0); // 시작 시간을 저장하는 ref
+  const isRecordingRef = useRef(isRecording);
+  const [isAttendanceConfirmed] = useState(true); // 출석 인증 여부
+  const [showAttendanceModal, setShowAttendanceModal] = useState(false);
+
+  const startRecording = () => {
+    if (!isAttendanceConfirmed) {
+      // 출석 인증을 하지 않았을 경우 모달 표시
+      setShowAttendanceModal(true);
+      return;
+    }
+
+    setIsRecording(true);
+    startTimeRef.current = Date.now() - timeElapsed; // 이전 시간부터 이어서 기록
+    intervalRef.current = setInterval(() => {
+      setTimeElapsed(Date.now() - startTimeRef.current);
+    }, 1000);
+  };
+
+  const stopRecording = () => {
+    if (intervalRef.current) {
+      clearInterval(intervalRef.current);
+      intervalRef.current = null;
+    }
+    setIsRecording(false);
+    // 현재 시간과 startTimeRef.current를 사용하여 최종 경과 시간 계산
+    const finalTimeElapsed = Date.now() - startTimeRef.current;
+    console.log('Recorded time:', formatTime(finalTimeElapsed));
+    setTimeElapsed(0);
+    startTimeRef.current = 0;
+  };
+
+  const formatTime = (milliseconds: number) => {
+    const totalSeconds = Math.floor(milliseconds / 1000);
+    const hours = Math.floor(totalSeconds / 3600)
+      .toString()
+      .padStart(2, '0');
+    const minutes = Math.floor((totalSeconds % 3600) / 60)
+      .toString()
+      .padStart(2, '0');
+    const seconds = (totalSeconds % 60).toString().padStart(2, '0');
+    return `${hours}:${minutes}:${seconds}`;
+  };
+
+  const handleStudyButtonPress = () => {
+    if (isRecording) {
+      stopRecording();
+    } else {
+      startRecording();
+    }
+  };
+
+  useEffect(() => {
+    // isRecording 상태 변경 시 ref 업데이트
+    isRecordingRef.current = isRecording;
+  }, [isRecording]);
+
+  useEffect(() => {
+    const subscription = AppState.addEventListener('change', nextAppState => {
+      if (nextAppState.match(/inactive|background/)) {
+        // 앱이 백그라운드로 전환될 때
+        if (isRecordingRef.current) {
+          stopRecording();
+        }
+      }
+    });
+
+    return () => {
+      subscription.remove();
+    };
+  }, []);
+
   return (
     <>
       <SafeAreaView style={{flex: 1, backgroundColor: '#F5F5F5'}}>
@@ -90,8 +167,10 @@ const StudyRecordScreen = () => {
                 title="새도의 신"
                 name="이은솔"
                 studyMessage="기말고사 화이팅..."
-                timerValue="12:36:18"
+                timerValue={formatTime(timeElapsed)}
                 totalTimeValue="80:30:34"
+                isRecording={isRecording}
+                onStudyButtonPress={handleStudyButtonPress}
               />
             </View>
 
@@ -168,6 +247,40 @@ const StudyRecordScreen = () => {
             </View>
           </ScrollView>
         </View>
+        <Modal
+          visible={showAttendanceModal}
+          transparent={true}
+          animationType="fade">
+          <View style={styles.modalBackground}>
+            <View style={styles.modalContainer}>
+              {/* 닫기 버튼 */}
+              <TouchableOpacity
+                style={styles.modalCloseButton}
+                onPress={() => setShowAttendanceModal(false)}>
+                <Image
+                  source={require('../../assets/images/icons/closeButton.png')}
+                  style={styles.modalCloseIcon}
+                />
+              </TouchableOpacity>
+
+              <View style={styles.modalHeader}>
+                <Image
+                  source={require('../../assets/images/icons/attendance.png')}
+                  style={styles.modalIcon}
+                />
+                <Text style={styles.modalTitle}>
+                  잠시만요!{'\n'}
+                  혹시 <Text style={styles.modalHighlightText}>출석 인증</Text>
+                  을 하셨나요?
+                </Text>
+              </View>
+              <Text style={styles.modalSubtitle}>
+                잔디 스터디 기능을 사용하기 위해서는{'\n'}홈 화면의 출석 인증을
+                먼저 해주셔야 해요!
+              </Text>
+            </View>
+          </View>
+        </Modal>
       </SafeAreaView>
       <BottomBar />
     </>
@@ -360,5 +473,56 @@ const styles = StyleSheet.create({
     height: 1,
     backgroundColor: '#DBDBDB',
     width: '100%',
+  },
+  modalBackground: {
+    flex: 1,
+    backgroundColor: 'rgba(0,0,0,0.5)',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  modalContainer: {
+    width: '80%',
+    backgroundColor: '#FFFFFF',
+    borderRadius: 16,
+    padding: 20,
+  },
+  modalHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  modalIcon: {
+    width: 46,
+    height: 46,
+    marginRight: 10,
+  },
+  modalTitle: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    color: '#4b5563',
+    flex: 1,
+  },
+  modalHighlightText: {
+    color: '#14B8A6',
+    fontWeight: 'bold',
+  },
+  modalSubtitle: {
+    marginTop: 10,
+    fontSize: 12,
+    color: '#6b7280',
+    textAlign: 'left',
+    lineHeight: 20,
+    marginLeft: 56,
+  },
+  modalCloseButton: {
+    position: 'absolute',
+    top: 10,
+    right: 10,
+    width: 24,
+    height: 24,
+    zIndex: 1,
+  },
+  modalCloseIcon: {
+    width: 24,
+    height: 24,
   },
 });

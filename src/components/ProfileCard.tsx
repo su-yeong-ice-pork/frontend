@@ -1,5 +1,3 @@
-// src/components/ProfileCard.tsx
-
 import React from 'react';
 import {View, Text, StyleSheet} from 'react-native';
 import ProfileImage from './ProfileImage';
@@ -11,6 +9,8 @@ interface ProfileCardProps {
   studyMessage: string;
   timerValue: string;
   totalTimeValue: string;
+  isRecording: boolean;
+  onStudyButtonPress: () => void;
 }
 
 const ProfileCard: React.FC<ProfileCardProps> = ({
@@ -19,6 +19,8 @@ const ProfileCard: React.FC<ProfileCardProps> = ({
   studyMessage,
   timerValue,
   totalTimeValue,
+  isRecording,
+  onStudyButtonPress,
 }) => {
   return (
     <View style={styles.card}>
@@ -33,7 +35,7 @@ const ProfileCard: React.FC<ProfileCardProps> = ({
         <Text style={styles.timer}>{timerValue}</Text>
         <Text style={styles.totalTimeLabel}>전체 공부 시간</Text>
         <Text style={styles.totalTime}>{totalTimeValue}</Text>
-        <StudyButton />
+        <StudyButton isRecording={isRecording} onPress={onStudyButtonPress} />
       </View>
     </View>
   );
