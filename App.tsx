@@ -9,14 +9,14 @@ import StudyDetailScreen from './src/screens/StudyDetailScreen';
 import AlarmScreen from './src/screens/AlarmScreen';
 import HomeScreen from './src/screens/HomeScreen';
 import StudyRecordScreen from './src/screens/StudyRecordScreen';
-
+import FriendsProfile from './src/screens/FriendsProfile';
 const Stack = createStackNavigator();
 
 const App = () => {
   return (
     <NavigationContainer>
       <Stack.Navigator
-        initialRouteName="Home"
+        initialRouteName="FriendsProfile"
         screenOptions={{headerShown: false}}>
         <Stack.Screen name="Landing" component={LandingScreen} />
         <Stack.Screen name="SignUp" component={SignUpScreen} />
@@ -25,6 +25,7 @@ const App = () => {
         <Stack.Screen name="Alarm" component={AlarmScreen} />
         <Stack.Screen name="Home" component={HomeScreen} />
         <Stack.Screen name="Log" component={StudyRecordScreen} />
+        <Stack.Screen name="FriendsProfile" component={FriendsProfile}/>
       </Stack.Navigator>
     </NavigationContainer>
   );
