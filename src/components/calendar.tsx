@@ -11,6 +11,7 @@ import {
 import {Calendar, LocaleConfig} from 'react-native-calendars';
 import YearlyCalendar from './YearCalendar';
 import moment from 'moment';
+import LinearGradient from 'react-native-linear-gradient';
 
 // Locale 설정
 LocaleConfig.locales['kr'] = {
@@ -119,30 +120,62 @@ const CalendarScreen = () => {
     else if (grassScore <= 6) return '#239a3b';
     else return '#196127'; // 진한 초록
   };
+  const handleTabPress = mode => {
+    setViewMode(mode);
+  };
 
   return (
     <View style={styles.container}>
       {/* 탭 전환 및 연도 선택 부분 */}
       <View style={styles.tabContainer}>
+        {/* 월간 잔디밭 탭 */}
         <TouchableOpacity
-          style={[styles.tabButton, viewMode === 'monthly' && styles.activeTab]}
-          onPress={() => setViewMode('monthly')}>
-          <Text
-            style={
-              viewMode === 'monthly' ? styles.activeTabText : styles.tabText
-            }>
-            월간 잔디밭
-          </Text>
+          style={styles.tabButton}
+          onPress={() => handleTabPress('monthly')}
+          activeOpacity={0.7}>
+          <View style={styles.tabContent}>
+            {viewMode === 'monthly' && (
+              <LinearGradient
+                colors={['#0DD8EC', '#15EC89']}
+                style={styles.activeIndicator}>
+                <LinearGradient
+                  colors={['#0DD8EC', '#15EC89']}
+                  style={styles.dot}
+                />
+              </LinearGradient>
+            )}
+            <Text
+              style={
+                viewMode === 'monthly' ? styles.activeTabText : styles.tabText
+              }>
+              월간 잔디밭
+            </Text>
+          </View>
         </TouchableOpacity>
+
+        {/* 연간 잔디밭 탭 */}
         <TouchableOpacity
-          style={[styles.tabButton, viewMode === 'yearly' && styles.activeTab]}
-          onPress={() => setViewMode('yearly')}>
-          <Text
-            style={
-              viewMode === 'yearly' ? styles.activeTabText : styles.tabText
-            }>
-            연간 잔디밭
-          </Text>
+          style={styles.tabButton}
+          onPress={() => handleTabPress('yearly')}
+          activeOpacity={0.7}>
+          <View style={styles.tabContent}>
+            {viewMode === 'yearly' && (
+              <LinearGradient
+                colors={['#0DD8EC', '#15EC89']}
+                style={styles.activeIndicator}>
+                <LinearGradient
+                  colors={['#0DD8EC', '#15EC89']}
+                  style={styles.dot}
+                />
+              </LinearGradient>
+            )}
+            <Text
+              style={
+                viewMode === 'yearly' ? styles.activeTabText : styles.tabText
+              }>
+              연간 잔디밭
+            </Text>
+          </View>
         </TouchableOpacity>
       </View>
 
@@ -222,7 +255,6 @@ const CalendarScreen = () => {
       ) : (
         <View style={styles.yearlyView}>
           {/* 연간 잔디밭 구현 */}
-          <Text style={styles.yearlyTitle}>연간 잔디밭</Text>
           <YearlyCalendar />
           <View style={styles.statsContainer}>
             <Text style={styles.statsText}>
@@ -272,28 +304,48 @@ const styles = StyleSheet.create({
   },
   tabContainer: {
     flexDirection: 'row',
+    justifyContent: 'center',
     alignItems: 'center',
     backgroundColor: '#4CB6A9',
     borderTopLeftRadius: 15,
     borderTopRightRadius: 15,
-    paddingVertical: 5,
-    paddingHorizontal: 10,
   },
   tabButton: {
-    padding: 10,
-    marginRight: 15,
+    flex: 1, // Distribute space equally
+    alignItems: 'center',
+    paddingBottom: 10,
   },
-  activeTab: {
-    borderBottomWidth: 3,
-    borderBottomColor: '#fff',
+  tabContent: {
+    alignItems: 'center',
+  },
+  activeIndicator: {
+    width: 80,
+    height: 3,
+    borderRadius: 40,
+    alignItems: 'flex-end',
+  },
+  borderLine: {
+    width: '100%',
+    height: 4,
+    borderRadius: 2,
+  },
+  dot: {
+    width: 5,
+    height: 5,
+    borderRadius: 5, // Half of width and height for a perfect circle
+    marginTop: 7,
   },
   tabText: {
-    fontSize: 16,
+    fontSize: 15,
+    marginTop: 15,
     color: '#B0D8D3',
+    fontFamily: 'NanumSquareNeo-cBd',
   },
   activeTabText: {
-    fontSize: 16,
+    fontSize: 15,
+    marginTop: 10,
     color: '#FFFFFF',
+    fontFamily: 'NanumSquareNeo-cBd',
   },
   calendarContainer: {
     padding: 10,
