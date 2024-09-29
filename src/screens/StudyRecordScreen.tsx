@@ -16,6 +16,7 @@ import {
 import Header from '../components/Header';
 import BottomBar from '../components/BottomBar';
 import ProfileCard from '../components/ProfileCard';
+import {useNavigation} from '@react-navigation/native';
 
 const {width} = Dimensions.get('window');
 
@@ -71,6 +72,7 @@ const StudyRecordScreen = () => {
   const isRecordingRef = useRef(isRecording);
   const [isAttendanceConfirmed] = useState(true); // 출석 인증 여부
   const [showAttendanceModal, setShowAttendanceModal] = useState(false);
+  const navigation = useNavigation();
 
   const startRecording = () => {
     if (!isAttendanceConfirmed) {
@@ -200,9 +202,7 @@ const StudyRecordScreen = () => {
                 <View key={friend.id}>
                   <TouchableOpacity
                     style={styles.memberItem}
-                    onPress={() => {
-                      /* 친구 프로필 보기 */
-                    }}>
+                    onPress={() => navigation.navigate('FriendsProfile')}>
                     <Image
                       source={
                         friend.image
