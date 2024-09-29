@@ -133,7 +133,26 @@ const HomeScreen = () => {
                       />
                     ))}
                   </View>
+                <View style={styles.profileTextContainer}>
+                  <Text style={styles.nickname}>{profile.nickName}</Text>
+                  <Text style={styles.username}>{profile.name}</Text>
+                  <View style={styles.badgeContainer}>
+                    <Text style={styles.badgeText}>보유 뱃지</Text>
+                    {profile.badge.map((badge, index) => (
+                      <Image
+                        key={index}
+                        source={badge.image}
+                        style={styles.badge}
+                      />
+                    ))}
+                  </View>
 
+                  <TouchableOpacity style={styles.moreButton}>
+                    <Text style={styles.moreText}>...</Text>
+                  </TouchableOpacity>
+                </View>
+              </View>
+            ))}
                   <TouchableOpacity style={styles.moreButton}>
                     <Text style={styles.moreText}>...</Text>
                   </TouchableOpacity>
