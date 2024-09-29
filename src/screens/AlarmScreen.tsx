@@ -1,5 +1,12 @@
 import React from 'react';
-import {View, Text, StyleSheet, ScrollView, Dimensions} from 'react-native';
+import {
+  View,
+  Text,
+  StyleSheet,
+  ScrollView,
+  Dimensions,
+  SafeAreaView,
+} from 'react-native';
 import NotificationList from '../components/NotificationList';
 import {NotificationData} from '../components/types/NotificationData';
 import Header from '../components/Header';
@@ -56,25 +63,29 @@ const previousNotifications: NotificationData[] = [
 
 const AlarmScreen = () => {
   return (
-    <View style={styles.container}>
-      <Header Title={'알림'} />
-      <ScrollView contentContainerStyle={styles.contentContainer}>
-        <View style={styles.content}>
-          <NotificationList
-            title="오늘 받은 알림"
-            notifications={todayNotifications}
-          />
-          <NotificationList
-            title="이전 알림"
-            notifications={previousNotifications}
-          />
-          <Text style={styles.footerText}>
-            알림은 30일 이후 자동삭제됩니다.
-          </Text>
+    <>
+      <SafeAreaView style={{flex: 1, backgroundColor: '#f5f5f5'}}>
+        <Header Title={'알림'} />
+        <View style={styles.container}>
+          <ScrollView contentContainerStyle={styles.contentContainer}>
+            <View style={styles.content}>
+              <NotificationList
+                title="오늘 받은 알림"
+                notifications={todayNotifications}
+              />
+              <NotificationList
+                title="이전 알림"
+                notifications={previousNotifications}
+              />
+              <Text style={styles.footerText}>
+                알림은 30일 이후 자동삭제됩니다.
+              </Text>
+            </View>
+          </ScrollView>
         </View>
-      </ScrollView>
-      <BottomBar />
-    </View>
+        <BottomBar />
+      </SafeAreaView>
+    </>
   );
 };
 
@@ -84,6 +95,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     width: width,
+
     backgroundColor: '#f5f5f5', // bg-neutral-100
   },
   contentContainer: {

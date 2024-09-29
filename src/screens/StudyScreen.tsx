@@ -34,9 +34,9 @@ const StudyScreen = () => {
             </View>
             <StudyList />
           </ScrollView>
-          <BottomBar />
         </View>
       </SafeAreaView>
+      <BottomBar />
     </>
   );
 };

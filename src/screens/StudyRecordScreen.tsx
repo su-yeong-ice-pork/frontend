@@ -63,7 +63,6 @@ const friends = [
     isOnline: true,
   },
 ];
-
 const StudyRecordScreen = () => {
   const [isRecording, setIsRecording] = useState(false);
   const [timeElapsed, setTimeElapsed] = useState(0);

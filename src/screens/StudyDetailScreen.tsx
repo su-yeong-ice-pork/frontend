@@ -157,10 +157,9 @@ const StudyDetailScreen = () => {
               ))}
             </View>
           </ScrollView>
-          <BottomBar />
-          {/* 하단 네모 버튼 */}
         </View>
       </SafeAreaView>
+      <BottomBar />
     </>
   );
 };
