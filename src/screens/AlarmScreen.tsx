@@ -64,7 +64,7 @@ const previousNotifications: NotificationData[] = [
 const AlarmScreen = () => {
   return (
     <>
-      <SafeAreaView style={{flex: 1, backgroundColor: '#f5f5f5'}}>
+      <SafeAreaView style={{flex: 1}}>
         <Header Title={'알림'} />
         <View style={styles.container}>
           <ScrollView contentContainerStyle={styles.contentContainer}>
@@ -95,8 +95,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     width: width,
-
-    backgroundColor: '#f5f5f5', // bg-neutral-100
+    backgroundColor: '#e4e4e7', // bg-neutral-100
   },
   contentContainer: {
     paddingBottom: 80, // Height of the BottomBar to prevent overlap
@@ -104,7 +103,6 @@ const styles = StyleSheet.create({
   content: {
     width: '100%',
     maxWidth: 480,
-    backgroundColor: '#e4e4e7', // bg-zinc-200
     paddingVertical: 10,
     alignSelf: 'center',
   },
