@@ -75,10 +75,7 @@ const HomeScreen = () => {
         longitude: location.longitude,
       };
 
-      const isInside = isPointInPolygon(
-        {latitude: 35.23559740400939, longitude: 129.0816297282198},
-        SERVICE_AREA,
-      );
+      const isInside = isPointInPolygon(userCoordinate, SERVICE_AREA);
 
       if (isInside) {
         setModalMessage('인증에 성공했습니다!');

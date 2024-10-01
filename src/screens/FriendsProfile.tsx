@@ -85,12 +85,11 @@ const FriendsProfile = () => {
               {/* 친구의 한마디 Section */}
               <View style={styles.friendMessageSection}>
                 <Text style={styles.sectionTitle}>친구의 한마디</Text>
-                <TouchableOpacity style={styles.friendMessageButton}>
+                <View style={styles.friendMessageButton}>
                   <Text style={styles.friendMessageText}>
                     {profile.message}
                   </Text>
-                  <View style={styles.bubbleTail} />
-                </TouchableOpacity>
+                </View>
               </View>
 
               <View style={styles.badgeContainer}>
@@ -247,27 +246,15 @@ const styles = StyleSheet.create({
   friendMessageButton: {
     backgroundColor: '#5AA6A8',
     paddingVertical: 8,
-    paddingHorizontal: 14,
-    borderRadius: 20,
+    paddingHorizontal: 12,
+    borderRadius: 10,
+    borderBottomLeftRadius: 0,
+    marginTop: 10,
     alignSelf: 'flex-start',
-    position: 'relative',
   },
   friendMessageText: {
     color: '#FFFFFF',
     fontSize: 14,
-  },
-  bubbleTail: {
-    position: 'absolute',
-    left: 10,
-    bottom: -6,
-    width: 0,
-    height: 0,
-    borderLeftWidth: 10,
-    borderLeftColor: 'transparent',
-    borderRightWidth: 10,
-    borderRightColor: 'transparent',
-    borderTopWidth: 10,
-    borderTopColor: '#5AA6A8',
   },
   leaveButton: {
     flexDirection: 'row',
