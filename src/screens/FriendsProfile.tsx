@@ -186,10 +186,13 @@ const styles = StyleSheet.create({
     fontSize: 12,
     color: '#009499',
     marginLeft: 10,
+    fontFamily: 'NanumSquareNeo-Variable',
+    fontWeight: '900',
   },
   username: {
     fontSize: 20,
-    fontWeight: 'bold',
+    fontFamily: 'NanumSquareNeo-Variable',
+    fontWeight: '900',
     color: '#333',
     marginLeft: 10,
     marginTop: -10,
@@ -209,6 +212,7 @@ const styles = StyleSheet.create({
     fontSize: 10,
     marginLeft: 7,
     fontWeight: 'bold',
+    fontFamily: 'NanumSquareNeo-Variable',
     color: '#838F8F',
     marginBottom: 5,
     alignSelf: 'flex-start',
@@ -227,6 +231,8 @@ const styles = StyleSheet.create({
     marginTop: 10,
     fontSize: 12,
     color: '#009499',
+    fontFamily: 'NanumSquareNeo-Variable',
+    fontWeight: '700',
   },
   friendMessageSection: {
     marginTop: 20,
@@ -243,6 +249,7 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     color: '#838F8F',
     marginBottom: 5,
+    fontFamily: 'NanumSquareNeo-Variable',
   },
   friendMessageButton: {
     backgroundColor: '#5AA6A8',
@@ -255,6 +262,8 @@ const styles = StyleSheet.create({
   friendMessageText: {
     color: '#FFFFFF',
     fontSize: 14,
+    fontFamily: 'NanumSquareNeo-Variable',
+    fontWeight: '700',
   },
   bubbleTail: {
     position: 'absolute',
@@ -282,8 +291,9 @@ const styles = StyleSheet.create({
   },
   leaveButtonText: {
     color: '#FF6F61',
-    fontWeight: 'bold',
+    fontWeight: '800',
     marginLeft: 5,
+    fontFamily: 'NanumSquareNeo-Variable',
   },
   leaveIcon: {
     width: 16,
@@ -293,6 +303,8 @@ const styles = StyleSheet.create({
     fontSize: 10,
     color: '#009499',
     marginTop: 5,
+    fontFamily: 'NanumSquareNeo-Variable',
+    fontWeight: '700',
   },
   currentDaySection: {
     padding: 20,
@@ -301,11 +313,14 @@ const styles = StyleSheet.create({
   dayCount: {
     fontSize: 24,
     color: '#009499',
+    fontFamily: 'NanumSquareNeo-Variable',
+    fontWeight: '900',
   },
   currentDayText: {
     fontSize: 16,
-    fontWeight: 'bold',
     color: '#333',
+    fontFamily: 'NanumSquareNeo-Variable',
+    fontWeight: '900',
   },
   calendarContainer: {
     marginTop: 20,

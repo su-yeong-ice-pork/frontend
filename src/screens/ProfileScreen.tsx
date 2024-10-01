@@ -398,14 +398,17 @@ const styles = StyleSheet.create({
     color: '#009499',
     flexDirection: 'row',
     marginLeft: 10,
+    fontWeight: '900',
+    fontFamily: 'NanumSquareNeo-Variable',
   },
   username: {
     fontSize: 20,
-    fontWeight: 'bold',
+    fontWeight: '900',
     color: '#333',
     flexDirection: 'row',
     marginLeft: 10,
     marginTop: -10,
+    fontFamily: 'NanumSquareNeo-Variable',
   },
   infoCardContainer: {
     flexDirection: 'row',
@@ -417,9 +420,10 @@ const styles = StyleSheet.create({
   },
   subTitle: {
     fontSize: 10,
-    fontWeight: 'bold',
+    fontWeight: '800',
     color: '#838F8F',
     marginBottom: 5,
+    fontFamily: 'NanumSquareNeo-Variable',
   },
   infoCard: {
     flexDirection: 'row',
@@ -443,10 +447,13 @@ const styles = StyleSheet.create({
     fontSize: 11, // text-xs
     fontWeight: '800', // font-extrabold
     color: '#B6B6B6', // text-zinc-600
+    fontFamily: 'NanumSquareNeo-Variable',
   },
   infoCardCount: {
-    fontSize: 16, // text-base
+    fontSize: 15, // text-base
     color: '#0D9488', // text-teal-600
+    fontWeight: '800',
+    fontFamily: 'NanumSquareNeo-Variable',
   },
   infoCardButton: {
     flexDirection: 'row',
@@ -471,6 +478,7 @@ const styles = StyleSheet.create({
     color: '#FFFFFF',
     fontSize: 12, // text-xs
     fontWeight: '800', // font-extrabold
+    fontFamily: 'NanumSquareNeo-Variable',
   },
   badgeSection: {
     marginTop: 16, // mt-4
@@ -478,8 +486,9 @@ const styles = StyleSheet.create({
   },
   badgeTitle: {
     fontSize: 10,
-    fontWeight: 'bold',
+    fontWeight: '800',
     color: '#838F8F',
+    fontFamily: 'NanumSquareNeo-Variable',
   },
   badgeContainer: {
     flexDirection: 'row',
@@ -506,6 +515,7 @@ const styles = StyleSheet.create({
     fontWeight: '800', // font-extrabold
     color: '#0D9488', // text-teal-600
     marginLeft: 5,
+    fontFamily: 'NanumSquareNeo-Variable',
   },
   moreImage: {
     marginTop: 8,
@@ -521,6 +531,7 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     color: '#838F8F',
     marginBottom: 5,
+    fontFamily: 'NanumSquareNeo-Variable',
   },
   frozenDetailContainer: {
     flexDirection: 'row',
@@ -535,11 +546,14 @@ const styles = StyleSheet.create({
   frozenDetailText: {
     fontSize: 10,
     color: '#333',
+    fontWeight: '700',
+    fontFamily: 'NanumSquareNeo-Variable',
   },
   frozenCount: {
     fontSize: 15,
     fontWeight: 'bold',
     color: '#12A5B0',
+    fontFamily: 'NanumSquareNeo-Variable',
   },
   useFrozenButton: {
     width: '80%', // 버튼의 너비
@@ -560,15 +574,18 @@ const styles = StyleSheet.create({
   useFrozenButtonText: {
     color: '#FFFFFF',
     fontSize: 10,
-    fontWeight: 'bold',
+    fontWeight: '800',
+    fontFamily: 'NanumSquareNeo-Variable',
   },
   freeze: {
     right: 5,
   },
   frozenNote: {
-    fontSize: 9,
+    fontSize: 8,
     color: '#009499',
     marginTop: 5,
+    fontWeight: '700',
+    fontFamily: 'NanumSquareNeo-Variable',
   },
   grassSection: {
     marginTop: 56, // mt-14
@@ -577,9 +594,12 @@ const styles = StyleSheet.create({
     fontSize: 20, // text-xl
     fontWeight: '800', // font-extrabold
     color: '#52525B', // text-neutral-600
+    fontFamily: 'NanumSquareNeo-Variable',
   },
   highlightText: {
     color: '#0D9488', // text-teal-600
+    fontFamily: 'NanumSquareNeo-Variable',
+    fontWeight: '800',
   },
 
   cardContainer: {
@@ -602,12 +622,16 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     marginTop: 10,
     marginBottom: -10,
+    fontFamily: 'NanumSquareNeo-Variable',
+    fontWeight: '700',
   },
   timeText: {
     fontSize: 12,
     textAlign: 'center',
     marginTop: 10,
     marginBottom: -10,
+    fontFamily: 'NanumSquareNeo-Variable',
+    fontWeight: '700',
   },
   image: {
     width: 120,
@@ -640,6 +664,7 @@ const styles = StyleSheet.create({
     fontSize: 14, // text-sm
     fontWeight: '800', // font-extrabold
     color: '#52525B', // text-neutral-600
+    fontFamily: 'NanumSquareNeo-Variable',
   },
   footerDivider: {
     height: 1,
@@ -689,6 +714,8 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     color: '#FFFFFF',
     fontSize: 13,
+    fontWeight: '700',
+    fontFamily: 'NanumSquareNeo-Variable',
   },
   button: {
     backgroundColor: '#009499',
@@ -701,6 +728,7 @@ const styles = StyleSheet.create({
     color: 'white',
     fontWeight: 'bold',
     textAlign: 'center',
+    fontFamily: 'NanumSquareNeo-Variable',
   },
   centeredModal: {
     flex: 1,
@@ -726,6 +754,8 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     marginTop: 10,
     marginBottom: 15,
+    fontFamily: 'NanumSquareNeo-Variable',
+    fontWeight: '800',
   },
   buttonContainer: {
     flexDirection: 'row', // 버튼을 수평으로 정렬

@@ -111,6 +111,7 @@ const styles = StyleSheet.create({
     marginTop: 10,
     fontSize: 12,
     fontWeight: '700',
-    color: '#737373', // text-zinc-500
+    color: '#737373',
+    fontFamily: 'NanumSquareNeo-Variable',
   },
 });

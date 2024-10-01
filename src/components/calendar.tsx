@@ -1,4 +1,4 @@
-// CalendarScreen.js
+//components/calendar.tsx
 import React, {useState} from 'react';
 import {
   View,
@@ -230,18 +230,14 @@ const CalendarScreen = () => {
               selectedDayBackgroundColor: '#A8E6CF',
               todayTextColor: '#00adf5',
               dotColor: '#A8E6CF',
-              // 기타 테마 설정...
             }}
-            firstDay={0} // 일요일을 주의 첫날로 설정
+            firstDay={0}
           />
           <View style={styles.statsContainer}>
             {statData.map((id, index) => (
               <View key={index}>
                 <Text style={styles.statsText}>
-                  <Image
-                    source={IMAGES.calendar}
-                    style={styles.statsCalendar}
-                  />
+                  <Image source={IMAGES.calendar} />
                   최장 <Text style={styles.highlight}>{id.day}</Text>일 유지
                 </Text>
                 <Text style={styles.statsText}>
@@ -257,12 +253,18 @@ const CalendarScreen = () => {
           {/* 연간 잔디밭 구현 */}
           <YearlyCalendar />
           <View style={styles.statsContainer}>
-            <Text style={styles.statsText}>
-              최장 <Text style={styles.highlight}>118</Text>일 유지
-            </Text>
-            <Text style={styles.statsText}>
-              총 공부시간 <Text style={styles.highlight}>489</Text>시간
-            </Text>
+            {statData.map((id, index) => (
+              <View key={index}>
+                <Text style={styles.statsText}>
+                  <Image source={IMAGES.calendar} />
+                  최장 <Text style={styles.highlight}>{id.day}</Text>일 유지
+                </Text>
+                <Text style={styles.statsText}>
+                  <Image source={IMAGES.studyTime} style={styles.statsTime} />총
+                  공부시간 <Text style={styles.highlight}>{id.time}</Text>시간
+                </Text>
+              </View>
+            ))}
           </View>
         </View>
       )}
@@ -297,7 +299,6 @@ const CalendarScreen = () => {
 };
 
 const styles = StyleSheet.create({
-  // 기존 스타일...
   container: {
     flex: 1,
     backgroundColor: '#F5F5F5',
@@ -311,7 +312,7 @@ const styles = StyleSheet.create({
     borderTopRightRadius: 15,
   },
   tabButton: {
-    flex: 1, // Distribute space equally
+    flex: 1,
     alignItems: 'center',
     paddingBottom: 10,
   },
@@ -339,13 +340,13 @@ const styles = StyleSheet.create({
     fontSize: 15,
     marginTop: 15,
     color: '#B0D8D3',
-    fontFamily: 'NanumSquareNeo-cBd',
+    fontFamily: 'NanumSquareNeo-Variable',
   },
   activeTabText: {
     fontSize: 15,
     marginTop: 10,
     color: '#FFFFFF',
-    fontFamily: 'NanumSquareNeo-cBd',
+    fontFamily: 'NanumSquareNeo-Variable',
   },
   calendarContainer: {
     padding: 10,
@@ -368,6 +369,7 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: '#333',
     marginVertical: 2,
+    fontFamily: 'NanumSquareNeo-Variable',
   },
   highlight: {
     color: '#1AA5AA',
@@ -411,8 +413,9 @@ const styles = StyleSheet.create({
   },
   arrowText: {
     color: '#009499',
-    fontSize: 14, // 크기를 작게 조정
+    fontSize: 14,
     marginHorizontal: 5,
+    fontFamily: 'NanumSquareNeo-Variable',
   },
   modalBackground: {
     flex: 1,
@@ -431,6 +434,7 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: 'bold',
     marginBottom: 10,
+    fontFamily: 'NanumSquareNeo-Variable',
   },
   closeButton: {
     marginTop: 20,
@@ -442,6 +446,7 @@ const styles = StyleSheet.create({
   closeButtonText: {
     color: '#fff',
     fontWeight: 'bold',
+    fontFamily: 'NanumSquareNeo-Variable',
   },
 });
 

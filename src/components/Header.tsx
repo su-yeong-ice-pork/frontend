@@ -55,10 +55,10 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   headerText: {
-    fontFamily: 'NanumSquareNeo-cBd',
     fontSize: 17,
     color: '#454545',
     fontWeight: 'bold',
     textAlign: 'center',
+    fontFamily: 'NanumSquareNeo-Variable',
   },
 });

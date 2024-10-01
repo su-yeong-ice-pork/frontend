@@ -65,9 +65,10 @@ const styles = StyleSheet.create({
     alignSelf: 'flex-start',
   },
   messageText: {
-    fontSize: 14,
+    fontSize: 13,
     color: '#454545',
-    fontFamily: 'NanumSquareNeo-eHv',
+    fontWeight: '900',
+    fontFamily: 'NanumSquareNeo-Variable',
   },
   rightSection: {
     flex: 1,
@@ -77,22 +78,26 @@ const styles = StyleSheet.create({
   timerLabel: {
     fontSize: 14,
     color: '#454545',
-    fontFamily: 'NanumSquareNeo-eHv',
+    fontWeight: '700',
+    fontFamily: 'NanumSquareNeo-Variable',
   },
   timer: {
-    fontSize: 24,
+    fontSize: 22,
     fontWeight: '700',
+    fontFamily: 'NanumSquareNeo-Variable',
     color: '#14B8A6',
   },
   totalTimeLabel: {
     fontSize: 12,
     color: '#454545',
-    fontFamily: 'NanumSquareNeo-eHv',
+    fontWeight: '700',
+    fontFamily: 'NanumSquareNeo-Variable',
     marginTop: 10,
   },
   totalTime: {
     fontSize: 18,
     fontWeight: '700',
+    fontFamily: 'NanumSquareNeo-Variable',
     color: '#14B8A6',
   },
 });

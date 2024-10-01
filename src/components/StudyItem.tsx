@@ -113,8 +113,8 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: '#4b5563',
     letterSpacing: 1,
-    fontFamily: 'NanumSquareOTF_bRg',
-    fontWeight: '700',
+    fontFamily: 'NanumSquareNeo-Variable',
+    fontWeight: '800',
   },
   studyTimeHighlight: {
     color: '#14b8a6',
@@ -137,7 +137,7 @@ const styles = StyleSheet.create({
     color: '#1e293b',
     fontWeight: '700',
     flexShrink: 1,
-    fontFamily: 'NanumSquareOTF_eHv',
+    fontFamily: 'NanumSquareNeo-Variablev',
   },
   memberContainer: {
     flexDirection: 'row',
@@ -154,7 +154,7 @@ const styles = StyleSheet.create({
     fontSize: 15,
     color: '#14b8a6',
     letterSpacing: 1,
-    fontFamily: 'NanumSquareOTF_eHv',
+    fontFamily: 'NanumSquareNeo-Variable',
     fontWeight: '700',
   },
   studyInfoIconAbsolute: {
@@ -175,7 +175,6 @@ const styles = StyleSheet.create({
     shadowOffset: {width: -4, height: 0},
     shadowOpacity: 0.19,
     shadowRadius: 11.4,
-    // Elevation for Android
     elevation: 5,
   },
   actionIcon: {
@@ -188,7 +187,7 @@ const styles = StyleSheet.create({
     bottom: -15,
     width: 79,
     color: '#FFFFFF',
-    fontFamily: 'NanumSquareNeo-cBd',
+    fontFamily: 'NanumSquareNeo-Variable',
     fontSize: 9,
     lineHeight: 70,
     textAlign: 'center',
