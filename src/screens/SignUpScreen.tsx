@@ -8,6 +8,7 @@ import {
   ScrollView,
   TextInput,
   Image,
+  Alert,
 } from 'react-native';
 import LinearGradient from 'react-native-linear-gradient';
 import Svg, {
@@ -16,7 +17,8 @@ import Svg, {
   Stop,
   Text as SvgText,
 } from 'react-native-svg';
-
+import handleSignup from '../api/signup';
+import checkPasswordFormat from '../api/checkPassword';
 const IMAGES = {
   backButton: require('../../assets/images/icons/backButton.png'),
   resetButton: require('../../assets/images/icons/resetButton.png'),
@@ -32,17 +34,19 @@ const SignUpScreen = ({navigation}) => {
   const [isActive, setIsActive] = useState(false);
 
   // 학과 등록
+  const [college, setCollege] = useState<string>('인문대학');
+  const [department, setDepartment] = useState<string>('영어영문학과');
 
   // 비밀번호
   const [inputPassword, setInputPassword] = useState('');
   const [errorMessage, setErrorMessage] = useState('');
 
   // 이름 입력
-  const [name, inputName] = useState('');
+  const [name, setName] = useState('');
   const [nameDuplicate, setNameDuplicate] = useState(false);
 
   useEffect(() => {
-    let timer;
+    let timer: ReturnType<typeof setInterval> | undefined;
     if (isActive && timeLeft > 0) {
       timer = setInterval(() => {
         setTimeLeft(prevTime => prevTime - 1);
@@ -56,7 +60,7 @@ const SignUpScreen = ({navigation}) => {
   }, [isActive, timeLeft]);
 
   // 초를 분:초 형식으로 변환하는 함수
-  const formatTime = seconds => {
+  const formatTime = (seconds: number) => {
     const minutes = Math.floor(seconds / 60);
     const secs = seconds % 60;
     return `${String(minutes).padStart(2, '0')}:${String(secs).padStart(
@@ -73,12 +77,11 @@ const SignUpScreen = ({navigation}) => {
     if (isActive) {
     }
   };
-
   // 학과 등록하기
   const handleRegister = () => {};
 
   // 비밀번호 입력
-  const handlePasswordChange = password => {
+  const handlePasswordChange = (password: string) => {
     setInputPassword(password);
     validationPassword(password); // 조건 확인
   };
@@ -89,13 +92,17 @@ const SignUpScreen = ({navigation}) => {
   };
 
   // 비밀번호 조건 확인
-  const validationPassword = password => {
+  const validationPassword = (password: string) => {
     const passwordRegex =
       /^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*#?&])[A-Za-z\d@$!%*#?&]{8,16}$/;
     if (!passwordRegex.test(password)) {
-      setErrorMessage('비밀번호를 다시 설정해주세요!');
+      setErrorMessage(
+        '비밀번호는 8~16자 영문, 숫자, 특수문자를 포함해야 합니다.',
+      );
+      return false;
     } else {
       setErrorMessage('');
+      return true;
     }
   };
 
@@ -105,7 +112,40 @@ const SignUpScreen = ({navigation}) => {
   };
 
   // 잔디 심으러 가기 버튼 클릭
-  const submitSignUp = () => {};
+  const submitSignUp = async () => {
+    if (!email || !inputPassword || !name) {
+      Alert.alert('모든 필드를 입력해주세요.');
+      return;
+    }
+
+    if (!validationPassword(inputPassword)) {
+      Alert.alert('비밀번호는 8~16자 영문, 숫자, 특수문자를 포함해야 합니다.');
+      return;
+    }
+
+    const signupData = {
+      email,
+      password: inputPassword,
+      name,
+      college,
+      department,
+    };
+
+    try {
+      const response = await handleSignup(signupData);
+
+      if (response.success) {
+        // 회원가입 성공 처리
+        Alert.alert('회원가입 성공', '회원가입이 완료되었습니다.');
+        navigation.navigate('Landing'); // 로그인 화면으로 이동
+      } else {
+        // 회원가입 실패 처리
+        Alert.alert('회원가입 실패', '회원가입에 실패하였습니다.');
+      }
+    } catch (error: any) {
+      Alert.alert('오류', error.message);
+    }
+  };
 
   return (
     <View style={styles.container}>
@@ -122,7 +162,7 @@ const SignUpScreen = ({navigation}) => {
       {/* 입력 폼 */}
       <ScrollView
         contentContainerStyle={styles.formContainer}
-        style={{backgroundColor: '#E1E6E8'}}>
+        style={{backgroundColor: '#E1E6E9'}}>
         <View style={styles.container}>
           <Text style={styles.welcomeText}>환영합니다!</Text>
           <View style={styles.inlineText}>
@@ -202,6 +242,8 @@ const SignUpScreen = ({navigation}) => {
               style={styles.inputBox}
               placeholder="대학 소속학과를 등록해주세요"
               placeholderTextColor="#B9B9B9"
+              value={college}
+              onChangeText={setCollege}
             />
             <TouchableOpacity
               style={styles.codeButton}
@@ -252,6 +294,8 @@ const SignUpScreen = ({navigation}) => {
               style={styles.inputBox}
               placeholder="1~8자리 입력 / 한글, 영어, 숫자 조합"
               placeholderTextColor="#B9B9B9"
+              value={name}
+              onChangeText={setName}
             />
             <TouchableOpacity style={styles.codeButton} onPress={chkDuplicate}>
               <Text style={styles.requestCodeButtonText}>중복 확인</Text>
