@@ -16,6 +16,8 @@ import Svg, {
   Stop,
   Text as SvgText,
 } from 'react-native-svg';
+import Header from '../components/Header';
+import {SafeAreaView} from 'react-native-safe-area-context';
 
 const IMAGES = {
   backButton: require('../../assets/images/icons/backButton.png'),
@@ -108,182 +110,192 @@ const SignUpScreen = ({navigation}) => {
   const submitSignUp = () => {};
 
   return (
-    <View style={styles.container}>
-      {/* 헤더 */}
-      <View style={styles.signUpHeader}>
-        <TouchableOpacity
-          style={styles.backButtonWrapper}
-          onPress={() => navigation.goBack()}>
-          <Image source={IMAGES.backButton} style={styles.setBackButton} />
-        </TouchableOpacity>
-        <Text style={styles.headerText}>회원가입</Text>
-      </View>
-
-      {/* 입력 폼 */}
-      <ScrollView
-        contentContainerStyle={styles.formContainer}
-        style={{backgroundColor: '#E1E6E8'}}>
+    <>
+      <SafeAreaView style={{flex: 1}}>
         <View style={styles.container}>
-          <Text style={styles.welcomeText}>환영합니다!</Text>
-          <View style={styles.inlineText}>
-            <Svg height={height * 0.05} width={width * 0.3}>
-              <Defs>
-                <SVGLinearGradient id="grad1" x1="0%" y1="0%" x2="100%" y2="0%">
-                  <Stop offset="0%" stopColor="#2CCDE4" stopOpacity="1" />
-                  <Stop offset="100%" stopColor="#25E798" stopOpacity="1" />
-                </SVGLinearGradient>
-              </Defs>
-              <SvgText
-                fill="url(#grad1)"
-                fontSize="24"
-                fontWeight="bold"
-                x="0"
-                y="30">
-                당신의 잔디
-              </SvgText>
-            </Svg>
-            <Text style={styles.welcomeText2}>를 함께 심어보아요!</Text>
-          </View>
-        </View>
+          {/* 헤더 */}
+          <Header Title={'회원가입'} />
 
-        {/* 이메일 입력 */}
-        <View style={styles.inputContainer}>
-          <Text style={styles.inputLabel}>
-            학교 이메일 인증 <Text style={styles.starmark}>*</Text>
-          </Text>
-          <View style={styles.inputWrapper}>
-            <TextInput
-              style={[styles.inputBox]}
-              placeholder="학교 이메일을 입력해주세요."
-              placeholderTextColor="#B9B9B9"
-              value={email}
-              onChangeText={setEmail}
-            />
-            <TouchableOpacity style={styles.codeButton} onPress={handleRequire}>
-              <Text style={styles.requestCodeButtonText}>{askCode}</Text>
-            </TouchableOpacity>
-          </View>
-          {isActive && (
-            <View style={styles.iconAndTextContainer}>
-              <Image source={IMAGES.iIcon} style={styles.setiIcon} />
-              <Text style={styles.activeText}>
-                메일이 오지 않으셨나요? 재요청 버튼을 눌러보세요.
-              </Text>
-            </View>
-          )}
-        </View>
-
-        {/* 인증 코드 입력 */}
-        <View style={styles.inputContainer}>
-          <View
-            style={[
-              styles.inputRow,
-              {borderBottomWidth: 1.5, borderBottomColor: '#A9A9A9'},
-            ]}>
-            <TextInput
-              style={{flex: 1}}
-              placeholder="메일로 전송된 코드를 입력해주세요."
-              placeholderTextColor="#B9B9B9"
-            />
-            <Text style={styles.timerText}>{formatTime(timeLeft)}</Text>
-            <TouchableOpacity style={styles.verifyButton}>
-              <Text style={styles.verifyButtonText}>확인</Text>
-            </TouchableOpacity>
-          </View>
-        </View>
-
-        {/* 학과 등록 */}
-        <View style={styles.inputContainer}>
-          <Text style={styles.inputLabel}>
-            학과 등록 <Text style={styles.starmark}>*</Text>
-          </Text>
-          <View style={styles.inputWrapper}>
-            <TextInput
-              style={styles.inputBox}
-              placeholder="대학 소속학과를 등록해주세요"
-              placeholderTextColor="#B9B9B9"
-            />
-            <TouchableOpacity
-              style={styles.codeButton}
-              onPress={handleRegister}>
-              <Text style={styles.requestCodeButtonText}>등록하기</Text>
-            </TouchableOpacity>
-          </View>
-        </View>
-
-        {/* 비밀번호 입력 */}
-        <View style={styles.inputContainer}>
-          <Text style={styles.inputLabel}>
-            비밀번호 입력 <Text style={styles.starmark}>*</Text>
-          </Text>
-          <View style={styles.inputWrapper}>
-            <TextInput
-              style={styles.inputBox}
-              placeholder="8~16자리 입력 / 영어, 숫자, 특수문자 조합"
-              placeholderTextColor="#B9B9B9"
-              secureTextEntry
-              value={inputPassword} // 상태를 연결해주어야 합니다.
-              onChangeText={handlePasswordChange}
-            />
-            <TouchableOpacity
-              style={styles.resetButton}
-              onPress={deletePassword}>
-              <Image source={IMAGES.resetButton} style={styles.clearIcon} />
-            </TouchableOpacity>
-          </View>
-
-          <View style={styles.iconAndTextContainer}>
-            {errorMessage ? (
-              <View style={styles.iconAndTextContainer}>
-                <Image source={IMAGES.iIcon} style={styles.setiIcon} />
-                <Text style={styles.activeText}>{errorMessage}</Text>
+          {/* 입력 폼 */}
+          <ScrollView
+            contentContainerStyle={styles.formContainer}
+            style={{backgroundColor: '#E1E6E8'}}>
+            <View style={styles.container}>
+              <Text style={styles.welcomeText}>환영합니다!</Text>
+              <View style={styles.inlineText}>
+                <Svg height={height * 0.05} width={width * 0.3}>
+                  <Defs>
+                    <SVGLinearGradient
+                      id="grad1"
+                      x1="0%"
+                      y1="0%"
+                      x2="100%"
+                      y2="0%">
+                      <Stop offset="0%" stopColor="#2CCDE4" stopOpacity="1" />
+                      <Stop offset="100%" stopColor="#25E798" stopOpacity="1" />
+                    </SVGLinearGradient>
+                  </Defs>
+                  <SvgText
+                    fill="url(#grad1)"
+                    fontSize="24"
+                    fontWeight="bold"
+                    x="0"
+                    y="30">
+                    당신의 잔디
+                  </SvgText>
+                </Svg>
+                <Text style={styles.welcomeText2}>를 함께 심어보아요!</Text>
               </View>
-            ) : null}
-          </View>
-        </View>
+            </View>
 
-        {/* 이름 입력 */}
-        <View style={styles.inputContainer}>
-          <Text style={styles.inputLabel}>
-            이름 입력 <Text style={styles.starmark}>*</Text>
-          </Text>
-          <View style={styles.inputWrapper}>
-            <TextInput
-              style={styles.inputBox}
-              placeholder="1~8자리 입력 / 한글, 영어, 숫자 조합"
-              placeholderTextColor="#B9B9B9"
-            />
-            <TouchableOpacity style={styles.codeButton} onPress={chkDuplicate}>
-              <Text style={styles.requestCodeButtonText}>중복 확인</Text>
+            {/* 이메일 입력 */}
+            <View style={styles.inputContainer}>
+              <Text style={styles.inputLabel}>
+                학교 이메일 인증 <Text style={styles.starmark}>*</Text>
+              </Text>
+              <View style={styles.inputWrapper}>
+                <TextInput
+                  style={[styles.inputBox]}
+                  placeholder="학교 이메일을 입력해주세요."
+                  placeholderTextColor="#B9B9B9"
+                  value={email}
+                  onChangeText={setEmail}
+                />
+                <TouchableOpacity
+                  style={styles.codeButton}
+                  onPress={handleRequire}>
+                  <Text style={styles.requestCodeButtonText}>{askCode}</Text>
+                </TouchableOpacity>
+              </View>
+              {isActive && (
+                <View style={styles.iconAndTextContainer}>
+                  <Image source={IMAGES.iIcon} style={styles.setiIcon} />
+                  <Text style={styles.activeText}>
+                    메일이 오지 않으셨나요? 재요청 버튼을 눌러보세요.
+                  </Text>
+                </View>
+              )}
+            </View>
+
+            {/* 인증 코드 입력 */}
+            <View style={styles.inputContainer}>
+              <View
+                style={[
+                  styles.inputRow,
+                  {borderBottomWidth: 1.5, borderBottomColor: '#A9A9A9'},
+                ]}>
+                <TextInput
+                  style={{flex: 1}}
+                  placeholder="메일로 전송된 코드를 입력해주세요."
+                  placeholderTextColor="#B9B9B9"
+                />
+                <Text style={styles.timerText}>{formatTime(timeLeft)}</Text>
+                <TouchableOpacity style={styles.verifyButton}>
+                  <Text style={styles.verifyButtonText}>확인</Text>
+                </TouchableOpacity>
+              </View>
+            </View>
+
+            {/* 학과 등록 */}
+            <View style={styles.inputContainer}>
+              <Text style={styles.inputLabel}>
+                학과 등록 <Text style={styles.starmark}>*</Text>
+              </Text>
+              <View style={styles.inputWrapper}>
+                <TextInput
+                  style={styles.inputBox}
+                  placeholder="대학 소속학과를 등록해주세요"
+                  placeholderTextColor="#B9B9B9"
+                />
+                <TouchableOpacity
+                  style={styles.codeButton}
+                  onPress={handleRegister}>
+                  <Text style={styles.requestCodeButtonText}>등록하기</Text>
+                </TouchableOpacity>
+              </View>
+            </View>
+
+            {/* 비밀번호 입력 */}
+            <View style={styles.inputContainer}>
+              <Text style={styles.inputLabel}>
+                비밀번호 입력 <Text style={styles.starmark}>*</Text>
+              </Text>
+              <View style={styles.inputWrapper}>
+                <TextInput
+                  style={styles.inputBox}
+                  placeholder="8~16자리 입력 / 영어, 숫자, 특수문자 조합"
+                  placeholderTextColor="#B9B9B9"
+                  secureTextEntry
+                  value={inputPassword} // 상태를 연결해주어야 합니다.
+                  onChangeText={handlePasswordChange}
+                />
+                <TouchableOpacity
+                  style={styles.resetButton}
+                  onPress={deletePassword}>
+                  <Image source={IMAGES.resetButton} style={styles.clearIcon} />
+                </TouchableOpacity>
+              </View>
+
+              <View style={styles.iconAndTextContainer}>
+                {errorMessage ? (
+                  <View style={styles.iconAndTextContainer}>
+                    <Image source={IMAGES.iIcon} style={styles.setiIcon} />
+                    <Text style={styles.activeText}>{errorMessage}</Text>
+                  </View>
+                ) : null}
+              </View>
+            </View>
+
+            {/* 이름 입력 */}
+            <View style={styles.inputContainer}>
+              <Text style={styles.inputLabel}>
+                이름 입력 <Text style={styles.starmark}>*</Text>
+              </Text>
+              <View style={styles.inputWrapper}>
+                <TextInput
+                  style={styles.inputBox}
+                  placeholder="1~8자리 입력 / 한글, 영어, 숫자 조합"
+                  placeholderTextColor="#B9B9B9"
+                />
+                <TouchableOpacity
+                  style={styles.codeButton}
+                  onPress={chkDuplicate}>
+                  <Text style={styles.requestCodeButtonText}>중복 확인</Text>
+                </TouchableOpacity>
+              </View>
+              {nameDuplicate && (
+                <View style={styles.iconAndTextContainer}>
+                  <Image source={IMAGES.iIcon} style={styles.setiIcon} />
+                  <Text style={styles.activeText}>
+                    이미 존재하는 이름입니다!
+                  </Text>
+                </View>
+              )}
+            </View>
+          </ScrollView>
+
+          {/* 하단 버튼 */}
+          <View style={styles.buttonContainer}>
+            <TouchableOpacity
+              style={styles.signUpButton}
+              onPress={submitSignUp}>
+              <LinearGradient
+                colors={['rgba(31, 209, 245, 1)', 'rgba(0, 255, 150, 1)']}
+                style={{
+                  flex: 1,
+                  borderRadius: 30,
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                }}
+                start={{x: 0, y: 0}}
+                end={{x: 1, y: 1}}>
+                <Text style={styles.signUpButtonText}>잔디 심으러 가기</Text>
+              </LinearGradient>
             </TouchableOpacity>
           </View>
-          {nameDuplicate && (
-            <View style={styles.iconAndTextContainer}>
-              <Image source={IMAGES.iIcon} style={styles.setiIcon} />
-              <Text style={styles.activeText}>이미 존재하는 이름입니다!</Text>
-            </View>
-          )}
         </View>
-      </ScrollView>
-
-      {/* 하단 버튼 */}
-      <View style={styles.buttonContainer}>
-        <TouchableOpacity style={styles.signUpButton} onPress={submitSignUp}>
-          <LinearGradient
-            colors={['rgba(31, 209, 245, 1)', 'rgba(0, 255, 150, 1)']}
-            style={{
-              flex: 1,
-              borderRadius: 30,
-              justifyContent: 'center',
-              alignItems: 'center',
-            }}
-            start={{x: 0, y: 0}}
-            end={{x: 1, y: 1}}>
-            <Text style={styles.signUpButtonText}>잔디 심으러 가기</Text>
-          </LinearGradient>
-        </TouchableOpacity>
-      </View>
-    </View>
+      </SafeAreaView>
+    </>
   );
 };
 
@@ -353,13 +365,15 @@ const styles = StyleSheet.create({
     marginBottom: height * 0.01,
   },
   welcomeText: {
-    fontFamily: 'NanumSquareNeo-dEb',
+    fontFamily: 'NanumSquareNeo-Variable',
+    fontWeight: '800',
     fontSize: 24,
     color: '#3E3E3E',
     paddingTop: height * 0.02,
   },
   welcomeText2: {
-    fontFamily: 'NanumSquareNeo-dEb',
+    fontFamily: 'NanumSquareNeo-Variable',
+    fontWeight: '800',
     fontSize: 24,
     color: '#3E3E3E',
     marginBottom: height * 0.035,
@@ -369,7 +383,8 @@ const styles = StyleSheet.create({
     marginBottom: height * 0.025,
   },
   inputLabel: {
-    fontFamily: 'NanumSquareNeo-cBd',
+    fontFamily: 'NanumSquareNeo-Variable',
+    fontWeight: '600',
     fontSize: 14,
     color: '#454545',
     marginBottom: height * 0.005,
@@ -383,6 +398,9 @@ const styles = StyleSheet.create({
     borderRadius: 6,
     paddingHorizontal: 10,
     justifyContent: 'center',
+    fontFamily: 'NanumSquareNeo-Variable',
+    fontWeight: '600',
+    fontSize: 12,
   },
   inputRow: {
     flexDirection: 'row',
@@ -401,6 +419,8 @@ const styles = StyleSheet.create({
     color: '#FFFFFF',
     fontSize: 11,
     borderRadius: 20,
+    fontFamily: 'NanumSquareNeo-Variable',
+    fontWeight: '600',
   },
   iconAndTextContainer: {
     flexDirection: 'row', // 가로로 정렬
@@ -414,9 +434,10 @@ const styles = StyleSheet.create({
     marginRight: width * 0.02,
   },
   activeText: {
-    fontFamily: 'NanumSquareNeo-aLt',
     color: '#009499',
     fontSize: 11,
+    fontFamily: 'NanumSquareNeo-Variable',
+    fontWeight: '600',
   },
   verifyButton: {
     marginLeft: width * 0.02,
@@ -429,12 +450,16 @@ const styles = StyleSheet.create({
   verifyButtonText: {
     color: '#FFFFFF',
     fontSize: 12,
+    fontFamily: 'NanumSquareNeo-Variable',
+    fontWeight: '600',
   },
   timerText: {
     marginLeft: 10,
     color: '#FF7777',
     fontSize: 12,
     textAlign: 'right',
+    fontFamily: 'NanumSquareNeo-Variable',
+    fontWeight: '700',
   },
   buttonContainer: {
     backgroundColor: '#E1E6E8', // 여백 부분에 색상 채움
@@ -450,10 +475,13 @@ const styles = StyleSheet.create({
     color: '#FFFFFF',
     justifyContent: 'center',
     fontSize: 16,
-    fontWeight: 'bold',
     textAlign: 'center',
+    fontFamily: 'NanumSquareNeo-Variable',
+    fontWeight: '800',
   },
   gradientText: {
     padding: 0,
+    fontFamily: 'NanumSquareNeo-Variable',
+    fontWeight: '800',
   },
 });
