@@ -1,3 +1,5 @@
+// src/screens/HomeScreen.tsx
+
 import React, {useState} from 'react';
 import {
   View,
@@ -8,13 +10,22 @@ import {
   StyleSheet,
   ScrollView,
   SafeAreaView,
+  Modal,
 } from 'react-native';
 import BottomBar from '../components/BottomBar';
-import {Calendar, DateData, LocaleConfig} from 'react-native-calendars';
 const {width, height} = Dimensions.get('window');
 import CalendarScreen from '../components/calendar';
-import YearlyCalendar from '../components/YearCalendar';
+import {
+  requestLocationPermission,
+  getCurrentLocation,
+} from '../utils/locationUtils';
+import {SERVICE_AREA, isPointInPolygon, Coordinate} from '../utils/serviceArea';
+
 const HomeScreen = () => {
+  // 모달 상태 관리
+  const [modalVisible, setModalVisible] = useState<boolean>(false);
+  const [modalMessage, setModalMessage] = useState<string>('');
+
   const IMAGES = {
     profile: require('../../assets/images/illustration/typeThree.png'),
     logo: require('../../assets/images/illustration/logo.png'),
@@ -25,6 +36,7 @@ const HomeScreen = () => {
     badge3: require('../../assets/images/badge/badge3.png'),
     freeze: require('../../assets/images/illustration/freeze.png'),
   };
+
   // 프로필 데이터 배열
   const profiles = [
     {
@@ -46,6 +58,41 @@ const HomeScreen = () => {
     },
   ];
 
+  // "혼자 인증하기" 버튼 핸들러
+  const handleSelfCertify = async () => {
+    const hasPermission = await requestLocationPermission();
+    if (!hasPermission) {
+      setModalMessage('위치 권한이 필요합니다.');
+      setModalVisible(true);
+      return;
+    }
+
+    try {
+      const location: {latitude: number; longitude: number} =
+        await getCurrentLocation();
+      const userCoordinate: Coordinate = {
+        latitude: location.latitude,
+        longitude: location.longitude,
+      };
+
+      const isInside = isPointInPolygon(
+        {latitude: 35.23559740400939, longitude: 129.0816297282198},
+        SERVICE_AREA,
+      );
+
+      if (isInside) {
+        setModalMessage('인증에 성공했습니다!');
+      } else {
+        setModalMessage('서비스 지역이 아닙니다.');
+      }
+      setModalVisible(true);
+    } catch (error) {
+      console.warn('위치 가져오기 실패:', error);
+      setModalMessage('위치 가져오기에 실패했습니다.');
+      setModalVisible(true);
+    }
+  };
+
   return (
     <>
       <SafeAreaView style={{flex: 1}}>
@@ -53,7 +100,6 @@ const HomeScreen = () => {
           style={styles.container}
           contentContainerStyle={{paddingBottom: 80}}>
           {/* 상단 프로필 영역 */}
-
           <View style={styles.logoSection}>
             <View style={styles.logoInfo}>
               <Image source={IMAGES.logo} style={styles.logoImage} />
@@ -61,7 +107,7 @@ const HomeScreen = () => {
           </View>
 
           <View>
-            {profiles.map((profile, index) => (
+            {profiles.map(profile => (
               <View key={profile.id}>
                 <View style={styles.upperSection}>
                   <View style={styles.profileInfo}>
@@ -95,9 +141,12 @@ const HomeScreen = () => {
               </View>
             ))}
           </View>
+
           {/* 인증하기 버튼들 */}
           <View style={styles.buttonSection}>
-            <TouchableOpacity style={styles.certifyButton}>
+            <TouchableOpacity
+              style={styles.certifyButton}
+              onPress={handleSelfCertify}>
               <Text style={styles.buttonText}>혼자 인증하기</Text>
               <Image source={IMAGES.self} style={styles.buttons} />
             </TouchableOpacity>
@@ -113,7 +162,7 @@ const HomeScreen = () => {
             <Text style={styles.frozenTitle}>보유 프리즈</Text>
             <View style={styles.frozenDetailContainer}>
               {freezes.map((freeze, index) => (
-                <View>
+                <View key={index}>
                   <Text style={styles.frozenDetailText}>
                     현재 총 <Text style={styles.frozenCount}>{freeze.num}</Text>{' '}
                     개의 프리즈를 보유하고 있습니다.
@@ -133,6 +182,7 @@ const HomeScreen = () => {
               ※ 프리즈는 잔다를 대신 채워줄 수 있는 잔디 채우기권입니다!
             </Text>
           </View>
+
           {/* 현재 일수 표시 */}
           <View style={styles.currentDaySection}>
             <Text style={styles.currentDayText}>
@@ -141,11 +191,31 @@ const HomeScreen = () => {
           </View>
 
           {/* 달력 부분 */}
-          <View style={styles.calendarContainer}>
+          <View>
             <CalendarScreen />
           </View>
         </ScrollView>
         <BottomBar />
+
+        {/* 인증 결과 모달 */}
+        <Modal
+          animationType="slide"
+          transparent={true}
+          visible={modalVisible}
+          onRequestClose={() => {
+            setModalVisible(!modalVisible);
+          }}>
+          <View style={styles.modalOverlay}>
+            <View style={styles.modalView}>
+              <Text style={styles.modalText}>{modalMessage}</Text>
+              <TouchableOpacity
+                style={styles.closeButton}
+                onPress={() => setModalVisible(!modalVisible)}>
+                <Text style={styles.closeButtonText}>닫기</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </Modal>
       </SafeAreaView>
     </>
   );
@@ -160,24 +230,19 @@ const styles = StyleSheet.create({
     width: width,
     height: height,
   },
-
   logoSection: {
     alignItems: 'center',
-
     flexDirection: 'row',
   },
-
   logoInfo: {
     flexDirection: 'row',
   },
-
   logoImage: {
     width: 80,
     height: 50,
     left: 20,
     resizeMode: 'contain',
   },
-
   upperSection: {
     position: 'relative',
     flexDirection: 'row',
@@ -201,14 +266,14 @@ const styles = StyleSheet.create({
     marginTop: 50,
     flexDirection: 'row',
   },
-
   nickname: {
     fontSize: 12,
     color: '#009499',
     flexDirection: 'row',
     marginLeft: 10,
+    fontWeight: '700',
+    fontFamily: 'NanumSquareNeo-Variable',
   },
-
   username: {
     fontSize: 20,
     fontWeight: 'bold',
@@ -216,23 +281,23 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     marginLeft: 10,
     marginTop: -10,
+    fontFamily: 'NanumSquareNeo-Variable',
   },
-
   badgeContainer: {
     flexDirection: 'row',
     marginLeft: 100,
     color: '#009499',
-
     position: 'relative',
   },
   badgeText: {
-    fontSize: 14,
+    fontSize: 13,
     color: '#777',
     flexDirection: 'row',
     marginTop: -30,
     position: 'absolute',
+    fontFamily: 'NanumSquareNeo-Variable',
+    fontWeight: 'bold',
   },
-
   badge: {
     width: 35,
     height: 35,
@@ -245,6 +310,7 @@ const styles = StyleSheet.create({
   moreText: {
     fontSize: 20,
     color: '#009499',
+    fontFamily: 'NanumSquareNeo-Variable',
   },
   buttonSection: {
     flexDirection: 'row',
@@ -279,15 +345,14 @@ const styles = StyleSheet.create({
     color: '#fff',
     fontSize: 14, // 텍스트 크기
     fontWeight: 'bold', // 텍스트 두께
+    fontFamily: 'NanumSquareNeo-Variable',
   },
-
   buttons: {
     width: 130, // 이미지의 가로 크기
     height: 55, // 이미지의 세로 크기
     resizeMode: 'contain',
     marginTop: 10,
   },
-
   frozenSection: {
     padding: 0,
     backgroundColor: '#F5F5F5',
@@ -295,12 +360,12 @@ const styles = StyleSheet.create({
     left: 30,
     marginBottom: 10,
   },
-
   frozenTitle: {
     fontSize: 10,
     fontWeight: 'bold',
     color: '#838F8F',
     marginBottom: 5,
+    fontFamily: 'NanumSquareNeo-Variable',
   },
   frozenDetailContainer: {
     flexDirection: 'row',
@@ -331,45 +396,41 @@ const styles = StyleSheet.create({
     alignItems: 'center', // 중앙 정렬 추가
     justifyContent: 'center', // 중앙 정렬 추가
   },
-
   frozenText: {
     flexDirection: 'row',
-
     alignItems: 'center', // 중앙 정렬 추가
   },
-
   useFrozenButtonText: {
     color: '#FFFFFF',
-
     fontSize: 10,
     fontWeight: 'bold',
+    fontFamily: 'NanumSquareNeo-Variable',
   },
-
   freeze: {
     right: 5,
   },
-
   frozenNote: {
     fontSize: 9,
     color: '#009499',
     marginTop: 5,
+    fontFamily: 'NanumSquareNeo-Variable',
   },
-
   currentDaySection: {
     padding: 20,
     alignItems: 'flex-start',
   },
-
   dayCount: {
     fontSize: 24,
     color: '#009499',
+    fontFamily: 'NanumSquareNeo-Variable',
+    fontWeight: 'bold',
   },
   currentDayText: {
     fontSize: 16,
     fontWeight: 'bold',
     color: '#333',
+    fontFamily: 'NanumSquareNeo-Variable',
   },
-
   bottomNav: {
     flexDirection: 'row',
     justifyContent: 'space-around',
@@ -383,5 +444,44 @@ const styles = StyleSheet.create({
   },
   navText: {
     color: '#333',
+  },
+  // 모달 스타일
+  modalOverlay: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+  },
+  modalView: {
+    width: '80%',
+    backgroundColor: 'white',
+    borderRadius: 8,
+    padding: 20,
+    alignItems: 'center',
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 4,
+    elevation: 5,
+  },
+  modalText: {
+    marginBottom: 15,
+    textAlign: 'center',
+    fontSize: 16,
+    fontWeight: '700',
+    fontFamily: 'NanumSquareNeo-Variable',
+  },
+  closeButton: {
+    backgroundColor: '#1AA5AA',
+    borderRadius: 4,
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+  },
+  closeButtonText: {
+    color: 'white',
+    fontWeight: 'bold',
   },
 });

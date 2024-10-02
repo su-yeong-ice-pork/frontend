@@ -13,7 +13,11 @@ import FindPassword from './src/screens/FindPasswordScreen';
 import ProfileScreen from './src/screens/ProfileScreen';
 import ChangePasswordScreen from './src/screens/ChangePasswordScreen';
 import EditProfileScreen from './src/screens/EditProfileScreen';
+import ProfileScreen from './src/screens/ProfileScreen';
+import ChangePasswordScreen from './src/screens/ChangePasswordScreen';
+import EditProfileScreen from './src/screens/EditProfileScreen';
 
+import FriendsProfile from './src/screens/FriendsProfile';
 const Stack = createStackNavigator();
 
 const App = () => {
@@ -30,9 +34,6 @@ const App = () => {
         <Stack.Screen name="Home" component={HomeScreen} />
         <Stack.Screen name="Log" component={StudyRecordScreen} />
         <Stack.Screen name="FindPassword" component={FindPassword} />
-        <Stack.Screen name="Profile" component={ProfileScreen} />
-        <Stack.Screen name="ChangePassword" component={ChangePasswordScreen} />
-        <Stack.Screen name="EditProfile" component={EditProfileScreen} />
       </Stack.Navigator>
     </NavigationContainer>
   );

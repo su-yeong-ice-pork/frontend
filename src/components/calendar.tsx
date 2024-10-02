@@ -1,4 +1,4 @@
-// CalendarScreen.js
+//components/calendar.tsx
 import React, {useState} from 'react';
 import {
   View,
@@ -11,6 +11,7 @@ import {
 import {Calendar, LocaleConfig} from 'react-native-calendars';
 import YearlyCalendar from './YearCalendar';
 import moment from 'moment';
+import LinearGradient from 'react-native-linear-gradient';
 
 // Locale 설정
 LocaleConfig.locales['kr'] = {
@@ -119,30 +120,62 @@ const CalendarScreen = () => {
     else if (grassScore <= 6) return '#239a3b';
     else return '#196127'; // 진한 초록
   };
+  const handleTabPress = mode => {
+    setViewMode(mode);
+  };
 
   return (
     <View style={styles.container}>
       {/* 탭 전환 및 연도 선택 부분 */}
       <View style={styles.tabContainer}>
+        {/* 월간 잔디밭 탭 */}
         <TouchableOpacity
-          style={[styles.tabButton, viewMode === 'monthly' && styles.activeTab]}
-          onPress={() => setViewMode('monthly')}>
-          <Text
-            style={
-              viewMode === 'monthly' ? styles.activeTabText : styles.tabText
-            }>
-            월간 잔디밭
-          </Text>
+          style={styles.tabButton}
+          onPress={() => handleTabPress('monthly')}
+          activeOpacity={0.7}>
+          <View style={styles.tabContent}>
+            {viewMode === 'monthly' && (
+              <LinearGradient
+                colors={['#0DD8EC', '#15EC89']}
+                style={styles.activeIndicator}>
+                <LinearGradient
+                  colors={['#0DD8EC', '#15EC89']}
+                  style={styles.dot}
+                />
+              </LinearGradient>
+            )}
+            <Text
+              style={
+                viewMode === 'monthly' ? styles.activeTabText : styles.tabText
+              }>
+              월간 잔디밭
+            </Text>
+          </View>
         </TouchableOpacity>
+
+        {/* 연간 잔디밭 탭 */}
         <TouchableOpacity
-          style={[styles.tabButton, viewMode === 'yearly' && styles.activeTab]}
-          onPress={() => setViewMode('yearly')}>
-          <Text
-            style={
-              viewMode === 'yearly' ? styles.activeTabText : styles.tabText
-            }>
-            연간 잔디밭
-          </Text>
+          style={styles.tabButton}
+          onPress={() => handleTabPress('yearly')}
+          activeOpacity={0.7}>
+          <View style={styles.tabContent}>
+            {viewMode === 'yearly' && (
+              <LinearGradient
+                colors={['#0DD8EC', '#15EC89']}
+                style={styles.activeIndicator}>
+                <LinearGradient
+                  colors={['#0DD8EC', '#15EC89']}
+                  style={styles.dot}
+                />
+              </LinearGradient>
+            )}
+            <Text
+              style={
+                viewMode === 'yearly' ? styles.activeTabText : styles.tabText
+              }>
+              연간 잔디밭
+            </Text>
+          </View>
         </TouchableOpacity>
       </View>
 
@@ -197,18 +230,14 @@ const CalendarScreen = () => {
               selectedDayBackgroundColor: '#A8E6CF',
               todayTextColor: '#00adf5',
               dotColor: '#A8E6CF',
-              // 기타 테마 설정...
             }}
-            firstDay={0} // 일요일을 주의 첫날로 설정
+            firstDay={0}
           />
           <View style={styles.statsContainer}>
             {statData.map((id, index) => (
               <View key={index}>
                 <Text style={styles.statsText}>
-                  <Image
-                    source={IMAGES.calendar}
-                    style={styles.statsCalendar}
-                  />
+                  <Image source={IMAGES.calendar} />
                   최장 <Text style={styles.highlight}>{id.day}</Text>일 유지
                 </Text>
                 <Text style={styles.statsText}>
@@ -222,15 +251,20 @@ const CalendarScreen = () => {
       ) : (
         <View style={styles.yearlyView}>
           {/* 연간 잔디밭 구현 */}
-          <Text style={styles.yearlyTitle}>연간 잔디밭</Text>
           <YearlyCalendar />
           <View style={styles.statsContainer}>
-            <Text style={styles.statsText}>
-              최장 <Text style={styles.highlight}>118</Text>일 유지
-            </Text>
-            <Text style={styles.statsText}>
-              총 공부시간 <Text style={styles.highlight}>489</Text>시간
-            </Text>
+            {statData.map((id, index) => (
+              <View key={index}>
+                <Text style={styles.statsText}>
+                  <Image source={IMAGES.calendar} />
+                  최장 <Text style={styles.highlight}>{id.day}</Text>일 유지
+                </Text>
+                <Text style={styles.statsText}>
+                  <Image source={IMAGES.studyTime} style={styles.statsTime} />총
+                  공부시간 <Text style={styles.highlight}>{id.time}</Text>시간
+                </Text>
+              </View>
+            ))}
           </View>
         </View>
       )}
@@ -265,35 +299,54 @@ const CalendarScreen = () => {
 };
 
 const styles = StyleSheet.create({
-  // 기존 스타일...
   container: {
     flex: 1,
     backgroundColor: '#F5F5F5',
   },
   tabContainer: {
     flexDirection: 'row',
+    justifyContent: 'center',
     alignItems: 'center',
     backgroundColor: '#4CB6A9',
     borderTopLeftRadius: 15,
     borderTopRightRadius: 15,
-    paddingVertical: 5,
-    paddingHorizontal: 10,
   },
   tabButton: {
-    padding: 10,
-    marginRight: 15,
+    flex: 1,
+    alignItems: 'center',
+    paddingBottom: 10,
   },
-  activeTab: {
-    borderBottomWidth: 3,
-    borderBottomColor: '#fff',
+  tabContent: {
+    alignItems: 'center',
+  },
+  activeIndicator: {
+    width: 80,
+    height: 3,
+    borderRadius: 40,
+    alignItems: 'flex-end',
+  },
+  borderLine: {
+    width: '100%',
+    height: 4,
+    borderRadius: 2,
+  },
+  dot: {
+    width: 5,
+    height: 5,
+    borderRadius: 5, // Half of width and height for a perfect circle
+    marginTop: 7,
   },
   tabText: {
-    fontSize: 16,
+    fontSize: 15,
+    marginTop: 15,
     color: '#B0D8D3',
+    fontFamily: 'NanumSquareNeo-Variable',
   },
   activeTabText: {
-    fontSize: 16,
+    fontSize: 15,
+    marginTop: 10,
     color: '#FFFFFF',
+    fontFamily: 'NanumSquareNeo-Variable',
   },
   calendarContainer: {
     padding: 10,
@@ -316,6 +369,7 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: '#333',
     marginVertical: 2,
+    fontFamily: 'NanumSquareNeo-Variable',
   },
   highlight: {
     color: '#1AA5AA',
@@ -359,8 +413,9 @@ const styles = StyleSheet.create({
   },
   arrowText: {
     color: '#009499',
-    fontSize: 14, // 크기를 작게 조정
+    fontSize: 14,
     marginHorizontal: 5,
+    fontFamily: 'NanumSquareNeo-Variable',
   },
   modalBackground: {
     flex: 1,
@@ -379,6 +434,7 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: 'bold',
     marginBottom: 10,
+    fontFamily: 'NanumSquareNeo-Variable',
   },
   closeButton: {
     marginTop: 20,
@@ -390,6 +446,7 @@ const styles = StyleSheet.create({
   closeButtonText: {
     color: '#fff',
     fontWeight: 'bold',
+    fontFamily: 'NanumSquareNeo-Variable',
   },
 });
 

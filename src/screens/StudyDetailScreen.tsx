@@ -9,6 +9,7 @@ import {
   ScrollView,
   TouchableOpacity,
   Dimensions,
+  SafeAreaView,
 } from 'react-native';
 import Header from '../components/Header';
 import BottomBar from '../components/BottomBar';
@@ -58,103 +59,108 @@ const StudyDetailScreen = () => {
   const totalStudyTime = 72;
 
   return (
-    <View style={styles.container}>
-      <Header Title={'스터디'} />
-      <ScrollView contentContainerStyle={styles.main}>
-        {/* 스터디 이름과 함께 인증하기 버튼 */}
-        <View style={styles.studyHeader}>
-          <View style={styles.studyInfo}>
-            <Text style={styles.studyTitle}>CPA 메이트</Text>
-            <Text style={styles.totalStudyTime}>
-              총 공부시간:{'  '}
-              <Text style={styles.totalStudyTimeValue}>{totalStudyTime}</Text>
-              시간
-            </Text>
-          </View>
-          <TouchableOpacity
-            style={styles.certifyButton}
-            onPress={() => {
-              /* 인증하기 기능 */
-            }}>
-            <Image
-              source={require('../../assets/images/icons/redstar.png')}
-              style={styles.redStar}
-              resizeMode="contain"
-            />
-            <Text style={styles.certifyButtonText}>함께 인증하기</Text>
-          </TouchableOpacity>
-        </View>
-
-        {/* 점선 */}
-        <View style={styles.dashedLine} />
-
-        {/* 구성원 목록과 구성원 추가 버튼 */}
-        <View style={styles.membersHeader}>
-          <Text style={styles.membersTitle}>구성원 목록</Text>
-          <TouchableOpacity
-            style={styles.addMemberButton}
-            onPress={() => {
-              /* 구성원 추가 기능 */
-            }}>
-            <Image
-              source={require('../../assets/images/icons/whiteUsers.png')}
-              style={styles.redStar}
-              resizeMode="contain"
-            />
-            <Text style={styles.addMemberButtonText}>구성원 추가</Text>
-          </TouchableOpacity>
-        </View>
-
-        {/* 구성원 리스트 */}
-        <View style={styles.membersList}>
-          {members.map((member, index) => (
-            <View key={member.id}>
+    <>
+      <SafeAreaView style={{flex: 1, backgroundColor: '#F5F5F5'}}>
+        <View style={styles.container}>
+          <Header Title={'스터디'} />
+          <ScrollView contentContainerStyle={styles.main}>
+            {/* 스터디 이름과 함께 인증하기 버튼 */}
+            <View style={styles.studyHeader}>
+              <View style={styles.studyInfo}>
+                <Text style={styles.studyTitle}>CPA 메이트</Text>
+                <Text style={styles.totalStudyTime}>
+                  총 공부시간:{'  '}
+                  <Text style={styles.totalStudyTimeValue}>
+                    {totalStudyTime}
+                  </Text>
+                  시간
+                </Text>
+              </View>
               <TouchableOpacity
-                style={styles.memberItem}
+                style={styles.certifyButton}
                 onPress={() => {
-                  /* 구성원 터치 기능 */
+                  /* 인증하기 기능 */
                 }}>
                 <Image
-                  source={
-                    member.image
-                      ? {uri: member.image}
-                      : require('../../assets/images/icons/baseIcon.png')
-                  }
-                  style={styles.memberImage}
-                  resizeMode="cover"
+                  source={require('../../assets/images/icons/redstar.png')}
+                  style={styles.redStar}
+                  resizeMode="contain"
                 />
-                <View style={styles.memberInfo}>
-                  <Text style={styles.memberName}>
-                    {member.name}{' '}
-                    {member.isHost && (
-                      <View style={styles.hostBadge}>
-                        <Image
-                          source={require('../../assets/images/icons/crown.png')}
-                          style={styles.crown}
-                          resizeMode="contain"
-                        />
-                        <Text style={styles.hostBadgeText}>방장</Text>
-                      </View>
-                    )}
-                  </Text>
-                  <Text style={styles.memberStudyTime}>
-                    오늘 공부 시간:{' '}
-                    <Text style={styles.totalStudyTimeValue}>
-                      {member.todayStudyTime}
-                    </Text>
-                  </Text>
-                </View>
+                <Text style={styles.certifyButtonText}>함께 인증하기</Text>
               </TouchableOpacity>
-              {index !== members.length - 1 && (
-                <View style={styles.separator} />
-              )}
             </View>
-          ))}
+
+            {/* 점선 */}
+            <View style={styles.dashedLine} />
+
+            {/* 구성원 목록과 구성원 추가 버튼 */}
+            <View style={styles.membersHeader}>
+              <Text style={styles.membersTitle}>구성원 목록</Text>
+              <TouchableOpacity
+                style={styles.addMemberButton}
+                onPress={() => {
+                  /* 구성원 추가 기능 */
+                }}>
+                <Image
+                  source={require('../../assets/images/icons/whiteUsers.png')}
+                  style={styles.redStar}
+                  resizeMode="contain"
+                />
+                <Text style={styles.addMemberButtonText}>구성원 추가</Text>
+              </TouchableOpacity>
+            </View>
+
+            {/* 구성원 리스트 */}
+            <View style={styles.membersList}>
+              {members.map((member, index) => (
+                <View key={member.id}>
+                  <TouchableOpacity
+                    style={styles.memberItem}
+                    onPress={() => {
+                      /* 구성원 터치 기능 */
+                    }}>
+                    <Image
+                      source={
+                        member.image
+                          ? {uri: member.image}
+                          : require('../../assets/images/icons/baseIcon.png')
+                      }
+                      style={styles.memberImage}
+                      resizeMode="cover"
+                    />
+                    <View style={styles.memberInfo}>
+                      <Text style={styles.memberName}>
+                        {member.name}{' '}
+                        {member.isHost && (
+                          <View style={styles.hostBadge}>
+                            <Image
+                              source={require('../../assets/images/icons/crown.png')}
+                              style={styles.crown}
+                              resizeMode="contain"
+                            />
+                            <Text style={styles.hostBadgeText}>방장</Text>
+                          </View>
+                        )}
+                      </Text>
+                      <Text style={styles.memberStudyTime}>
+                        오늘 공부 시간:{' '}
+                        <Text style={styles.totalStudyTimeValue}>
+                          {member.todayStudyTime}
+                        </Text>
+                      </Text>
+                    </View>
+                  </TouchableOpacity>
+                  {index !== members.length - 1 && (
+                    <View style={styles.separator} />
+                  )}
+                </View>
+              ))}
+            </View>
+          </ScrollView>
         </View>
-      </ScrollView>
+      </SafeAreaView>
       <BottomBar />
-      {/* 하단 네모 버튼 */}
-    </View>
+    </>
   );
 };
 
@@ -166,9 +172,10 @@ const styles = StyleSheet.create({
     backgroundColor: '#F5F5F5',
   },
   main: {
-    padding: 20,
+    paddingHorizontal: 20,
     alignItems: 'center',
     width: width,
+    paddingBottom: 80,
   },
   // 스터디 이름과 인증하기 버튼 컨테이너
   studyHeader: {
@@ -185,17 +192,18 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   studyTitle: {
-    fontSize: 30,
-    fontWeight: '700',
+    fontSize: 27,
+    fontWeight: '900',
     color: '#454545',
-    fontFamily: 'NanumSquareNeo-eHv',
+    fontFamily: 'NanumSquareNeo-Variable',
     marginBottom: 5,
     width: '100%',
   },
   totalStudyTime: {
     fontSize: 14,
     color: '#454545',
-    fontFamily: 'NanumSquareNeo-eHv',
+    fontWeight: '700',
+    fontFamily: 'NanumSquareNeo-Variable',
     width: '100%',
   },
   certifyButton: {
@@ -212,7 +220,8 @@ const styles = StyleSheet.create({
   certifyButtonText: {
     color: '#FFFFFF',
     fontSize: 14,
-    fontFamily: 'NanumSquareNeo-eHv',
+    fontWeight: 'bold',
+    fontFamily: 'NanumSquareNeo-Variable',
   },
   redStar: {
     width: 20,
@@ -243,7 +252,8 @@ const styles = StyleSheet.create({
   membersTitle: {
     fontSize: 16,
     color: '#454545',
-    fontFamily: 'NanumSquareNeo-eHv',
+    fontWeight: '900',
+    fontFamily: 'NanumSquareNeo-Variable',
   },
   addMemberButton: {
     backgroundColor: '#1AA5AA',
@@ -258,7 +268,8 @@ const styles = StyleSheet.create({
     color: '#FFFFFF',
     fontSize: 12,
     letterSpacing: 1,
-    fontFamily: 'NanumSquareNeo-eHv',
+    fontWeight: '900',
+    fontFamily: 'NanumSquareNeo-Variable',
   },
   // 구성원 리스트
   membersList: {
@@ -288,19 +299,22 @@ const styles = StyleSheet.create({
   memberName: {
     fontSize: 18,
     color: '#454545',
-    fontFamily: 'NanumSquareNeo-eHv',
+    fontWeight: '900',
+    fontFamily: 'NanumSquareNeo-Variable',
     marginBottom: 5,
     width: '100%',
   },
   hostBadgeText: {
     fontSize: 12,
     color: '#ffffff',
-    fontFamily: 'NanumSquareNeo-eHv',
+    fontWeight: '900',
+    fontFamily: 'NanumSquareNeo-Variable',
   },
   memberStudyTime: {
     fontSize: 14,
     color: '#646464',
-    fontFamily: 'NanumSquareNeo-eHv',
+    fontWeight: '900',
+    fontFamily: 'NanumSquareNeo-Variable',
     width: '100%',
   },
   hostBadge: {
