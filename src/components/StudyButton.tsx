@@ -49,6 +49,7 @@ const styles = StyleSheet.create({
   button: {
     flexDirection: 'row',
     alignItems: 'center',
+    width: 128,
     paddingVertical: 5,
     paddingHorizontal: 10,
     borderRadius: 25,
@@ -70,14 +71,14 @@ const styles = StyleSheet.create({
   },
   text: {
     color: '#FFFFFF',
-    fontSize: 12,
+    fontSize: 10,
     fontWeight: '700',
-    fontFamily: 'NanumSquareNeo-aLt',
+    fontFamily: 'NanumSquareNeo-Variable',
   },
   recordingText: {
     color: '#FFFFFF',
     fontSize: 12,
     fontWeight: '700',
-    fontFamily: 'NanumSquareNeo-aLt',
+    fontFamily: 'NanumSquareNeo-Variable',
   },
 });

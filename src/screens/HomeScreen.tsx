@@ -188,7 +188,7 @@ const HomeScreen = () => {
           </View>
 
           {/* 달력 부분 */}
-          <View style={styles.calendarContainer}>
+          <View>
             <CalendarScreen />
           </View>
         </ScrollView>
@@ -268,6 +268,8 @@ const styles = StyleSheet.create({
     color: '#009499',
     flexDirection: 'row',
     marginLeft: 10,
+    fontWeight: '700',
+    fontFamily: 'NanumSquareNeo-Variable',
   },
   username: {
     fontSize: 20,
@@ -276,6 +278,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     marginLeft: 10,
     marginTop: -10,
+    fontFamily: 'NanumSquareNeo-Variable',
   },
   badgeContainer: {
     flexDirection: 'row',
@@ -284,11 +287,13 @@ const styles = StyleSheet.create({
     position: 'relative',
   },
   badgeText: {
-    fontSize: 14,
+    fontSize: 13,
     color: '#777',
     flexDirection: 'row',
     marginTop: -30,
     position: 'absolute',
+    fontFamily: 'NanumSquareNeo-Variable',
+    fontWeight: 'bold',
   },
   badge: {
     width: 35,
@@ -302,6 +307,7 @@ const styles = StyleSheet.create({
   moreText: {
     fontSize: 20,
     color: '#009499',
+    fontFamily: 'NanumSquareNeo-Variable',
   },
   buttonSection: {
     flexDirection: 'row',
@@ -336,6 +342,7 @@ const styles = StyleSheet.create({
     color: '#fff',
     fontSize: 14, // 텍스트 크기
     fontWeight: 'bold', // 텍스트 두께
+    fontFamily: 'NanumSquareNeo-Variable',
   },
   buttons: {
     width: 130, // 이미지의 가로 크기
@@ -355,6 +362,7 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     color: '#838F8F',
     marginBottom: 5,
+    fontFamily: 'NanumSquareNeo-Variable',
   },
   frozenDetailContainer: {
     flexDirection: 'row',
@@ -393,6 +401,7 @@ const styles = StyleSheet.create({
     color: '#FFFFFF',
     fontSize: 10,
     fontWeight: 'bold',
+    fontFamily: 'NanumSquareNeo-Variable',
   },
   freeze: {
     right: 5,
@@ -401,6 +410,7 @@ const styles = StyleSheet.create({
     fontSize: 9,
     color: '#009499',
     marginTop: 5,
+    fontFamily: 'NanumSquareNeo-Variable',
   },
   currentDaySection: {
     padding: 20,
@@ -409,11 +419,14 @@ const styles = StyleSheet.create({
   dayCount: {
     fontSize: 24,
     color: '#009499',
+    fontFamily: 'NanumSquareNeo-Variable',
+    fontWeight: 'bold',
   },
   currentDayText: {
     fontSize: 16,
     fontWeight: 'bold',
     color: '#333',
+    fontFamily: 'NanumSquareNeo-Variable',
   },
   bottomNav: {
     flexDirection: 'row',
@@ -456,7 +469,7 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     fontSize: 16,
     fontWeight: '700',
-    fontFamily: 'NanumSquareNeo-aLt',
+    fontFamily: 'NanumSquareNeo-Variable',
   },
   closeButton: {
     backgroundColor: '#1AA5AA',

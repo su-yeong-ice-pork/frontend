@@ -32,6 +32,7 @@ const styles = StyleSheet.create({
     marginLeft: 16,
     fontSize: 20,
     fontWeight: '800',
-    color: '#3f3f46', // text-zinc-700
+    color: '#3f3f46',
+    fontFamily: 'NanumSquareNeo-Variable',
   },
 });

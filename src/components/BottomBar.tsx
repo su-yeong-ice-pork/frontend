@@ -99,7 +99,6 @@ const styles = StyleSheet.create({
     borderTopColor: '#e0e0e0',
     position: 'absolute',
     bottom: 0,
-    // Ensure the bar is above other content
     zIndex: 100,
   },
   iconContainer: {
@@ -113,12 +112,12 @@ const styles = StyleSheet.create({
   },
   label: {
     fontSize: 12,
-    color: '#ABABAB', // Default text color
-    fontFamily: 'NanumSquareNeo-eHv', // Custom font
-    fontWeight: 'normal',
+    color: '#ABABAB',
+    fontFamily: 'NanumSquareNeo-Variable',
+    fontWeight: '700',
   },
   labelActive: {
-    color: '#000', // Active text color
+    color: '#000',
     fontWeight: 'bold',
   },
 });

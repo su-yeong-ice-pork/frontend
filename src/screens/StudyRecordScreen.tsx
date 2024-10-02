@@ -63,7 +63,6 @@ const friends = [
     isOnline: true,
   },
 ];
-
 const StudyRecordScreen = () => {
   const [isRecording, setIsRecording] = useState(false);
   const [timeElapsed, setTimeElapsed] = useState(0);
@@ -329,11 +328,13 @@ const styles = StyleSheet.create({
     color: '#FFFFFF',
     fontWeight: 'bold',
     fontSize: 16,
+    fontFamily: 'NanumSquareNeo-Variable',
   },
   inactiveTabText: {
     color: '#FFFFFF',
     fontWeight: 'bold',
     fontSize: 16,
+    fontFamily: 'NanumSquareNeo-Variable',
   },
   profileCardContainer: {
     width: width - 40,
@@ -347,13 +348,16 @@ const styles = StyleSheet.create({
   },
   profileCardTitle: {
     fontSize: 22,
-    fontWeight: '700',
+    fontWeight: '900',
     color: '#4b5563',
     marginBottom: 20,
     lineHeight: 30,
+    fontFamily: 'NanumSquareNeo-Variable',
   },
   highlightText: {
     color: '#15D58A',
+    fontWeight: '900',
+    fontFamily: 'NanumSquareNeo-Variable',
   },
   // 점선
   dashedLine: {
@@ -377,7 +381,8 @@ const styles = StyleSheet.create({
   membersTitle: {
     fontSize: 16,
     color: '#454545',
-    fontFamily: 'NanumSquareNeo-eHv',
+    fontWeight: '900',
+    fontFamily: 'NanumSquareNeo-Variable',
   },
   addMemberButton: {
     backgroundColor: '#1AA5AA',
@@ -392,7 +397,8 @@ const styles = StyleSheet.create({
     color: '#FFFFFF',
     fontSize: 12,
     letterSpacing: 1,
-    fontFamily: 'NanumSquareNeo-eHv',
+    fontWeight: '900',
+    fontFamily: 'NanumSquareNeo-Variable',
   },
   redStar: {
     width: 20,
@@ -427,7 +433,8 @@ const styles = StyleSheet.create({
   memberName: {
     fontSize: 18,
     color: '#454545',
-    fontFamily: 'NanumSquareNeo-eHv',
+    fontFamily: 'NanumSquareNeo-Variable',
+    fontWeight: '800',
     marginRight: 10,
   },
   onlineStatus: {
@@ -444,12 +451,14 @@ const styles = StyleSheet.create({
   onlineText: {
     fontSize: 14,
     color: '#1AA5AA',
-    fontFamily: 'NanumSquareNeo-eHv',
+    fontWeight: '700',
+    fontFamily: 'NanumSquareNeo-Variable',
   },
   memberStudyTime: {
     fontSize: 14,
     color: '#646464',
-    fontFamily: 'NanumSquareNeo-eHv',
+    fontWeight: '700',
+    fontFamily: 'NanumSquareNeo-Variable',
     marginTop: 5,
   },
   totalStudyTimeValue: {
@@ -467,7 +476,8 @@ const styles = StyleSheet.create({
   messageText: {
     fontSize: 14,
     color: '#454545',
-    fontFamily: 'NanumSquareNeo-eHv',
+    fontWeight: '800',
+    fontFamily: 'NanumSquareNeo-Variable',
   },
   separator: {
     height: 1,
@@ -496,22 +506,26 @@ const styles = StyleSheet.create({
     marginRight: 10,
   },
   modalTitle: {
-    fontSize: 18,
-    fontWeight: 'bold',
+    fontSize: 16,
+    fontWeight: '900',
+    fontFamily: 'NanumSquareNeo-Variable',
     color: '#4b5563',
     flex: 1,
   },
   modalHighlightText: {
     color: '#14B8A6',
-    fontWeight: 'bold',
+    fontWeight: '900',
+    fontFamily: 'NanumSquareNeo-Variable',
   },
   modalSubtitle: {
     marginTop: 10,
-    fontSize: 12,
+    fontSize: 11,
     color: '#6b7280',
     textAlign: 'left',
     lineHeight: 20,
     marginLeft: 56,
+    fontWeight: '800',
+    fontFamily: 'NanumSquareNeo-Variable',
   },
   modalCloseButton: {
     position: 'absolute',

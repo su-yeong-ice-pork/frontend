@@ -92,18 +92,21 @@ const styles = StyleSheet.create({
   senderText: {
     fontSize: 14,
     fontWeight: '800',
-    color: '#52525b', // text-neutral-700
+    color: '#52525b',
+    fontFamily: 'NanumSquareNeo-Variable',
   },
   contentText: {
     marginTop: 8,
     fontSize: 14,
-    fontWeight: '500',
-    color: '#71717a', // text-zinc-600
+    fontWeight: '700',
+    color: '#71717a',
+    fontFamily: 'NanumSquareNeo-Variable',
   },
   timeText: {
     marginTop: 8,
     fontSize: 12,
     fontWeight: '700',
-    color: '#a3a3a3', // text-neutral-400
+    color: '#a3a3a3',
+    fontFamily: 'NanumSquareNeo-Variable',
   },
 });

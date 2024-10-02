@@ -32,7 +32,7 @@
 		<true/>
 	</dict>
 	<key>NSLocationWhenInUseUsageDescription</key>
-	<string/>
+	<string>앱 사용 중 위치 접근을 허용해주세요.</string>
 	<key>UILaunchStoryboardName</key>
 	<string>LaunchScreen</string>
 	<key>UIRequiredDeviceCapabilities</key>
@@ -49,16 +49,9 @@
 	<false/>
 	<key>UIAppFonts</key>
 	<array>
-		<string>NanumSquareNeo-aLt.ttf</string>
-		<string>NanumSquareNeo-bRg.ttf</string>
-		<string>NanumSquareNeo-cBd.ttf</string>
-		<string>NanumSquareNeo-dEb.ttf</string>
-		<string>NanumSquareNeo-eHv.ttf</string>
+		<string>NanumSquareNeo-Variable.ttf</string>
 	</array>
-	<key>NSLocationWhenInUseUsageDescription</key>
-	<string>앱 사용 중 위치 접근을 허용해주세요.</string>
 	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
 	<string>앱이 항상 위치 접근을 허용하도록 설정해주세요.</string>
-
 </dict>
 </plist>

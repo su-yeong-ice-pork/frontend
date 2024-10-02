@@ -34,9 +34,9 @@ const StudyScreen = () => {
             </View>
             <StudyList />
           </ScrollView>
-          <BottomBar />
         </View>
       </SafeAreaView>
+      <BottomBar />
     </>
   );
 };
@@ -66,6 +66,7 @@ const styles = StyleSheet.create({
     fontWeight: '800',
     color: '#1e293b',
     lineHeight: 32,
+    fontFamily: 'NanumSquareNeo-Variable',
   },
   highlight: {
     color: '#14b8a6',

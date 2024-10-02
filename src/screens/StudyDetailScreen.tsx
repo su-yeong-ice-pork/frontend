@@ -157,10 +157,9 @@ const StudyDetailScreen = () => {
               ))}
             </View>
           </ScrollView>
-          <BottomBar />
-          {/* 하단 네모 버튼 */}
         </View>
       </SafeAreaView>
+      <BottomBar />
     </>
   );
 };
@@ -193,17 +192,18 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   studyTitle: {
-    fontSize: 30,
-    fontWeight: '700',
+    fontSize: 27,
+    fontWeight: '900',
     color: '#454545',
-    fontFamily: 'NanumSquareNeo-eHv',
+    fontFamily: 'NanumSquareNeo-Variable',
     marginBottom: 5,
     width: '100%',
   },
   totalStudyTime: {
     fontSize: 14,
     color: '#454545',
-    fontFamily: 'NanumSquareNeo-eHv',
+    fontWeight: '700',
+    fontFamily: 'NanumSquareNeo-Variable',
     width: '100%',
   },
   certifyButton: {
@@ -220,7 +220,8 @@ const styles = StyleSheet.create({
   certifyButtonText: {
     color: '#FFFFFF',
     fontSize: 14,
-    fontFamily: 'NanumSquareNeo-eHv',
+    fontWeight: 'bold',
+    fontFamily: 'NanumSquareNeo-Variable',
   },
   redStar: {
     width: 20,
@@ -251,7 +252,8 @@ const styles = StyleSheet.create({
   membersTitle: {
     fontSize: 16,
     color: '#454545',
-    fontFamily: 'NanumSquareNeo-eHv',
+    fontWeight: '900',
+    fontFamily: 'NanumSquareNeo-Variable',
   },
   addMemberButton: {
     backgroundColor: '#1AA5AA',
@@ -266,7 +268,8 @@ const styles = StyleSheet.create({
     color: '#FFFFFF',
     fontSize: 12,
     letterSpacing: 1,
-    fontFamily: 'NanumSquareNeo-eHv',
+    fontWeight: '900',
+    fontFamily: 'NanumSquareNeo-Variable',
   },
   // 구성원 리스트
   membersList: {
@@ -296,19 +299,22 @@ const styles = StyleSheet.create({
   memberName: {
     fontSize: 18,
     color: '#454545',
-    fontFamily: 'NanumSquareNeo-eHv',
+    fontWeight: '900',
+    fontFamily: 'NanumSquareNeo-Variable',
     marginBottom: 5,
     width: '100%',
   },
   hostBadgeText: {
     fontSize: 12,
     color: '#ffffff',
-    fontFamily: 'NanumSquareNeo-eHv',
+    fontWeight: '900',
+    fontFamily: 'NanumSquareNeo-Variable',
   },
   memberStudyTime: {
     fontSize: 14,
     color: '#646464',
-    fontFamily: 'NanumSquareNeo-eHv',
+    fontWeight: '900',
+    fontFamily: 'NanumSquareNeo-Variable',
     width: '100%',
   },
   hostBadge: {
