@@ -1,19 +1,35 @@
 import React, {useState} from 'react';
 
-import {View, Text, TouchableOpacity, Image, StyleSheet} from 'react-native';
+import {
+  View,
+  Text,
+  TouchableOpacity,
+  TextInput,
+  StyleSheet,
+} from 'react-native';
 const supportTextPlaceholder = '예시) 잔디야! 오늘 8시에 새도 스터디 기억하지?';
+
 const CheerupText = () => {
+  const [supportText, setSupportText] = useState('');
+  const handleSendPress = () => {
+    setSupportText('');
+  };
   return (
     <View style={styles.supportTextSection}>
       <Text style={styles.sectionTitle}>응원텍스트</Text>
+
       <View style={styles.textInputContainer}>
-        <Text style={styles.textInputPlaceholder}>
-          {supportTextPlaceholder}
-        </Text>
-        <TouchableOpacity style={styles.sendButton}>
+        <TextInput
+          style={styles.textInputPlaceholder}
+          placeholder={supportTextPlaceholder}
+          maxLength={20}
+          onChangeText={text => setSupportText(text)}
+          value={supportText}></TextInput>
+        <TouchableOpacity style={styles.sendButton} onPress={handleSendPress}>
           <Text style={styles.sendButtonText}>보내기</Text>
         </TouchableOpacity>
       </View>
+
       <Text style={styles.infoText}>
         응원 텍스트는 최대 20자 입력, 매일 하루 2개씩 가능합니다!
       </Text>

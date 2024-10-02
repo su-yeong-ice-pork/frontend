@@ -52,6 +52,10 @@ const Sticker = () => {
           </TouchableOpacity>
         ))}
       </View>
+      <Text style={styles.infoText}>
+        클릭한 응원스티커는 상대방에게 알림이 갑니다! 스티커는 매일 하루 2개씩
+        가능합니다!
+      </Text>
     </View>
   );
 };
@@ -66,6 +70,11 @@ const styles = StyleSheet.create({
     color: '#838F8F',
     marginBottom: 5,
   },
+  infoText: {
+    fontSize: 10,
+    color: '#009499',
+    marginTop: 5,
+  },
   stickerSection: {
     padding: 20,
   },
@@ -74,6 +83,8 @@ const styles = StyleSheet.create({
     padding: 20,
     justifyContent: 'space-between',
     backgroundColor: 'white',
+    width: 370, // 고정된 너비 설정
+    height: 95, // 고정된 높이 설정
   },
   sticker: {
     margin: 5,
@@ -91,7 +102,7 @@ const styles = StyleSheet.create({
     transform: [{scale: 1.0}],
   },
   enlargedStickerImage: {
-    width: 60,
-    height: 60,
+    width: 55,
+    height: 55,
   },
 });

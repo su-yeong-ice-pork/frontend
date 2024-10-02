@@ -9,6 +9,7 @@ import {
   ScrollView,
   TextInput,
   Image,
+  Alert,
   FlatList,
 } from 'react-native';
 import LinearGradient from 'react-native-linear-gradient';
@@ -23,6 +24,10 @@ import {SafeAreaView} from 'react-native-safe-area-context';
 import DropDownPicker from 'react-native-dropdown-picker';
 
 import {collegeData} from '../constants/departData.js';
+import handleSignup from '../api/signup';
+import checkName from '../api/checkName';
+import checkEmail from '../api/checkEmail';
+import checkCode from '../api/checkCode';
 
 const IMAGES = {
   backButton: require('../../assets/images/icons/backButton.png'),
@@ -38,16 +43,30 @@ const SignUpScreen = ({navigation}) => {
   const [timeLeft, setTimeLeft] = useState(300);
   const [isActive, setIsActive] = useState(false);
 
+  //이메일 등록
+  const [emailErrorMessage, setEmailErrorMessage] = useState<string>('');
+  const [isEmailSent, setIsEmailSent] = useState<boolean>(false);
+
+  //이메일 코드
+  const [isEmailVerified, setIsEmailVerified] = useState<boolean>(false);
+  const [codeErrorMessage, setCodeErrorMessage] = useState<string>('');
+  const [verificationCode, setVerificationCode] = useState<string>('');
+
+  // 학과 등록
+  const [college, setCollege] = useState<string>('인문대학');
+  const [department, setDepartment] = useState<string>('영어영문학과');
+
   // 비밀번호
   const [inputPassword, setInputPassword] = useState('');
   const [errorMessage, setErrorMessage] = useState('');
 
   // 이름 입력
-  const [name, inputName] = useState('');
-  const [nameDuplicate, setNameDuplicate] = useState(false);
+  const [name, setName] = useState<string>('');
+  const [nameErrorMessage, setNameErrorMessage] = useState<string>('');
+  const [isNameAvailable, setIsNameAvailable] = useState<boolean>(false);
 
   useEffect(() => {
-    let timer;
+    let timer: ReturnType<typeof setInterval> | undefined;
     if (isActive && timeLeft > 0) {
       timer = setInterval(() => {
         setTimeLeft(prevTime => prevTime - 1);
@@ -61,7 +80,7 @@ const SignUpScreen = ({navigation}) => {
   }, [isActive, timeLeft]);
 
   // 초를 분:초 형식으로 변환하는 함수
-  const formatTime = seconds => {
+  const formatTime = (seconds: number) => {
     const minutes = Math.floor(seconds / 60);
     const secs = seconds % 60;
     return `${String(minutes).padStart(2, '0')}:${String(secs).padStart(
@@ -70,14 +89,102 @@ const SignUpScreen = ({navigation}) => {
     )}`;
   };
 
-  const handleRequire = () => {
-    setAskCode('재요청');
-    setIsActive(true); // 타이머 시작
-    setTimeLeft(300); // 타이머 리셋
+  const handleRequire = async (): Promise<void> => {
+    if (!email) {
+      setEmailErrorMessage('이메일을 입력해주세요');
+      return;
+    }
+
+    //이메일 형식 검증
+    const emailRegex = /^[A-Za-z0-9._%+-]+@pusan\.ac\.kr$/;
+    if (!emailRegex.test(email)) {
+      setEmailErrorMessage('pusan.ac.kr 계정을 사용해주세요.');
+      return;
+    }
+    try {
+      const response = await checkEmail(email);
+
+      if (response.success) {
+        setEmailErrorMessage('');
+        setIsEmailSent(true); // 이메일 전송 상태 업데이트
+        setAskCode('재요청');
+        setIsActive(true); // 타이머 시작
+        setTimeLeft(300); // 타이머 리셋
+      } else {
+        // 오류 발생 시 상태 코드에 따라 메시지 처리
+        if (response.error?.status === 400) {
+          setEmailErrorMessage(
+            response.error.message || '이메일 형식이 올바르지 않습니다.',
+          );
+        } else if (response.error?.status === 409) {
+          setEmailErrorMessage(
+            response.error.message || '이미 사용 중인 이메일입니다.',
+          );
+        } else if (response.error?.status === 500) {
+          setEmailErrorMessage(
+            response.error.message || '메일 전송에 실패하였습니다.',
+          );
+        } else {
+          setEmailErrorMessage(
+            response.error?.message || '알 수 없는 오류가 발생했습니다.',
+          );
+        }
+        setIsEmailSent(false);
+      }
+    } catch (error: any) {
+      setEmailErrorMessage(
+        error.message || '이메일 전송 중 오류가 발생했습니다.',
+      );
+      setIsEmailSent(false);
+    }
+  };
+
+  //코드 확인
+
+  const verifyCode = async (): Promise<void> => {
+    if (!verificationCode) {
+      setCodeErrorMessage('인증 코드를 입력해주세요.');
+      return;
+    }
+
+    const checkCodeData = {
+      email,
+      code: verificationCode,
+    };
+
+    try {
+      const response = await checkCode(checkCodeData);
+
+      if (response.success) {
+        setCodeErrorMessage('인증이 완료되었습니다.');
+        setIsEmailVerified(true);
+        setIsActive(false); // 타이머 중지
+      } else {
+        // 오류 발생 시 상태 코드에 따라 메시지 처리
+        if (response.error?.status === 400) {
+          setCodeErrorMessage(
+            response.error.message || '인증 코드가 일치하지 않습니다.',
+          );
+        } else if (response.error?.status === 404) {
+          setCodeErrorMessage(
+            response.error.message ||
+              '인증 코드가 만료되었습니다. 재발급해주세요.',
+          );
+        } else {
+          setCodeErrorMessage(
+            response.error?.message || '알 수 없는 오류가 발생했습니다.',
+          );
+        }
+        setIsEmailVerified(false);
+      }
+    } catch (error: any) {
+      setCodeErrorMessage(error.message || '인증 중 오류가 발생했습니다.');
+      setIsEmailVerified(false);
+    }
   };
 
   // 비밀번호 입력
-  const handlePasswordChange = password => {
+  const handlePasswordChange = (password: string) => {
     setInputPassword(password);
     validationPassword(password); // 조건 확인
   };
@@ -88,23 +195,90 @@ const SignUpScreen = ({navigation}) => {
   };
 
   // 비밀번호 조건 확인
-  const validationPassword = password => {
+  const validationPassword = (password: string) => {
     const passwordRegex =
       /^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*#?&])[A-Za-z\d@$!%*#?&]{8,16}$/;
     if (!passwordRegex.test(password)) {
-      setErrorMessage('비밀번호를 다시 설정해주세요!');
+      setErrorMessage(
+        '비밀번호는 8~16자 영문, 숫자, 특수문자를 포함해야 합니다.',
+      );
+      return false;
     } else {
       setErrorMessage('');
+      return true;
     }
   };
 
   // 이름 중복 확인
-  const chkDuplicate = () => {
-    setNameDuplicate(true);
+  const chkDuplicate = async (): Promise<void> => {
+    if (!name) {
+      setNameErrorMessage('이름을 입력해주세요.');
+      return;
+    }
+
+    try {
+      const response = await checkName(name);
+
+      if (response.success) {
+        setNameErrorMessage('사용 가능한 이름입니다.');
+        setIsNameAvailable(true);
+      } else {
+        if (response.error?.status === 400) {
+          setNameErrorMessage(
+            response.error.message || '이름 형식이 올바르지 않습니다.',
+          );
+        } else if (response.error?.status === 409) {
+          setNameErrorMessage(
+            response.error.message || '이미 사용 중인 이름입니다.',
+          );
+        } else {
+          setNameErrorMessage(
+            response.error?.message || '알 수 없는 오류가 발생했습니다.',
+          );
+        }
+        setIsNameAvailable(false);
+      }
+    } catch (error: any) {
+      setNameErrorMessage(error.message || '이름 확인 중 오류가 발생했습니다.');
+      setIsNameAvailable(false);
+    }
   };
 
   // 잔디 심으러 가기 버튼 클릭
-  const submitSignUp = () => {};
+  const submitSignUp = async () => {
+    if (!email || !inputPassword || !name) {
+      Alert.alert('모든 필드를 입력해주세요.');
+      return;
+    }
+
+    if (!validationPassword(inputPassword)) {
+      Alert.alert('비밀번호는 8~16자 영문, 숫자, 특수문자를 포함해야 합니다.');
+      return;
+    }
+
+    const signupData = {
+      email,
+      password: inputPassword,
+      name,
+      college,
+      department,
+    };
+
+    try {
+      const response = await handleSignup(signupData);
+
+      if (response.success) {
+        // 회원가입 성공 처리
+        Alert.alert('회원가입 성공', '회원가입이 완료되었습니다.');
+        navigation.navigate('Landing'); // 로그인 화면으로 이동
+      } else {
+        // 회원가입 실패 처리
+        Alert.alert('회원가입 실패', '회원가입에 실패하였습니다.');
+      }
+    } catch (error: any) {
+      Alert.alert('오류', error.message);
+    }
+  };
 
   return (
     <>
@@ -181,13 +355,31 @@ const SignUpScreen = ({navigation}) => {
                 <TextInput
                   style={{flex: 1}}
                   placeholder="메일로 전송된 코드를 입력해주세요."
+                  value={verificationCode}
                   placeholderTextColor="#B9B9B9"
+                  onChangeText={text => {
+                    setVerificationCode(text);
+                    setCodeErrorMessage('');
+                  }}
                 />
                 <Text style={styles.timerText}>{formatTime(timeLeft)}</Text>
-                <TouchableOpacity style={styles.verifyButton}>
+                <TouchableOpacity
+                  style={styles.verifyButton}
+                  onPress={verifyCode}>
                   <Text style={styles.verifyButtonText}>확인</Text>
                 </TouchableOpacity>
               </View>
+              {codeErrorMessage ? (
+                <View style={styles.iconAndTextContainer}>
+                  <Image source={IMAGES.iIcon} style={styles.setiIcon} />
+                  <Text style={styles.activeText}>{codeErrorMessage}</Text>
+                </View>
+              ) : null}
+              {isEmailVerified && (
+                <Text style={styles.successMessage}>
+                  이메일 인증이 완료되었습니다.
+                </Text>
+              )}
             </View>
 
             {/* 학과 등록 */}
@@ -234,6 +426,12 @@ const SignUpScreen = ({navigation}) => {
                   style={styles.inputBox}
                   placeholder="1~8자리 입력 / 한글, 영어, 숫자 조합"
                   placeholderTextColor="#B9B9B9"
+                  value={name}
+                  onChangeText={text => {
+                    setName(text);
+                    setIsNameAvailable(false);
+                    setNameErrorMessage('');
+                  }}
                 />
                 <TouchableOpacity
                   style={styles.codeButton}
@@ -241,14 +439,12 @@ const SignUpScreen = ({navigation}) => {
                   <Text style={styles.requestCodeButtonText}>중복 확인</Text>
                 </TouchableOpacity>
               </View>
-              {nameDuplicate && (
+              {nameErrorMessage ? (
                 <View style={styles.iconAndTextContainer}>
                   <Image source={IMAGES.iIcon} style={styles.setiIcon} />
-                  <Text style={styles.activeText}>
-                    이미 존재하는 이름입니다!
-                  </Text>
+                  <Text style={styles.activeText}>{nameErrorMessage}</Text>
                 </View>
-              )}
+              ) : null}
             </View>
           </ScrollView>
 

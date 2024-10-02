@@ -174,7 +174,7 @@ const LandingScreen = ({navigation}) => {
           <View style={styles.buttonsContainer}>
             <TouchableOpacity
               style={styles.rectangle4380}
-              onPress={() => navigation.navigate('SignUp')}>
+              onPress={() => navigation.navigate('Landing')}>
               <Text style={styles.signUpText}>회원가입</Text>
             </TouchableOpacity>
             <TouchableOpacity

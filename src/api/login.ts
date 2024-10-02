@@ -18,7 +18,7 @@ const handleLogin = async (email: string, password: string) => {
 
     // Proceed with navigation or storing the token
     // navigation.navigate('HomeScreen');
-  } catch (error) {
+  } catch (error: any) {
     if (error.response) {
       // Server responded with a status code outside the 2xx range
       console.error('Server Error:', error.response.data);
