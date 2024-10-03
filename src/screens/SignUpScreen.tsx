@@ -2,6 +2,7 @@ import React, {useState, useEffect} from 'react';
 import {
   View,
   Text,
+  Modal,
   StyleSheet,
   TouchableOpacity,
   Dimensions,
@@ -20,9 +21,11 @@ import Svg, {
 import Header from '../components/Header';
 import {SafeAreaView} from 'react-native-safe-area-context';
 import handleSignup from '../api/signup';
-import checkName from '../api/checkName';
-import checkEmail from '../api/checkEmail';
 import checkCode from '../api/checkCode';
+import DropDownPicker from 'react-native-dropdown-picker';
+import checkEmail from '../api/checkEmail';
+import checkName from '../api/checkName';
+import {collegeData} from '../constants/departData';
 
 const IMAGES = {
   backButton: require('../../assets/images/icons/backButton.png'),
@@ -48,8 +51,8 @@ const SignUpScreen = ({navigation}) => {
   const [verificationCode, setVerificationCode] = useState<string>('');
 
   // 학과 등록
-  const [college, setCollege] = useState<string>('인문대학');
-  const [department, setDepartment] = useState<string>('영어영문학과');
+  const [college, setCollege] = useState('');
+  const [department, setDepartment] = useState('');
 
   // 비밀번호
   const [inputPassword, setInputPassword] = useState('');
@@ -178,9 +181,6 @@ const SignUpScreen = ({navigation}) => {
     }
   };
 
-  // 학과 등록하기
-  const handleRegister = () => {};
-
   // 비밀번호 입력
   const handlePasswordChange = (password: string) => {
     setInputPassword(password);
@@ -294,22 +294,19 @@ const SignUpScreen = ({navigation}) => {
               <View style={styles.inlineText}>
                 <Svg height={height * 0.05} width={width * 0.3}>
                   <Defs>
-                    <SVGLinearGradient
-                      id="grad1"
-                      x1="0%"
-                      y1="0%"
-                      x2="100%"
-                      y2="0%">
+                    <SVGLinearGradient id="grad1">
                       <Stop offset="0%" stopColor="#2CCDE4" stopOpacity="1" />
                       <Stop offset="100%" stopColor="#25E798" stopOpacity="1" />
                     </SVGLinearGradient>
                   </Defs>
                   <SvgText
                     fill="url(#grad1)"
-                    fontSize="24"
+                    fontSize="25"
                     fontWeight="bold"
                     x="0"
-                    y="30">
+                    y="10%"
+                    textAnchor="start"
+                    alignmentBaseline="hanging">
                     당신의 잔디
                   </SvgText>
                 </Svg>
@@ -384,25 +381,12 @@ const SignUpScreen = ({navigation}) => {
             </View>
 
             {/* 학과 등록 */}
-            <View style={styles.inputContainer}>
-              <Text style={styles.inputLabel}>
-                학과 등록 <Text style={styles.starmark}>*</Text>
-              </Text>
-              <View style={styles.inputWrapper}>
-                <TextInput
-                  style={styles.inputBox}
-                  placeholder="대학 소속학과를 등록해주세요"
-                  placeholderTextColor="#B9B9B9"
-                  value={college}
-                  onChangeText={setCollege}
-                />
-                <TouchableOpacity
-                  style={styles.codeButton}
-                  onPress={handleRegister}>
-                  <Text style={styles.requestCodeButtonText}>등록하기</Text>
-                </TouchableOpacity>
-              </View>
-            </View>
+            <RegisterDepart
+              college={college}
+              department={department}
+              setCollege={setCollege}
+              setDepartment={setDepartment}
+            />
 
             {/* 비밀번호 입력 */}
             <View style={styles.inputContainer}>
@@ -494,6 +478,186 @@ const SignUpScreen = ({navigation}) => {
 
 export default SignUpScreen;
 
+// 학과 등록하기 컴포넌트
+const RegisterDepart = ({college, department, setCollege, setDepartment}) => {
+  const [openCollege, setOpenCollege] = useState(false);
+  const [openDepartment, setOpenDepartment] = useState(false);
+  const [selectedCollege, setSelectedCollege] = useState(college || '');
+  const [selectedDepartment, setSelectedDepartment] = useState(
+    department || '',
+  );
+  const [modalVisible, setModalVisible] = useState(false);
+  const [colleges, setColleges] = useState(
+    collegeData.map(item => ({label: item.college, value: item.college})),
+  );
+  const [departments, setDepartments] = useState([]);
+
+  useEffect(() => {
+    const selected = collegeData.find(c => c.college === selectedCollege);
+    if (selected) {
+      setDepartments(selected.departments.map(d => ({label: d, value: d})));
+    } else {
+      setDepartments([]);
+    }
+  }, [selectedCollege]);
+
+  const confirmSelection = () => {
+    if (selectedCollege && selectedDepartment) {
+      setCollege(selectedCollege);
+      setDepartment(selectedDepartment);
+      setModalVisible(false);
+    } else {
+      alert('단과대학과 학과를 모두 선택해주세요.');
+    }
+  };
+
+  useEffect(() => {
+    const selected = collegeData.find(c => c.college === selectedCollege);
+    if (selected) {
+      setDepartments(selected.departments.map(d => ({label: d, value: d})));
+    } else {
+      setDepartments([]);
+    }
+  }, [selectedCollege]);
+
+  return (
+    <View style={styles.inputContainer}>
+      <Text style={styles.inputLabel}>
+        학과 등록 <Text style={styles.starmark}>*</Text>
+      </Text>
+
+      <TouchableOpacity
+        style={styles.inputBox}
+        onPress={() => setModalVisible(true)}>
+        <Text
+          style={
+            selectedDepartment ? styles.selectedText : styles.placeholderText
+          }>
+          {selectedCollege && selectedDepartment
+            ? selectedCollege + ' ' + selectedDepartment
+            : '대학 소속학과를 등록해주세요'}
+        </Text>
+      </TouchableOpacity>
+
+      {/* 드롭다운 모달 */}
+      <Modal visible={modalVisible} transparent={true} animationType="slide">
+        <TouchableOpacity
+          style={styles.modalOverlay}
+          activeOpacity={1}
+          onPressOut={() => setModalVisible(false)}>
+          <View style={styles.modalContainer}>
+            {/* College Selection */}
+            <View style={styles.inputWrapper}>
+              <Text style={styles.modalTitle}>학과 등록</Text>
+              <TouchableOpacity
+                style={styles.resetButton}
+                onPress={() => setModalVisible(false)}>
+                <Image source={IMAGES.resetButton} style={styles.clearIcon} />
+              </TouchableOpacity>
+            </View>
+
+            <View style={styles.modalContainer2}>
+              <DropDownPicker
+                open={openCollege}
+                value={selectedCollege}
+                items={colleges}
+                setOpen={setOpenCollege}
+                setValue={setSelectedCollege}
+                setItems={setColleges}
+                listMode="SCROLLVIEW"
+                placeholder="단과대학"
+                zIndex={3000}
+                zIndexInverse={100}
+                onOpen={() => setOpenDepartment(false)}
+                scrollViewProps={{
+                  nestedScrollEnabled: true,
+                }}
+                containerStyle={{
+                  height: 40,
+                  width: width * 0.35, // 원하는 너비로 조절
+                  marginBottom: 10, // 필요에 따라 조절
+                }}
+                style={{
+                  backgroundColor: '#fafafa',
+                  // borderColor: '#ccc',
+                  borderWidth: 0,
+                }}
+                dropDownContainerStyle={{
+                  backgroundColor: '#fafafa',
+                  borderColor: '#ddd',
+                }}
+                tickIconStyle={{
+                  width: 20,
+                  height: 20,
+                  tintColor: '#009499', // 체크 마크 색상
+                }}
+                labelStyle={{
+                  fontSize: 13,
+                  textAlign: 'left',
+                }}
+                arrowStyle={{
+                  tintColor: '#009499', // 화살표 아이콘 색상
+                }}
+              />
+
+              <DropDownPicker
+                open={openDepartment}
+                value={selectedDepartment}
+                items={departments}
+                setOpen={setOpenDepartment}
+                setValue={setSelectedDepartment}
+                setItems={setDepartments}
+                listMode="SCROLLVIEW"
+                placeholder="학과"
+                zIndex={2000} // Ensure the dropdown is above other content
+                zIndexInverse={1000}
+                disabled={!selectedCollege} // Disable until a college is selected
+                onOpen={() => setOpenCollege(false)}
+                scrollViewProps={{
+                  nestedScrollEnabled: true,
+                }}
+                containerStyle={{
+                  height: 40,
+                  width: width * 0.35, // 원하는 너비로 조절
+                  marginBottom: 10, // 필요에 따라 조절
+                }}
+                style={{
+                  backgroundColor: '#fafafa',
+                  // borderColor: '#ccc',
+                  borderWidth: 0,
+                }}
+                dropDownContainerStyle={{
+                  backgroundColor: '#fafafa',
+                  borderColor: '#ddd',
+                }}
+                tickIconStyle={{
+                  width: 20,
+                  height: 20,
+                  tintColor: '#009499', // 체크 마크 색상
+                }}
+                labelStyle={{
+                  fontSize: 12,
+                  textAlign: 'left',
+                }}
+                arrowStyle={{
+                  tintColor: '#009499', // 화살표 아이콘 색상
+                }}
+              />
+            </View>
+
+            {/* Confirm Button */}
+            <TouchableOpacity
+              style={styles.confirmButton}
+              onPress={confirmSelection}>
+              <Text style={styles.confirmButtonText}>확인</Text>
+            </TouchableOpacity>
+          </View>
+        </TouchableOpacity>
+      </Modal>
+    </View>
+  );
+};
+
 const styles = StyleSheet.create({
   container: {
     flex: 1,
@@ -526,9 +690,11 @@ const styles = StyleSheet.create({
     paddingHorizontal: width * 0.05,
   },
   inlineText: {
-    flexDirection: 'row', // 텍스트를 수직 방향으로 배열
-    alignItems: 'baseline',
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    justifyContent: 'flex-start',
   },
+
   inputWrapper: {
     position: 'relative',
     justifyContent: 'center',
@@ -593,6 +759,71 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     fontFamily: 'NanumSquareNeo-Variable',
     fontWeight: '600',
+    fontSize: 12,
+  },
+  placeholderText: {
+    color: '#B9B9B9',
+  },
+  selectedText: {
+    color: '#000000',
+  },
+  modalTitle: {
+    fontSize: 13,
+    fontWeight: 'bold',
+    marginBottom: 20,
+  },
+  selectionContainer: {
+    flexDirection: 'row', // 단과대학과 학과 리스트를 좌우로 배치
+    justifyContent: 'space-between',
+  },
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0,0,0,0.5)',
+    justifyContent: 'center',
+  },
+  modalContainer: {
+    backgroundColor: '#FFFFFF',
+    marginHorizontal: 20,
+    padding: 10,
+    borderRadius: 10,
+    maxHeight: 300,
+  },
+  modalContainer2: {
+    flexDirection: 'row',
+    justifyContent: 'space-between', // 두 드롭다운 사이의 간격 조절
+    alignItems: 'center', // 세로축 가운데 정렬
+    paddingHorizontal: 20, // 좌우 패딩으로 모달의 가운데 위치 조정
+    width: '100%',
+  },
+  dropdownStyle: {
+    fontSize: 5,
+    width: width * 0.35,
+    alignSelf: 'center',
+  },
+  item: {
+    paddingVertical: 10,
+    paddingHorizontal: 5,
+    borderBottomColor: '#CCCCCC',
+    borderBottomWidth: 1,
+  },
+  itemText: {
+    fontSize: 16,
+  },
+  selectedItem: {
+    backgroundColor: '#E6F7FF',
+  },
+  confirmButton: {
+    backgroundColor: '#009499',
+    borderRadius: 20,
+    paddingVertical: 10,
+    alignItems: 'center',
+    marginTop: 15,
+    width: width * 0.2,
+    alignSelf: 'center',
+    zIndex: -1,
+  },
+  confirmButtonText: {
+    color: '#FFFFFF',
     fontSize: 12,
   },
   inputRow: {
