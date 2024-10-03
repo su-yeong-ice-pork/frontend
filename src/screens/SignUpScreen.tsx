@@ -10,7 +10,6 @@ import {
   TextInput,
   Image,
   Alert,
-  FlatList,
 } from 'react-native';
 import LinearGradient from 'react-native-linear-gradient';
 import Svg, {
@@ -21,6 +20,12 @@ import Svg, {
 } from 'react-native-svg';
 import Header from '../components/Header';
 import {SafeAreaView} from 'react-native-safe-area-context';
+import handleSignup from '../api/signup';
+import checkCode from '../api/checkCode';
+import DropDownPicker from 'react-native-dropdown-picker';
+import checkEmail from '../api/checkEmail';
+import checkName from '../api/checkName';
+import {collegeData} from '../constants/departData';
 
 const IMAGES = {
   backButton: require('../../assets/images/icons/backButton.png'),
@@ -474,7 +479,7 @@ const SignUpScreen = ({navigation}) => {
 export default SignUpScreen;
 
 // 학과 등록하기 컴포넌트
-const RegisterDepart = () => {
+const RegisterDepart = ({college, department, setCollege, setDepartment}) => {
   const [openCollege, setOpenCollege] = useState(false);
   const [openDepartment, setOpenDepartment] = useState(false);
   const [selectedCollege, setSelectedCollege] = useState(college || '');
@@ -562,7 +567,7 @@ const RegisterDepart = () => {
                 listMode="SCROLLVIEW"
                 placeholder="단과대학"
                 zIndex={3000}
-                zIndexInverse={1000}
+                zIndexInverse={100}
                 onOpen={() => setOpenDepartment(false)}
                 scrollViewProps={{
                   nestedScrollEnabled: true,
@@ -815,6 +820,7 @@ const styles = StyleSheet.create({
     marginTop: 15,
     width: width * 0.2,
     alignSelf: 'center',
+    zIndex: -1,
   },
   confirmButtonText: {
     color: '#FFFFFF',
