@@ -148,168 +148,198 @@ const styles = StyleSheet.create({
   logoSection: {
     alignItems: 'center',
     flexDirection: 'row',
+    paddingVertical: height * 0.02, // 추가된 패딩
   },
   logoInfo: {
     flexDirection: 'row',
   },
   logoImage: {
-    width: 80,
-    height: 50,
-    left: 20,
+    width: width * 0.2, // 20% of screen width
+    height: height * 0.06, // 6% of screen height
+    left: width * 0.05, // 5% of screen width
     resizeMode: 'contain',
   },
   upperSection: {
     position: 'relative',
     flexDirection: 'row',
     alignItems: 'center',
-    padding: 50,
+    padding: height * 0.06, // 6% of screen height
     backgroundColor: '#86C0AE',
   },
   profileInfo: {
     flexDirection: 'row',
     flex: 1,
     position: 'absolute',
+    left: width * 0.07, // 7% of screen width
   },
   profileImage: {
-    width: 100,
-    height: 100,
-    marginTop: 50,
-    left: 30,
+    width: width * 0.22, // 25% of screen width
+    height: width * 0.22, // 25% of screen width to keep it square
+    marginTop: height * 0.05, // 3% of screen height
+    left: width * 0.02, // 2% of screen width
+    borderRadius: (width * 0.25) / 2, // Make it circular
   },
   profileTextContainer: {
-    marginLeft: 15,
-    marginTop: 50,
+    marginLeft: width * 0.04, // 4% of screen width
+    marginTop: height * 0.03, // 3% of screen height
     flexDirection: 'row',
+    alignItems: 'center',
   },
   nickname: {
-    fontSize: 12,
+    fontSize: width * 0.035, // 3.5% of screen width
     color: '#009499',
-    marginLeft: 10,
+    marginLeft: width * 0.025, // 2.5% of screen width
     fontFamily: 'NanumSquareNeo-Variable',
     fontWeight: '900',
   },
   username: {
-    fontSize: 20,
+    fontSize: width * 0.05, // 5% of screen width
     fontFamily: 'NanumSquareNeo-Variable',
     fontWeight: '900',
     color: '#333',
-    marginLeft: 10,
-    marginTop: -10,
+    marginLeft: width * 0.025, // 2.5% of screen width
+    marginTop: -height * 0.005, // -1.5% of screen height
   },
   badgeContainer: {
-    padding: 20,
+    padding: height * 0.025, // 2.5% of screen height
     alignItems: 'center',
   },
   badges: {
     flexDirection: 'row',
     backgroundColor: 'white',
-    padding: 10,
-    borderRadius: 6,
+    padding: width * 0.025, // 2.5% of screen width
+    borderRadius: width * 0.015, // 1.5% of screen width
     alignSelf: 'flex-start',
+    alignItems: 'center',
   },
   badgeText: {
-    fontSize: 10,
-    marginLeft: 7,
     fontWeight: 'bold',
+    fontSize: width * 0.035,
+    marginLeft: width * 0.015, // 1.5% of screen width
     fontFamily: 'NanumSquareNeo-Variable',
     color: '#838F8F',
-    marginBottom: 5,
+    marginBottom: height * 0.003, // 0.3% of screen height
     alignSelf: 'flex-start',
   },
   badge: {
-    width: 35,
-    height: 35,
-    marginRight: 7,
+    width: width * 0.09, // 9% of screen width
+    height: width * 0.09, // 9% of screen width to keep it square
+    marginRight: width * 0.02, // 2% of screen width
     resizeMode: 'contain',
   },
   moreButton: {
-    color: '#009499',
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   moreText: {
-    marginLeft: 5,
-    marginTop: 10,
-    fontSize: 12,
+    marginLeft: width * 0.012, // 1.2% of screen width
+    marginTop: height * 0.005, // 0.5% of screen height
+    fontWeight: 'bold',
+    fontSize: width * 0.025,
     color: '#009499',
     fontFamily: 'NanumSquareNeo-Variable',
-    fontWeight: '700',
   },
   friendMessageSection: {
-    marginTop: 20,
-    paddingVertical: 10,
-    paddingHorizontal: 15,
-    borderRadius: 10,
-    marginLeft: 10,
+    marginTop: height * 0.025, // 2.5% of screen height
+    paddingVertical: height * 0.01, // 1% of screen height
+    paddingHorizontal: width * 0.04, // 4% of screen width
+    borderRadius: width * 0.02, // 2% of screen width
+    marginLeft: width * 0.01, // 2.5% of screen width
     position: 'relative',
     alignSelf: 'flex-start',
   },
   sectionTitle: {
-    fontSize: 10,
-    marginLeft: 5,
     fontWeight: 'bold',
+    fontSize: width * 0.035,
+    marginLeft: width * 0.01, // 1.2% of screen width
     color: '#838F8F',
-    marginBottom: 5,
     fontFamily: 'NanumSquareNeo-Variable',
   },
   friendMessageButton: {
     backgroundColor: '#5AA6A8',
-    paddingVertical: 8,
-    paddingHorizontal: 12,
-    borderRadius: 10,
+    paddingVertical: height * 0.008, // 0.8% of screen height
+    paddingHorizontal: width * 0.03, // 3% of screen width
+    borderRadius: width * 0.015, // 1.5% of screen width
     borderBottomLeftRadius: 0,
-    marginTop: 10,
+    marginTop: height * 0.012, // 1.2% of screen height
     alignSelf: 'flex-start',
   },
   friendMessageText: {
     color: '#FFFFFF',
-    fontSize: 14,
+    fontSize: width * 0.04, // 4% of screen width
     fontFamily: 'NanumSquareNeo-Variable',
     fontWeight: '700',
   },
   leaveButton: {
     flexDirection: 'row',
-    alignItems: 'flex-end',
+    alignItems: 'center',
     borderColor: '#FF6F61',
-    paddingVertical: 6,
-    paddingHorizontal: 14,
-    borderRadius: 15,
-    marginLeft: 140,
-    marginTop: -30,
-    borderWidth: 1.5,
+    paddingVertical: height * 0.015, // 1.5% of screen height
+    paddingHorizontal: width * 0.04, // 4% of screen width
+    borderRadius: width * 0.0375, // 3.75% of screen width
+    marginLeft: width * 0.35, // 35% of screen width
+    marginTop: -height * 0.03, // -3% of screen height
+    borderWidth: width * 0.003, // 0.3% of screen width
   },
   leaveButtonText: {
     color: '#FF6F61',
     fontWeight: '800',
-    marginLeft: 5,
+    marginLeft: width * 0.012, // 1.2% of screen width
     fontFamily: 'NanumSquareNeo-Variable',
   },
   leaveIcon: {
-    width: 16,
-    height: 16,
+    width: width * 0.04, // 4% of screen width
+    height: width * 0.04, // 4% of screen width
   },
   infoText: {
-    fontSize: 10,
+    fontSize: width * 0.025, // 2.5% of screen width
     color: '#009499',
-    marginTop: 5,
+    marginTop: height * 0.012, // 1.2% of screen height
     fontFamily: 'NanumSquareNeo-Variable',
     fontWeight: '700',
   },
   currentDaySection: {
-    padding: 20,
+    padding: height * 0.025, // 2.5% of screen height
     alignItems: 'flex-start',
   },
   dayCount: {
-    fontSize: 24,
+    fontSize: width * 0.06, // 6% of screen width
     color: '#009499',
     fontFamily: 'NanumSquareNeo-Variable',
     fontWeight: '900',
   },
   currentDayText: {
-    fontSize: 16,
+    fontSize: width * 0.04, // 4% of screen width
     color: '#333',
     fontFamily: 'NanumSquareNeo-Variable',
     fontWeight: '900',
   },
   calendarContainer: {
-    marginTop: 20,
+    marginTop: height * 0.025, // 2.5% of screen height
+    paddingHorizontal: width * 0.04, // 4% of screen width
+  },
+  // 추가적인 스타일 변경 사항
+  iconAndTextContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginTop: height * 0.002, // 0.2% of screen height
+  },
+  setiIcon: {
+    width: width * 0.03, // 3% of screen width
+    height: width * 0.03, // 3% of screen width
+    resizeMode: 'contain',
+    marginRight: width * 0.015, // 1.5% of screen width
+  },
+  activeText: {
+    fontFamily: 'NanumSquareNeo-aLt',
+    color: '#009499',
+    fontSize: width * 0.03, // 3% of screen width
+  },
+  successMessage: {
+    fontSize: width * 0.035, // 3.5% of screen width
+    color: '#28a745',
+    fontFamily: 'NanumSquareNeo-Variable',
+    fontWeight: '700',
+    marginTop: height * 0.01, // 1% of screen height
   },
 });

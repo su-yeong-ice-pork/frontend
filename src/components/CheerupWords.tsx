@@ -1,7 +1,15 @@
-import React, {useState} from 'react';
-import {View, Text, TouchableOpacity, Image, StyleSheet} from 'react-native';
+import React from 'react';
+import {
+  View,
+  Text,
+  TouchableOpacity,
+  StyleSheet,
+  Dimensions,
+} from 'react-native';
 
-const cheerupWords = () => {
+const {width, height} = Dimensions.get('window');
+
+const CheerupWords = () => {
   const supportMessages = [
     {id: 1, text: '잔디 심자!'},
     {id: 2, text: '힘내!'},
@@ -27,59 +35,51 @@ const cheerupWords = () => {
   );
 };
 
-export default cheerupWords;
+export default CheerupWords;
 
 const styles = StyleSheet.create({
+  supportMessageSection: {
+    padding: width * 0.02, // 5% of screen width
+    backgroundColor: '#F2F4F6',
+    borderRadius: width * 0.02, // 2% of screen width
+    marginHorizontal: width * 0.03, // 5% of screen width
+    marginBottom: height * 0.02, // 2% of screen height
+  },
   sectionTitle: {
-    fontSize: 10,
-    marginLeft: 5,
+    fontSize: width * 0.035, // 3.5% of screen width
+    marginLeft: width * 0.012, // 1.2% of screen width
     fontWeight: 'bold',
     color: '#838F8F',
-    marginBottom: 5,
-  },
-
-  supportMessageSection: {
-    padding: 20,
-    backgroundColor: '#F2F4F6',
-    borderRadius: 10,
-    marginBottom: 10,
+    marginBottom: height * 0.01, // 1% of screen height
+    fontFamily: 'NanumSquareNeo-Variable',
   },
   messageContainer: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
-    marginBottom: 10,
+    alignItems: 'center',
   },
   supportButton: {
     backgroundColor: '#FFFFFF',
-    borderWidth: 1,
+    borderWidth: width * 0.003, // 0.3% of screen width
     borderColor: '#5AA6A8',
-    borderRadius: 20,
-    paddingVertical: 10,
-    paddingHorizontal: 20,
-    marginRight: 5,
+    borderRadius: width * 0.03, // 3% of screen width
+    paddingVertical: height * 0.012, // 1.2% of screen height
+    paddingHorizontal: width * 0.025, // 4% of screen width
+    marginRight: width * 0.02, // 2% of screen width
     alignItems: 'center',
-  },
-  supportButton2: {
-    backgroundColor: '#009499',
-    borderWidth: 1,
-    borderColor: '#5AA6A8',
-    borderRadius: 20,
-    paddingVertical: 10,
-    paddingHorizontal: 20,
-    marginRight: 5,
-    alignItems: 'center',
+    // Optional: 최소 너비 설정
+    minWidth: width * 0.2, // 25% of screen width
   },
   supportButtonText: {
     color: '#5AA6A8',
     fontWeight: 'bold',
-  },
-  supportButtonText2: {
-    color: 'white',
-    fontWeight: 'bold',
+    fontSize: width * 0.035, // 3.5% of screen width
+    fontFamily: 'NanumSquareNeo-Variable',
   },
   infoText: {
-    fontSize: 10,
+    fontSize: width * 0.03, // 3% of screen width
     color: '#009499',
-    marginTop: 5,
+    marginTop: height * 0.005, // 0.5% of screen height
+    textAlign: 'center',
+    fontFamily: 'NanumSquareNeo-Variable',
   },
 });
