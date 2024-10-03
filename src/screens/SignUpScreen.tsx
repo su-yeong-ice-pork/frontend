@@ -46,8 +46,8 @@ const SignUpScreen = ({navigation}) => {
   const [verificationCode, setVerificationCode] = useState<string>('');
 
   // 학과 등록
-  const [college, setCollege] = useState<string>('인문대학');
-  const [department, setDepartment] = useState<string>('영어영문학과');
+  const [college, setCollege] = useState('');
+  const [department, setDepartment] = useState('');
 
   // 비밀번호
   const [inputPassword, setInputPassword] = useState('');
@@ -376,7 +376,12 @@ const SignUpScreen = ({navigation}) => {
             </View>
 
             {/* 학과 등록 */}
-            <RegisterDepart />
+            <RegisterDepart
+              college={college}
+              department={department}
+              setCollege={setCollege}
+              setDepartment={setDepartment}
+            />
 
             {/* 비밀번호 입력 */}
             <View style={styles.inputContainer}>
@@ -472,11 +477,11 @@ export default SignUpScreen;
 const RegisterDepart = () => {
   const [openCollege, setOpenCollege] = useState(false);
   const [openDepartment, setOpenDepartment] = useState(false);
-  const [selectedCollege, setSelectedCollege] = useState('');
-  const [selectedDepartment, setSelectedDepartment] = useState('');
+  const [selectedCollege, setSelectedCollege] = useState(college || '');
+  const [selectedDepartment, setSelectedDepartment] = useState(
+    department || '',
+  );
   const [modalVisible, setModalVisible] = useState(false);
-  const [currentList, setCurrentList] = useState([]);
-  const [listType, setListType] = useState('');
   const [colleges, setColleges] = useState(
     collegeData.map(item => ({label: item.college, value: item.college})),
   );
@@ -493,6 +498,8 @@ const RegisterDepart = () => {
 
   const confirmSelection = () => {
     if (selectedCollege && selectedDepartment) {
+      setCollege(selectedCollege);
+      setDepartment(selectedDepartment);
       setModalVisible(false);
     } else {
       alert('단과대학과 학과를 모두 선택해주세요.');
