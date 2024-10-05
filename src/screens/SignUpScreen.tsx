@@ -25,8 +25,6 @@ import DropDownPicker from 'react-native-dropdown-picker';
 
 import {collegeData} from '../constants/departData.js';
 import handleSignup from '../api/signup';
-import checkName from '../api/checkName';
-import checkEmail from '../api/checkEmail';
 import checkCode from '../api/checkCode';
 
 const IMAGES = {
@@ -42,6 +40,7 @@ const SignUpScreen = ({navigation}) => {
   const [askCode, setAskCode] = useState('코드 요청');
   const [timeLeft, setTimeLeft] = useState(300);
   const [isActive, setIsActive] = useState(false);
+  const [showCodeInput, setShowCodeInput] = useState(false);
 
   //이메일 등록
   const [emailErrorMessage, setEmailErrorMessage] = useState<string>('');
@@ -53,8 +52,8 @@ const SignUpScreen = ({navigation}) => {
   const [verificationCode, setVerificationCode] = useState<string>('');
 
   // 학과 등록
-  const [college, setCollege] = useState<string>('인문대학');
-  const [department, setDepartment] = useState<string>('영어영문학과');
+  const [college, setCollege] = useState('');
+  const [department, setDepartment] = useState('');
 
   // 비밀번호
   const [inputPassword, setInputPassword] = useState('');
@@ -106,6 +105,7 @@ const SignUpScreen = ({navigation}) => {
 
       if (response.success) {
         setEmailErrorMessage('');
+        setShowCodeInput(true);
         setIsEmailSent(true); // 이메일 전송 상태 업데이트
         setAskCode('재요청');
         setIsActive(true); // 타이머 시작
@@ -157,6 +157,7 @@ const SignUpScreen = ({navigation}) => {
 
       if (response.success) {
         setCodeErrorMessage('인증이 완료되었습니다.');
+        setShowCodeInput(false);
         setIsEmailVerified(true);
         setIsActive(false); // 타이머 중지
       } else {
@@ -343,47 +344,57 @@ const SignUpScreen = ({navigation}) => {
                   </Text>
                 </View>
               )}
-            </View>
-
-            {/* 인증 코드 입력 */}
-            <View style={styles.inputContainer}>
-              <View
-                style={[
-                  styles.inputRow,
-                  {borderBottomWidth: 1.5, borderBottomColor: '#A9A9A9'},
-                ]}>
-                <TextInput
-                  style={{flex: 1}}
-                  placeholder="메일로 전송된 코드를 입력해주세요."
-                  value={verificationCode}
-                  placeholderTextColor="#B9B9B9"
-                  onChangeText={text => {
-                    setVerificationCode(text);
-                    setCodeErrorMessage('');
-                  }}
-                />
-                <Text style={styles.timerText}>{formatTime(timeLeft)}</Text>
-                <TouchableOpacity
-                  style={styles.verifyButton}
-                  onPress={verifyCode}>
-                  <Text style={styles.verifyButtonText}>확인</Text>
-                </TouchableOpacity>
-              </View>
-              {codeErrorMessage ? (
+              {isEmailVerified && (
                 <View style={styles.iconAndTextContainer}>
                   <Image source={IMAGES.iIcon} style={styles.setiIcon} />
-                  <Text style={styles.activeText}>{codeErrorMessage}</Text>
+                  <Text style={styles.activeText}>
+                    이메일 인증이 완료되었습니다.
+                  </Text>
                 </View>
-              ) : null}
-              {isEmailVerified && (
-                <Text style={styles.successMessage}>
-                  이메일 인증이 완료되었습니다.
-                </Text>
               )}
             </View>
 
+            {/* 인증 코드 입력 */}
+            {showCodeInput && (
+              <View style={styles.inputContainer}>
+                <View
+                  style={[
+                    styles.inputRow,
+                    {borderBottomWidth: 1.5, borderBottomColor: '#A9A9A9'},
+                  ]}>
+                  <TextInput
+                    style={{flex: 1}}
+                    placeholder="메일로 전송된 코드를 입력해주세요."
+                    value={verificationCode}
+                    placeholderTextColor="#B9B9B9"
+                    onChangeText={text => {
+                      setVerificationCode(text);
+                      setCodeErrorMessage('');
+                    }}
+                  />
+                  <Text style={styles.timerText}>{formatTime(timeLeft)}</Text>
+                  <TouchableOpacity
+                    style={styles.verifyButton}
+                    onPress={verifyCode}>
+                    <Text style={styles.verifyButtonText}>확인</Text>
+                  </TouchableOpacity>
+                </View>
+                {codeErrorMessage ? (
+                  <View style={styles.iconAndTextContainer}>
+                    <Image source={IMAGES.iIcon} style={styles.setiIcon} />
+                    <Text style={styles.activeText}>{codeErrorMessage}</Text>
+                  </View>
+                ) : null}
+              </View>
+            )}
+
             {/* 학과 등록 */}
-            <RegisterDepart />
+            <RegisterDepart
+              college={college}
+              department={department}
+              setCollege={setCollege}
+              setDepartment={setDepartment}
+            />
 
             {/* 비밀번호 입력 */}
             <View style={styles.inputContainer}>
@@ -476,14 +487,14 @@ const SignUpScreen = ({navigation}) => {
 export default SignUpScreen;
 
 // 학과 등록하기 컴포넌트
-const RegisterDepart = () => {
+const RegisterDepart = ({college, department, setCollege, setDepartment}) => {
   const [openCollege, setOpenCollege] = useState(false);
   const [openDepartment, setOpenDepartment] = useState(false);
-  const [selectedCollege, setSelectedCollege] = useState('');
-  const [selectedDepartment, setSelectedDepartment] = useState('');
+  const [selectedCollege, setSelectedCollege] = useState(college || '');
+  const [selectedDepartment, setSelectedDepartment] = useState(
+    department || '',
+  );
   const [modalVisible, setModalVisible] = useState(false);
-  const [currentList, setCurrentList] = useState([]);
-  const [listType, setListType] = useState('');
   const [colleges, setColleges] = useState(
     collegeData.map(item => ({label: item.college, value: item.college})),
   );
@@ -500,6 +511,8 @@ const RegisterDepart = () => {
 
   const confirmSelection = () => {
     if (selectedCollege && selectedDepartment) {
+      setCollege(selectedCollege);
+      setDepartment(selectedDepartment);
       setModalVisible(false);
     } else {
       alert('단과대학과 학과를 모두 선택해주세요.');
@@ -562,7 +575,7 @@ const RegisterDepart = () => {
                 listMode="SCROLLVIEW"
                 placeholder="단과대학"
                 zIndex={3000}
-                zIndexInverse={1000}
+                zIndexInverse={100}
                 onOpen={() => setOpenDepartment(false)}
                 scrollViewProps={{
                   nestedScrollEnabled: true,
@@ -815,6 +828,7 @@ const styles = StyleSheet.create({
     marginTop: 15,
     width: width * 0.2,
     alignSelf: 'center',
+    zIndex: -1,
   },
   confirmButtonText: {
     color: '#FFFFFF',
