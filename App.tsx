@@ -13,6 +13,7 @@ import ProfileScreen from './src/screens/ProfileScreen';
 import ChangePasswordScreen from './src/screens/ChangePasswordScreen';
 import EditProfileScreen from './src/screens/EditProfileScreen';
 import FriendsProfile from './src/screens/FriendsProfile';
+
 const Stack = createStackNavigator();
 
 const App = () => {
