@@ -72,7 +72,7 @@ const styles = StyleSheet.create({
     color: '#81A3A5',
     flex: 1,
     fontSize: 11,
-    marginLeft: 10,
+    marginLeft: 5,
   },
   sendButton: {
     backgroundColor: '#009499',

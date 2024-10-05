@@ -24,6 +24,7 @@ const FriendsProfile = () => {
     badge2: require('../../assets/images/badge/badge2.png'),
     badge3: require('../../assets/images/badge/badge3.png'),
     leaveFriends: require('../../assets/images/icons/leaveFriend.png'),
+    moreIcon: require('../../assets/images/icons/moreIcon2.png'),
   };
 
   const profiles = [
@@ -104,7 +105,8 @@ const FriendsProfile = () => {
                   ))}
 
                   <TouchableOpacity style={styles.moreButton}>
-                    <Text style={styles.moreText}>... 더보기</Text>
+                    <Image style={styles.moreImage} source={IMAGES.moreIcon} />
+                    <Text style={styles.moreText}>더보기</Text>
                   </TouchableOpacity>
                 </View>
               </View>
@@ -224,14 +226,21 @@ const styles = StyleSheet.create({
   },
   moreButton: {
     color: '#009499',
+    flexDirection: 'row',
+    alignItems: 'center',
   },
   moreText: {
+    fontSize: 12, // text-xs
+    fontWeight: '800', // font-extrabold
+    color: '#0D9488', // text-teal-600
     marginLeft: 5,
-    marginTop: 10,
-    fontSize: 12,
-    color: '#009499',
     fontFamily: 'NanumSquareNeo-Variable',
-    fontWeight: '700',
+  },
+  moreImage: {
+    marginTop: 8,
+    marginLeft: 15,
+    marginRight: 5,
+    marginBottom: 5,
   },
   friendMessageSection: {
     marginTop: 20,
@@ -264,6 +273,11 @@ const styles = StyleSheet.create({
     fontSize: 14,
     fontFamily: 'NanumSquareNeo-Variable',
     fontWeight: '700',
+  },
+  leaveButtonContainer: {
+    position: 'absolute',
+    right: width * 0.05,
+    marginTop: height * 0.02,
   },
   leaveButton: {
     flexDirection: 'row',

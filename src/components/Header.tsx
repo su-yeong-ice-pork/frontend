@@ -23,7 +23,7 @@ const Header = ({Title}: any) => {
           style={styles.backButtonIcon}
         />
       </TouchableOpacity>
-      <View style={styles.titleWrapper}>
+      <View>
         <Text style={styles.headerText}>{Title}</Text>
       </View>
     </View>
@@ -35,30 +35,29 @@ export default Header;
 const styles = StyleSheet.create({
   headerContainer: {
     height: height * 0.08,
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingHorizontal: width * 0.03,
-    backgroundColor: '#fff',
-  },
-  backButtonWrapper: {
     justifyContent: 'center',
     alignItems: 'center',
+    backgroundColor: '#fff',
+    position: 'relative',
+  },
+  backButtonWrapper: {
+    position: 'absolute',
+    left: width * 0.03,
+    height: '100%',
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 10,
   },
   backButtonIcon: {
     width: width * 0.06,
     height: width * 0.06,
     resizeMode: 'contain',
   },
-  titleWrapper: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
   headerText: {
     fontSize: 17,
     color: '#454545',
     fontWeight: 'bold',
-    textAlign: 'center',
     fontFamily: 'NanumSquareNeo-Variable',
+    textAlign: 'center',
   },
 });

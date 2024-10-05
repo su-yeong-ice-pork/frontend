@@ -9,6 +9,7 @@ import {
   ScrollView,
   Dimensions,
   TextInput,
+  SafeAreaView,
 } from 'react-native';
 import LinearGradient from 'react-native-linear-gradient';
 import handleLogin from '../api/login';
@@ -133,125 +134,127 @@ const LandingScreen = ({navigation}) => {
   };
 
   return (
-    <LinearGradient
-      colors={['rgba(0, 255, 150, 1)', 'rgba(31, 209, 245, 1)']}
-      start={{x: 0, y: 0}}
-      end={{x: 0, y: 1}}
-      style={styles.container}>
-      <ScrollView
-        ref={scrollViewRef}
-        horizontal
-        pagingEnabled
-        showsHorizontalScrollIndicator={false}
-        scrollEventThrottle={16}
-        contentContainerStyle={{flexGrow: 1}}
-        onScroll={Animated.event(
-          [{nativeEvent: {contentOffset: {x: scrollX}}}],
-          {useNativeDriver: false},
-        )}
-        onMomentumScrollEnd={handleScrollEnd}>
-        {slides.map((item, index) => renderSlide({item, index}))}
-      </ScrollView>
+    <SafeAreaView style={{flex: 1}}>
+      <LinearGradient
+        colors={['rgba(0, 255, 150, 1)', 'rgba(31, 209, 245, 1)']}
+        start={{x: 0, y: 0}}
+        end={{x: 0, y: 1}}
+        style={styles.container}>
+        <ScrollView
+          ref={scrollViewRef}
+          horizontal
+          pagingEnabled
+          showsHorizontalScrollIndicator={false}
+          scrollEventThrottle={16}
+          contentContainerStyle={{flexGrow: 1}}
+          onScroll={Animated.event(
+            [{nativeEvent: {contentOffset: {x: scrollX}}}],
+            {useNativeDriver: false},
+          )}
+          onMomentumScrollEnd={handleScrollEnd}>
+          {slides.map((item, index) => renderSlide({item, index}))}
+        </ScrollView>
 
-      <View style={styles.paginationContainer}>
-        {slides.map((_, i) => {
-          let opacity = scrollX.interpolate({
-            inputRange: [
-              (i - 1) * Dimensions.get('window').width,
-              i * Dimensions.get('window').width,
-              (i + 1) * Dimensions.get('window').width,
-            ],
-            outputRange: [0.3, 1, 0.3],
-            extrapolate: 'clamp',
-          });
-          return <Animated.View key={i} style={[styles.dot, {opacity}]} />;
-        })}
-      </View>
+        <View style={styles.paginationContainer}>
+          {slides.map((_, i) => {
+            let opacity = scrollX.interpolate({
+              inputRange: [
+                (i - 1) * Dimensions.get('window').width,
+                i * Dimensions.get('window').width,
+                (i + 1) * Dimensions.get('window').width,
+              ],
+              outputRange: [0.3, 1, 0.3],
+              extrapolate: 'clamp',
+            });
+            return <Animated.View key={i} style={[styles.dot, {opacity}]} />;
+          })}
+        </View>
 
-      {!showLoginForm && (
-        // 로그인 폼이 보이지 않을 때만 버튼들을 렌더링합니다.
-        <>
-          <View style={styles.buttonsContainer}>
-            <TouchableOpacity
-              style={styles.rectangle4380}
-              onPress={() => navigation.navigate('Landing')}>
-              <Text style={styles.signUpText}>회원가입</Text>
-            </TouchableOpacity>
-            <TouchableOpacity
-              style={styles.rectangle4381}
-              onPress={() => setShowLoginForm(true)}>
-              <Text style={styles.loginText}>기존 계정으로 로그인하기</Text>
-            </TouchableOpacity>
-          </View>
-
-          <Text
-            style={styles.footerText}
-            numberOfLines={1}
-            adjustsFontSizeToFit>
-            계정 생성 시 잔디의{' '}
-            <Text style={styles.underline}>개인정보 처리방침</Text> 및{' '}
-            <Text style={styles.underline}>이용약관</Text>에 동의하게 됩니다.
-          </Text>
-        </>
-      )}
-
-      {showLoginForm && (
-        <View style={styles.loginFormContainer}>
-          <View style={styles.inputContainer}>
-            <Text style={styles.inputLabel}>아이디</Text>
-            <TextInput
-              style={styles.input}
-              placeholder="아이디를 입력해주세요."
-              placeholderTextColor="#B9B9B9"
-              value={email}
-              onChangeText={setEmail}
-            />
-            <TouchableOpacity style={styles.findTextContainer}>
-              <Text style={styles.findText}>아이디 찾기</Text>
-            </TouchableOpacity>
-          </View>
-          <View style={styles.inputContainer}>
-            <Text style={styles.inputLabel}>비밀번호</Text>
-            <TextInput
-              style={styles.input}
-              placeholder="비밀번호를 입력해주세요."
-              placeholderTextColor="#B9B9B9"
-              secureTextEntry
-              value={password}
-              onChangeText={setPassword}
-            />
-            <TouchableOpacity
-              style={styles.findTextContainer}
-              onPress={() => navigation.navigate('FindPassword')}>
-              <Text style={styles.findText}>비밀번호 찾기</Text>
-            </TouchableOpacity>
-
-            <View style={styles.autoLoginContainer}>
+        {!showLoginForm && (
+          // 로그인 폼이 보이지 않을 때만 버튼들을 렌더링합니다.
+          <>
+            <View style={styles.buttonsContainer}>
               <TouchableOpacity
-                style={styles.customCheckboxContainer}
-                onPress={() => setIsAutoLogin(!isAutoLogin)}>
-                <View
-                  style={[
-                    styles.customCheckbox,
-                    isAutoLogin && styles.customCheckboxChecked,
-                  ]}>
-                  {isAutoLogin && <Text style={styles.checkmark}>✓</Text>}
-                </View>
+                style={styles.rectangle4380}
+                onPress={() => navigation.navigate('Landing')}>
+                <Text style={styles.signUpText}>회원가입</Text>
               </TouchableOpacity>
-              <TouchableOpacity onPress={() => setIsAutoLogin(!isAutoLogin)}>
-                <Text style={styles.optionText}>자동 로그인</Text>
+              <TouchableOpacity
+                style={styles.rectangle4381}
+                onPress={() => setShowLoginForm(true)}>
+                <Text style={styles.loginText}>기존 계정으로 로그인하기</Text>
               </TouchableOpacity>
             </View>
-          </View>
 
-          <TouchableOpacity
-            style={styles.loginButton}
-            onPress={() => handleLogin(email, password)}>
-            <Text style={styles.loginButtonText}>잔디 심기</Text>
-          </TouchableOpacity>
-        </View>
-      )}
-    </LinearGradient>
+            <Text
+              style={styles.footerText}
+              numberOfLines={1}
+              adjustsFontSizeToFit>
+              계정 생성 시 잔디의{' '}
+              <Text style={styles.underline}>개인정보 처리방침</Text> 및{' '}
+              <Text style={styles.underline}>이용약관</Text>에 동의하게 됩니다.
+            </Text>
+          </>
+        )}
+
+        {showLoginForm && (
+          <View style={styles.loginFormContainer}>
+            <View style={styles.inputContainer}>
+              <Text style={styles.inputLabel}>아이디</Text>
+              <TextInput
+                style={styles.input}
+                placeholder="아이디를 입력해주세요."
+                placeholderTextColor="#B9B9B9"
+                value={email}
+                onChangeText={setEmail}
+              />
+              <TouchableOpacity style={styles.findTextContainer}>
+                <Text style={styles.findText}>아이디 찾기</Text>
+              </TouchableOpacity>
+            </View>
+            <View style={styles.inputContainer}>
+              <Text style={styles.inputLabel}>비밀번호</Text>
+              <TextInput
+                style={styles.input}
+                placeholder="비밀번호를 입력해주세요."
+                placeholderTextColor="#B9B9B9"
+                secureTextEntry
+                value={password}
+                onChangeText={setPassword}
+              />
+              <TouchableOpacity
+                style={styles.findTextContainer}
+                onPress={() => navigation.navigate('FindPassword')}>
+                <Text style={styles.findText}>비밀번호 찾기</Text>
+              </TouchableOpacity>
+
+              <View style={styles.autoLoginContainer}>
+                <TouchableOpacity
+                  style={styles.customCheckboxContainer}
+                  onPress={() => setIsAutoLogin(!isAutoLogin)}>
+                  <View
+                    style={[
+                      styles.customCheckbox,
+                      isAutoLogin && styles.customCheckboxChecked,
+                    ]}>
+                    {isAutoLogin && <Text style={styles.checkmark}>✓</Text>}
+                  </View>
+                </TouchableOpacity>
+                <TouchableOpacity onPress={() => setIsAutoLogin(!isAutoLogin)}>
+                  <Text style={styles.optionText}>자동 로그인</Text>
+                </TouchableOpacity>
+              </View>
+            </View>
+
+            <TouchableOpacity
+              style={styles.loginButton}
+              onPress={() => handleLogin(email, password)}>
+              <Text style={styles.loginButtonText}>잔디 심기</Text>
+            </TouchableOpacity>
+          </View>
+        )}
+      </LinearGradient>
+    </SafeAreaView>
   );
 };
 

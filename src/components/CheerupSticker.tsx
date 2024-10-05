@@ -1,5 +1,16 @@
+// src/components/CheerupSticker.tsx
+
 import React, {useState} from 'react';
-import {View, Text, TouchableOpacity, Image, StyleSheet} from 'react-native';
+import {
+  View,
+  Text,
+  TouchableOpacity,
+  Image,
+  StyleSheet,
+  Dimensions,
+} from 'react-native';
+
+const {width, height} = Dimensions.get('window');
 
 const Sticker = () => {
   const IMAGES = {
@@ -24,8 +35,8 @@ const Sticker = () => {
     setEnlargedStickers(
       prev =>
         prev.includes(sticker)
-          ? prev.filter(item => item !== sticker) // Remove if already enlarged
-          : [...prev, sticker], // Add if not enlarged
+          ? prev.filter(item => item !== sticker) // 이미 확대된 경우 제거
+          : [...prev, sticker], // 확대되지 않은 경우 추가
     );
   };
 
@@ -63,46 +74,42 @@ const Sticker = () => {
 export default Sticker;
 
 const styles = StyleSheet.create({
+  stickerSection: {
+    paddingHorizontal: width * 0.05,
+    paddingVertical: height * 0.02,
+  },
   sectionTitle: {
-    fontSize: 10,
-    marginLeft: 5,
+    fontSize: width * 0.035,
     fontWeight: 'bold',
     color: '#838F8F',
-    marginBottom: 5,
-  },
-  infoText: {
-    fontSize: 10,
-    color: '#009499',
-    marginTop: 5,
-  },
-  stickerSection: {
-    padding: 20,
+    marginBottom: height * 0.01,
+    fontFamily: 'NanumSquareNeo-Variable',
   },
   stickerContainer: {
     flexDirection: 'row',
-    padding: 20,
+    flexWrap: 'nowrap', // 한 줄에 표시하도록 설정
     justifyContent: 'space-between',
     backgroundColor: 'white',
-    width: 370, // 고정된 너비 설정
-    height: 95, // 고정된 높이 설정
+    padding: width * 0.03,
+    borderRadius: 6,
+    alignItems: 'center', // 세로 중앙 정렬
   },
   sticker: {
-    margin: 5,
-  },
-  infoText: {
-    fontSize: 10,
-    color: '#009499',
-    marginTop: 5,
+    marginHorizontal: width * 0.005, // 좌우 여백을 줄임
   },
   stickerImage: {
-    width: 40,
-    height: 40,
-  },
-  enlargedSticker: {
-    transform: [{scale: 1.0}],
+    width: width * 0.12, // 이미지 크기를 작게 조정
+    height: width * 0.12,
   },
   enlargedStickerImage: {
-    width: 55,
-    height: 55,
+    width: width * 0.15, // 클릭 시 이미지 크기를 조금 더 크게
+    height: width * 0.15,
+  },
+  infoText: {
+    fontSize: width * 0.03,
+    color: '#009499',
+    marginTop: height * 0.01,
+    fontFamily: 'NanumSquareNeo-Variable',
+    fontWeight: '700',
   },
 });

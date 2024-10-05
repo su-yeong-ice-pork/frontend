@@ -77,7 +77,7 @@ const BottomBar = () => {
       </TouchableOpacity>
       <TouchableOpacity
         style={styles.iconContainer}
-        onPress={() => navigateTo('FriendsProfile')}>
+        onPress={() => navigateTo('Profile')}>
         <Image source={images.profile} style={styles.icon} />
         <Text style={getLabelStyle('Profile')}>프로필</Text>
       </TouchableOpacity>

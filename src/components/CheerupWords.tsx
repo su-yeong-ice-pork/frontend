@@ -1,5 +1,5 @@
-import React, {useState} from 'react';
-import {View, Text, TouchableOpacity, Image, StyleSheet} from 'react-native';
+import React from 'react';
+import {View, Text, TouchableOpacity, StyleSheet} from 'react-native';
 
 const cheerupWords = () => {
   const supportMessages = [
@@ -15,7 +15,12 @@ const cheerupWords = () => {
       <View style={styles.messageContainer}>
         {supportMessages.map(message => (
           <TouchableOpacity key={message.id} style={styles.supportButton}>
-            <Text style={styles.supportButtonText}>{message.text}</Text>
+            <Text
+              style={styles.supportButtonText}
+              adjustsFontSizeToFit
+              numberOfLines={1}>
+              {message.text}
+            </Text>
           </TouchableOpacity>
         ))}
       </View>
@@ -37,7 +42,6 @@ const styles = StyleSheet.create({
     color: '#838F8F',
     marginBottom: 5,
   },
-
   supportMessageSection: {
     padding: 20,
     backgroundColor: '#F2F4F6',
@@ -46,36 +50,23 @@ const styles = StyleSheet.create({
   },
   messageContainer: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
     marginBottom: 10,
   },
   supportButton: {
+    flex: 1,
     backgroundColor: '#FFFFFF',
     borderWidth: 1,
     borderColor: '#5AA6A8',
     borderRadius: 20,
     paddingVertical: 10,
-    paddingHorizontal: 20,
-    marginRight: 5,
-    alignItems: 'center',
-  },
-  supportButton2: {
-    backgroundColor: '#009499',
-    borderWidth: 1,
-    borderColor: '#5AA6A8',
-    borderRadius: 20,
-    paddingVertical: 10,
-    paddingHorizontal: 20,
-    marginRight: 5,
+    marginHorizontal: 2,
     alignItems: 'center',
   },
   supportButtonText: {
     color: '#5AA6A8',
     fontWeight: 'bold',
-  },
-  supportButtonText2: {
-    color: 'white',
-    fontWeight: 'bold',
+    fontSize: 13,
+    justifyContent: 'center',
   },
   infoText: {
     fontSize: 10,
