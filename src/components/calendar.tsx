@@ -66,17 +66,21 @@ const IMAGES = {
 
 const CalendarScreen = () => {
   const [selectedDate, setSelectedDate] = useState('');
-  const [selectedDateData, setSelectedDateData] = useState(null);
+  const [selectedDateData, setSelectedDateData] = useState<any>(null);
   const [modalVisible, setModalVisible] = useState(false);
-  const [viewMode, setViewMode] = useState('yearly'); // 'monthly' 또는 'yearly'
+  const [viewMode, setViewMode] = useState<'monthly' | 'yearly'>('yearly');
   const [displayedDate, setDisplayedDate] = useState(
     moment().format('YYYY-MM-DD'),
   );
 
-  const activityData = {
+  const activityData: {
+    [key: string]: {studyTime: number; grassScore: number; color?: string};
+  } = {
     '2024-09-10': {studyTime: 2, grassScore: 5, color: '#B5DD89'},
     '2024-09-11': {studyTime: 4, grassScore: 10, color: '#A5DC1B'},
     '2024-09-12': {studyTime: 0, grassScore: 0},
+    '2024-10-08': {studyTime: 3, grassScore: 7, color: '#7bc96f'}, // 예시 데이터 추가
+    // 다른 날짜 데이터를 추가하세요
   };
 
   const statData = [
@@ -86,14 +90,15 @@ const CalendarScreen = () => {
     },
   ];
 
-  const onDayPress = day => {
+  const onDayPress = (day: any) => {
+    console.log('Selected Date:', day.dateString); // 디버깅 로그
     setSelectedDate(day.dateString);
     setSelectedDateData(activityData[day.dateString]);
     setModalVisible(true);
   };
 
   const getMarkedDates = () => {
-    let markedDates = {};
+    let markedDates: any = {};
     for (let date in activityData) {
       const activity = activityData[date];
       const color = getColorForActivity(activity.grassScore);
@@ -112,7 +117,7 @@ const CalendarScreen = () => {
     return markedDates;
   };
 
-  const getColorForActivity = grassScore => {
+  const getColorForActivity = (grassScore: number) => {
     // 잔디 점수에 따른 색상 설정
     if (grassScore === 0) return '#ebedf0'; // 연한 회색
     else if (grassScore <= 2) return '#c6e48b'; // 연한 초록
@@ -120,8 +125,23 @@ const CalendarScreen = () => {
     else if (grassScore <= 6) return '#239a3b';
     else return '#196127'; // 진한 초록
   };
-  const handleTabPress = mode => {
+
+  const handleTabPress = (mode: 'monthly' | 'yearly') => {
     setViewMode(mode);
+  };
+
+  const handlePreviousMonth = () => {
+    const newDate = moment(displayedDate)
+      .subtract(1, 'months')
+      .format('YYYY-MM-DD');
+    setDisplayedDate(newDate);
+    console.log('Month Subtracted To:', newDate); // 디버깅 로그
+  };
+
+  const handleNextMonth = () => {
+    const newDate = moment(displayedDate).add(1, 'months').format('YYYY-MM-DD');
+    setDisplayedDate(newDate);
+    console.log('Month Added To:', newDate); // 디버깅 로그
   };
 
   return (
@@ -182,14 +202,17 @@ const CalendarScreen = () => {
       {viewMode === 'monthly' ? (
         <View style={styles.calendarContainer}>
           <Calendar
+            key={displayedDate} // key prop 추가
             current={displayedDate}
             onDayPress={onDayPress}
             markedDates={getMarkedDates()}
             markingType={'custom'}
             renderArrow={() => null} // 기본 화살표 숨기기
-            onMonthChange={date => {
-              setDisplayedDate(date.dateString);
-            }}
+            // onMonthChange는 필요 없으므로 제거하거나, 사용 시 주의
+            // onMonthChange={(date) => {
+            //   setDisplayedDate(date.dateString);
+            //   console.log('Displayed Month Changed To:', date.dateString); // 디버깅 로그
+            // }}
             renderHeader={() => {
               return (
                 <View style={styles.calendarHeader}>
@@ -199,27 +222,15 @@ const CalendarScreen = () => {
                     </Text>
                     <Text style={styles.headerYearUnitText}>년</Text>
                     <Text style={styles.headerMonthText}>
-                      {moment(displayedDate).format(' M')}
+                      {moment(displayedDate).format('M')}
                     </Text>
                     <Text style={styles.headerMonthUnitText}>월</Text>
                   </View>
                   <View style={styles.headerArrows}>
-                    <TouchableOpacity
-                      onPress={() => {
-                        const newDate = moment(displayedDate)
-                          .subtract(1, 'months')
-                          .format('YYYY-MM-DD');
-                        setDisplayedDate(newDate);
-                      }}>
+                    <TouchableOpacity onPress={handlePreviousMonth}>
                       <Text style={styles.arrowText}>{'<'}</Text>
                     </TouchableOpacity>
-                    <TouchableOpacity
-                      onPress={() => {
-                        const newDate = moment(displayedDate)
-                          .add(1, 'months')
-                          .format('YYYY-MM-DD');
-                        setDisplayedDate(newDate);
-                      }}>
+                    <TouchableOpacity onPress={handleNextMonth}>
                       <Text style={styles.arrowText}>{'>'}</Text>
                     </TouchableOpacity>
                   </View>
@@ -277,7 +288,16 @@ const CalendarScreen = () => {
         onRequestClose={() => setModalVisible(false)}>
         <View style={styles.modalBackground}>
           <View style={styles.modalContainer}>
-            <Text style={styles.modalTitle}>{selectedDate}</Text>
+            {/* 날짜 포맷을 변경하여 보기 좋은 형태로 표시 */}
+            <Text style={styles.modalTitle}>
+              {selectedDate
+                ? moment(selectedDate, 'YYYY-MM-DD').isValid()
+                  ? moment(selectedDate, 'YYYY-MM-DD').format(
+                      'YYYY년 MM월 DD일',
+                    )
+                  : '유효하지 않은 날짜'
+                : ''}
+            </Text>
             {selectedDateData ? (
               <>
                 <Text>공부 시간: {selectedDateData.studyTime} 시간</Text>
