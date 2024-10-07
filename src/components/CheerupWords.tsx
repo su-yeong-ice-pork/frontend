@@ -1,4 +1,5 @@
 import React from 'react';
+<<<<<<< HEAD
 import {
   View,
   Text,
@@ -6,6 +7,9 @@ import {
   StyleSheet,
   Dimensions,
 } from 'react-native';
+=======
+import {View, Text, TouchableOpacity, StyleSheet} from 'react-native';
+>>>>>>> 409949a0dd87b70d155a0640a9d4d8d23d540897
 
 const {width, height} = Dimensions.get('window');
 
@@ -23,7 +27,12 @@ const CheerupWords = () => {
       <View style={styles.messageContainer}>
         {supportMessages.map(message => (
           <TouchableOpacity key={message.id} style={styles.supportButton}>
-            <Text style={styles.supportButtonText}>{message.text}</Text>
+            <Text
+              style={styles.supportButtonText}
+              adjustsFontSizeToFit
+              numberOfLines={1}>
+              {message.text}
+            </Text>
           </TouchableOpacity>
         ))}
       </View>
@@ -50,21 +59,42 @@ const styles = StyleSheet.create({
     marginLeft: width * 0.012, // 1.2% of screen width
     fontWeight: 'bold',
     color: '#838F8F',
+<<<<<<< HEAD
     marginBottom: height * 0.01, // 1% of screen height
     fontFamily: 'NanumSquareNeo-Variable',
   },
   messageContainer: {
     flexDirection: 'row',
     alignItems: 'center',
+=======
+    marginBottom: 5,
+  },
+  supportMessageSection: {
+    padding: 20,
+    backgroundColor: '#F2F4F6',
+    borderRadius: 10,
+    marginBottom: 10,
+  },
+  messageContainer: {
+    flexDirection: 'row',
+    marginBottom: 10,
+>>>>>>> 409949a0dd87b70d155a0640a9d4d8d23d540897
   },
   supportButton: {
+    flex: 1,
     backgroundColor: '#FFFFFF',
     borderWidth: width * 0.003, // 0.3% of screen width
     borderColor: '#5AA6A8',
+<<<<<<< HEAD
     borderRadius: width * 0.03, // 3% of screen width
     paddingVertical: height * 0.012, // 1.2% of screen height
     paddingHorizontal: width * 0.025, // 4% of screen width
     marginRight: width * 0.02, // 2% of screen width
+=======
+    borderRadius: 20,
+    paddingVertical: 10,
+    marginHorizontal: 2,
+>>>>>>> 409949a0dd87b70d155a0640a9d4d8d23d540897
     alignItems: 'center',
     // Optional: 최소 너비 설정
     minWidth: width * 0.2, // 25% of screen width
@@ -72,8 +102,13 @@ const styles = StyleSheet.create({
   supportButtonText: {
     color: '#5AA6A8',
     fontWeight: 'bold',
+<<<<<<< HEAD
     fontSize: width * 0.035, // 3.5% of screen width
     fontFamily: 'NanumSquareNeo-Variable',
+=======
+    fontSize: 13,
+    justifyContent: 'center',
+>>>>>>> 409949a0dd87b70d155a0640a9d4d8d23d540897
   },
   infoText: {
     fontSize: width * 0.03, // 3% of screen width

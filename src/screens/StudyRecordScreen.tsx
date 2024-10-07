@@ -13,7 +13,9 @@ import {
   AppState,
   Modal,
 } from 'react-native';
+
 import Header from '../components/Header';
+import DashLine from '../components/DashLine';
 import BottomBar from '../components/BottomBar';
 import ProfileCard from '../components/ProfileCard';
 import {useNavigation} from '@react-navigation/native';
@@ -142,7 +144,7 @@ const StudyRecordScreen = () => {
 
   return (
     <>
-      <SafeAreaView style={{flex: 1, backgroundColor: '#F5F5F5'}}>
+      <SafeAreaView style={{flex: 1}}>
         <View style={styles.container}>
           <Header Title={'기록장 / 랭킹'} />
           <ScrollView
@@ -176,7 +178,7 @@ const StudyRecordScreen = () => {
             </View>
 
             {/* 점선 */}
-            <View style={styles.dashedLine} />
+            <DashLine />
 
             {/* 친구 목록 헤더 */}
             <View style={styles.membersHeader}>

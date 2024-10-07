@@ -1,4 +1,8 @@
+<<<<<<< HEAD
 // Sticker.tsx
+=======
+// src/components/CheerupSticker.tsx
+>>>>>>> 409949a0dd87b70d155a0640a9d4d8d23d540897
 
 import React, {useState} from 'react';
 import {
@@ -8,7 +12,10 @@ import {
   Image,
   StyleSheet,
   Dimensions,
+<<<<<<< HEAD
   Alert,
+=======
+>>>>>>> 409949a0dd87b70d155a0640a9d4d8d23d540897
 } from 'react-native';
 
 const {width, height} = Dimensions.get('window');
@@ -35,9 +42,15 @@ const Sticker = () => {
   const handleStickerClick = (stickerKey: string) => {
     setEnlargedStickers(
       prev =>
+<<<<<<< HEAD
         prev.includes(stickerKey)
           ? prev.filter(item => item !== stickerKey) // Remove if already enlarged
           : [...prev, stickerKey], // Add if not enlarged
+=======
+        prev.includes(sticker)
+          ? prev.filter(item => item !== sticker) // 이미 확대된 경우 제거
+          : [...prev, sticker], // 확대되지 않은 경우 추가
+>>>>>>> 409949a0dd87b70d155a0640a9d4d8d23d540897
     );
 
     // 여기서 서버로 선택된 스티커를 전송하는 로직을 추가할 수 있습니다.
@@ -79,6 +92,7 @@ export default Sticker;
 
 const styles = StyleSheet.create({
   stickerSection: {
+<<<<<<< HEAD
     padding: width * 0.02, // 5% of screen width
     backgroundColor: '#F2F4F6',
     borderRadius: width * 0.02, // 2% of screen width
@@ -91,10 +105,21 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     color: '#838F8F',
     marginBottom: height * 0.01, // 1% of screen height
+=======
+    paddingHorizontal: width * 0.05,
+    paddingVertical: height * 0.02,
+  },
+  sectionTitle: {
+    fontSize: width * 0.035,
+    fontWeight: 'bold',
+    color: '#838F8F',
+    marginBottom: height * 0.01,
+>>>>>>> 409949a0dd87b70d155a0640a9d4d8d23d540897
     fontFamily: 'NanumSquareNeo-Variable',
   },
   stickerContainer: {
     flexDirection: 'row',
+<<<<<<< HEAD
     flexWrap: 'wrap', // Allow wrapping on smaller screens
     justifyContent: 'space-between',
     padding: width * 0.04, // 4% of screen width
@@ -128,5 +153,31 @@ const styles = StyleSheet.create({
     marginTop: height * 0.005, // 0.5% of screen height
     textAlign: 'center',
     fontFamily: 'NanumSquareNeo-Variable',
+=======
+    flexWrap: 'nowrap', // 한 줄에 표시하도록 설정
+    justifyContent: 'space-between',
+    backgroundColor: 'white',
+    padding: width * 0.03,
+    borderRadius: 6,
+    alignItems: 'center', // 세로 중앙 정렬
+  },
+  sticker: {
+    marginHorizontal: width * 0.005, // 좌우 여백을 줄임
+  },
+  stickerImage: {
+    width: width * 0.12, // 이미지 크기를 작게 조정
+    height: width * 0.12,
+  },
+  enlargedStickerImage: {
+    width: width * 0.15, // 클릭 시 이미지 크기를 조금 더 크게
+    height: width * 0.15,
+  },
+  infoText: {
+    fontSize: width * 0.03,
+    color: '#009499',
+    marginTop: height * 0.01,
+    fontFamily: 'NanumSquareNeo-Variable',
+    fontWeight: '700',
+>>>>>>> 409949a0dd87b70d155a0640a9d4d8d23d540897
   },
 });

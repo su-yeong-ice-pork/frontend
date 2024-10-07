@@ -1,3 +1,5 @@
+// src/screens/ProfileScreen.tsx
+
 import React, {useState} from 'react';
 import {
   View,
@@ -9,7 +11,6 @@ import {
   ScrollView,
   Dimensions,
   SafeAreaView,
-  Touchable,
 } from 'react-native';
 import BottomBar from '../components/BottomBar';
 import LinearGradient from 'react-native-linear-gradient';
@@ -36,6 +37,7 @@ const IMAGES = {
   profileBackButton: require('../../assets/images/icons/profileBackButton.png'),
   sleepyFaceEmoji: require('../../assets/images/emoji/sleepyFaceEmoji.png'),
   closeLogout: require('../../assets/images/icons/closeLogout.png'),
+  iIcon: require('../../assets/images/icons/iIcon.png'),
 };
 import {useNavigation} from '@react-navigation/native';
 
@@ -65,7 +67,7 @@ const ProfileScreen = ({navigation}) => {
   const profile = profiles[0];
 
   return (
-    <SafeAreaView style={{flex: 1, backgroundColor: '#F5F5F5'}}>
+    <SafeAreaView style={{flex: 1}}>
       <View style={{flex: 1}}>
         <ScrollView
           style={styles.container}
@@ -192,12 +194,10 @@ const FreezeSummary = ({freezeCount}) => {
     <View style={styles.frozenSection}>
       <Text style={styles.frozenTitle}>보유 프리즈</Text>
       <View style={styles.frozenDetailContainer}>
-        <View>
-          <Text style={styles.frozenDetailText}>
-            현재 총 <Text style={styles.frozenCount}>{freezeCount}</Text> 개의
-            프리즈를 보유하고 있습니다.
-          </Text>
-        </View>
+        <Text style={styles.frozenDetailText}>
+          현재 총 <Text style={styles.frozenCount}>{freezeCount}</Text> 개의
+          프리즈를 보유하고 있습니다.
+        </Text>
         <TouchableOpacity style={styles.useFrozenButton}>
           <LinearGradient
             colors={['rgba(31, 209, 245, 1)', 'rgba(0, 255, 150, 1)']} // 그라데이션 색상
@@ -212,7 +212,8 @@ const FreezeSummary = ({freezeCount}) => {
         </TouchableOpacity>
       </View>
       <Text style={styles.frozenNote}>
-        ※ 프리즈는 잔다를 대신 채워줄 수 있는 잔디 채우기권입니다!
+        <Image source={IMAGES.iIcon} style={styles.setiIcon} /> 프리즈는 잔디를
+        대신 채워줄 수 있는 잔디 채우기권입니다!
       </Text>
     </View>
   );
@@ -329,8 +330,8 @@ const styles = StyleSheet.create({
     backgroundColor: '#E4E4E7', // bg-zinc-200
   },
   content: {
-    paddingHorizontal: 24, // px-6
-    marginTop: 6, // mt-1.5
+    paddingHorizontal: width * 0.05,
+    marginTop: height * 0.01,
   },
   profileHeader: {
     flexDirection: 'column',
@@ -364,7 +365,6 @@ const styles = StyleSheet.create({
   },
   profileBackButton: {
     position: 'absolute',
-
     width: 26,
     height: 26,
     resizeMode: 'contain',
@@ -428,56 +428,52 @@ const styles = StyleSheet.create({
   infoCard: {
     flexDirection: 'row',
     alignItems: 'center',
-    height: 45,
-    width: 240,
-    backgroundColor: '#FFFFFF', // bg-white
-    paddingHorizontal: 20, // px-5
-    borderRadius: 4, // rounded
+    height: height * 0.06,
+    width: width * 0.6,
+    backgroundColor: '#FFFFFF',
+    paddingHorizontal: width * 0.05,
+    borderRadius: 4,
   },
   infoCardIcon: {
-    width: 15,
-    height: 15,
-    aspectRatio: 1.09,
+    width: width * 0.04,
+    height: width * 0.04,
     resizeMode: 'contain',
-    alignItems: 'center',
-    marginTop: 2,
-    marginRight: 4, // gap-px
+    marginRight: width * 0.02,
   },
   infoCardText: {
-    fontSize: 11, // text-xs
-    fontWeight: '800', // font-extrabold
-    color: '#B6B6B6', // text-zinc-600
+    fontSize: width * 0.03,
+    fontWeight: '800',
+    color: '#B6B6B6',
     fontFamily: 'NanumSquareNeo-Variable',
   },
   infoCardCount: {
-    fontSize: 15, // text-base
-    color: '#0D9488', // text-teal-600
+    fontSize: width * 0.04,
+    color: '#0D9488',
     fontWeight: '800',
     fontFamily: 'NanumSquareNeo-Variable',
   },
   infoCardButton: {
     flexDirection: 'row',
     alignItems: 'center',
-    height: 45,
+    height: height * 0.06,
     borderRadius: 4,
-    backgroundColor: '#0D9488', // bg-teal-600
-    paddingHorizontal: 12, // px-3
-    paddingVertical: 4, // py-px
+    backgroundColor: '#0D9488',
+    paddingHorizontal: width * 0.03,
     shadowColor: '#000',
     shadowOffset: {width: 1, height: 1},
     shadowOpacity: 0.06,
     shadowRadius: 6,
   },
   infoCardButtonIcon: {
-    width: 11,
-    aspectRatio: 1.1,
+    width: width * 0.03,
+    height: width * 0.03,
     resizeMode: 'contain',
-    marginRight: 6, // gap-1.5
+    marginRight: width * 0.015,
   },
   infoCardButtonText: {
     color: '#FFFFFF',
-    fontSize: 12, // text-xs
-    fontWeight: '800', // font-extrabold
+    fontSize: width * 0.03,
+    fontWeight: '800',
     fontFamily: 'NanumSquareNeo-Variable',
   },
   badgeSection: {
@@ -494,11 +490,12 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     backgroundColor: '#FFFFFF',
     alignItems: 'center',
-    height: 50,
-    paddingHorizontal: 20,
-    paddingVertical: 10,
+    height: height * 0.07,
+    width: width * 0.65,
+    paddingHorizontal: width * 0.06,
+    paddingVertical: height * 0.02,
     borderRadius: 4,
-    marginTop: 8,
+    marginTop: height * 0.01,
   },
   badge: {
     width: 35,
@@ -524,7 +521,7 @@ const styles = StyleSheet.create({
   },
   frozenSection: {
     marginTop: 16, // mt-4
-    width: width * 0.6,
+    // width: width * 0.6, // 고정된 너비 제거
   },
   frozenTitle: {
     fontSize: 10,
@@ -535,15 +532,15 @@ const styles = StyleSheet.create({
   },
   frozenDetailContainer: {
     flexDirection: 'row',
-    width: 230,
-    height: 50,
     alignItems: 'center',
-    justifyContent: 'space-between',
     backgroundColor: '#FFFFFF',
-    padding: 15,
     borderRadius: 3,
+    paddingHorizontal: width * 0.04,
+    paddingVertical: height * 0.015,
+    justifyContent: 'space-between',
   },
   frozenDetailText: {
+    flex: 1, // 텍스트가 남은 공간을 차지하도록 설정
     fontSize: 10,
     color: '#333',
     fontWeight: '700',
@@ -556,29 +553,32 @@ const styles = StyleSheet.create({
     fontFamily: 'NanumSquareNeo-Variable',
   },
   useFrozenButton: {
-    width: '80%', // 버튼의 너비
-    height: 50, // 버튼의 높이
-    paddingHorizontal: 15,
-    left: 10,
+    // width와 height를 제거하여 내용에 따라 크기가 조절되도록 함
+    paddingHorizontal: width * 0.03,
+    paddingVertical: height * 0.01,
   },
   gradientStyle: {
-    flex: 1, // 전체 영역 채우기
     justifyContent: 'center', // 내용 중앙 정렬
     alignItems: 'center', // 내용 중앙 정렬
     borderRadius: 3,
+    paddingHorizontal: width * 0.03,
+    paddingVertical: height * 0.01,
   },
   frozenText: {
     flexDirection: 'row',
-    alignItems: 'center', // 중앙 정렬 추가
+    alignItems: 'center',
   },
   useFrozenButtonText: {
     color: '#FFFFFF',
-    fontSize: 10,
-    fontWeight: '800',
+    fontSize: width * 0.035,
+    fontWeight: 'bold',
     fontFamily: 'NanumSquareNeo-Variable',
   },
   freeze: {
-    right: 5,
+    width: width * 0.05,
+    height: width * 0.05,
+    resizeMode: 'contain',
+    marginRight: width * 0.01,
   },
   frozenNote: {
     fontSize: 8,
@@ -586,6 +586,12 @@ const styles = StyleSheet.create({
     marginTop: 5,
     fontWeight: '700',
     fontFamily: 'NanumSquareNeo-Variable',
+  },
+  setiIcon: {
+    width: width * 0.03,
+    height: height * 0.03,
+    resizeMode: 'contain',
+    marginRight: width * 0.03,
   },
   grassSection: {
     marginTop: 56, // mt-14
@@ -610,32 +616,32 @@ const styles = StyleSheet.create({
   card: {
     backgroundColor: '#FFFFFF',
     borderRadius: 8,
-    padding: 10,
+    padding: width * 0.03,
     alignItems: 'center',
     justifyContent: 'center',
-    marginHorizontal: 5,
-    width: 170,
-    height: 180,
+    marginHorizontal: width * 0.01,
+    width: width * 0.4,
+    height: height * 0.25,
   },
   dateText: {
-    fontSize: 12,
+    fontSize: width * 0.03,
     textAlign: 'center',
-    marginTop: 10,
-    marginBottom: -10,
+    marginTop: height * 0.01,
+    marginBottom: -height * 0.01,
     fontFamily: 'NanumSquareNeo-Variable',
     fontWeight: '700',
   },
   timeText: {
-    fontSize: 12,
+    fontSize: width * 0.03,
     textAlign: 'center',
-    marginTop: 10,
-    marginBottom: -10,
+    marginTop: height * 0.01,
+    marginBottom: -height * 0.01,
     fontFamily: 'NanumSquareNeo-Variable',
     fontWeight: '700',
   },
   image: {
-    width: 120,
-    height: 120,
+    width: width * 0.25,
+    height: width * 0.25,
     resizeMode: 'contain',
   },
 

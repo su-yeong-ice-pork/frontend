@@ -17,9 +17,9 @@ const {width} = Dimensions.get('window');
 const StudyScreen = () => {
   return (
     <>
-      <SafeAreaView style={{flex: 1, backgroundColor: '#F5F5F5'}}>
+      <SafeAreaView style={{flex: 1}}>
+        <Header Title={'스터디'} />
         <View style={styles.container}>
-          <Header Title={'스터디'} />
           <ScrollView contentContainerStyle={styles.main}>
             <View style={styles.headerSection}>
               <Text style={styles.title}>

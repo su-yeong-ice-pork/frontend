@@ -35,6 +35,8 @@ const HomeScreen = () => {
     badge2: require('../../assets/images/badge/badge2.png'),
     badge3: require('../../assets/images/badge/badge3.png'),
     freeze: require('../../assets/images/illustration/freeze.png'),
+    iIcon: require('../../assets/images/icons/iIcon.png'),
+    moreIcon: require('../../assets/images/icons/moreIcon2.png'),
   };
 
   // 프로필 데이터 배열
@@ -132,7 +134,7 @@ const HomeScreen = () => {
                   </View>
 
                   <TouchableOpacity style={styles.moreButton}>
-                    <Text style={styles.moreText}>...</Text>
+                    <Image style={styles.moreImage} source={IMAGES.moreIcon} />
                   </TouchableOpacity>
                 </View>
               </View>
@@ -154,18 +156,14 @@ const HomeScreen = () => {
             </TouchableOpacity>
           </View>
 
-          {/* 보유 콘텐츠 및 현재 일수 */}
+          {/* 보유 프리즈 및 현재 일수 */}
           <View style={styles.frozenSection}>
             <Text style={styles.frozenTitle}>보유 프리즈</Text>
             <View style={styles.frozenDetailContainer}>
-              {freezes.map((freeze, index) => (
-                <View key={index}>
-                  <Text style={styles.frozenDetailText}>
-                    현재 총 <Text style={styles.frozenCount}>{freeze.num}</Text>{' '}
-                    개의 프리즈를 보유하고 있습니다.
-                  </Text>
-                </View>
-              ))}
+              <Text style={styles.frozenDetailText}>
+                현재 총 <Text style={styles.frozenCount}>{freezes[0].num}</Text>{' '}
+                개의 프리즈를 보유하고 있습니다.
+              </Text>
               <TouchableOpacity style={styles.useFrozenButton}>
                 <View style={styles.frozenText}>
                   <Image source={IMAGES.freeze} style={styles.freeze} />
@@ -176,7 +174,8 @@ const HomeScreen = () => {
               </TouchableOpacity>
             </View>
             <Text style={styles.frozenNote}>
-              ※ 프리즈는 잔다를 대신 채워줄 수 있는 잔디 채우기권입니다!
+              <Image source={IMAGES.iIcon} style={styles.setiIcon} /> 프리즈는
+              잔디를 대신 채워줄 수 있는 잔디 채우기권입니다!
             </Text>
           </View>
 
@@ -282,7 +281,7 @@ const styles = StyleSheet.create({
   },
   badgeContainer: {
     flexDirection: 'row',
-    marginLeft: 100,
+    marginLeft: width * 0.15,
     color: '#009499',
     position: 'relative',
   },
@@ -303,6 +302,12 @@ const styles = StyleSheet.create({
   },
   moreButton: {
     color: '#009499',
+    justifyContent: 'center',
+  },
+  moreImage: {
+    marginTop: 8,
+    marginLeft: 15,
+    marginRight: 5,
   },
   moreText: {
     fontSize: 20,
@@ -312,136 +317,127 @@ const styles = StyleSheet.create({
   buttonSection: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    paddingHorizontal: 20,
-    marginVertical: 40,
+    paddingHorizontal: width * 0.05,
+    marginVertical: height * 0.05,
   },
   certifyButton: {
     backgroundColor: '#86C0AE',
-    width: 150,
-    height: 100,
+    width: width * 0.4,
+    height: height * 0.15,
     borderRadius: 4,
     alignItems: 'center',
     justifyContent: 'center',
     shadowColor: '#000',
     elevation: 3,
-    marginHorizontal: 10,
   },
   certifyButton2: {
     backgroundColor: '#1AA5AA',
-    width: 150,
-    height: 100,
+    width: width * 0.4,
+    height: height * 0.15,
     borderRadius: 4,
     alignItems: 'center',
     justifyContent: 'center',
     shadowColor: '#000',
     elevation: 3,
-    marginHorizontal: 10,
   },
   buttonText: {
     marginTop: 10,
     color: '#fff',
-    fontSize: 14, // 텍스트 크기
-    fontWeight: 'bold', // 텍스트 두께
+    fontSize: width * 0.04,
+    fontWeight: 'bold',
     fontFamily: 'NanumSquareNeo-Variable',
   },
   buttons: {
-    width: 130, // 이미지의 가로 크기
-    height: 55, // 이미지의 세로 크기
+    width: width * 0.3,
+    height: height * 0.08,
     resizeMode: 'contain',
     marginTop: 10,
   },
   frozenSection: {
-    padding: 0,
-    backgroundColor: '#F5F5F5',
-    borderRadius: 8,
-    left: 30,
-    marginBottom: 10,
+    paddingHorizontal: width * 0.05,
+    marginBottom: height * 0.02,
   },
   frozenTitle: {
-    fontSize: 10,
+    fontSize: width * 0.035,
     fontWeight: 'bold',
     color: '#838F8F',
-    marginBottom: 5,
+    marginBottom: height * 0.005,
     fontFamily: 'NanumSquareNeo-Variable',
   },
   frozenDetailContainer: {
     flexDirection: 'row',
-    width: 230,
-    height: 50,
     alignItems: 'center',
-    justifyContent: 'space-between',
     backgroundColor: '#FFFFFF',
-    padding: 15,
+    paddingHorizontal: width * 0.04,
+    paddingVertical: height * 0.015,
     borderRadius: 3,
   },
   frozenDetailText: {
-    fontSize: 10,
+    flex: 1, // 텍스트가 남은 공간을 차지하도록 설정
+    fontSize: width * 0.035,
     color: '#333',
+    fontFamily: 'NanumSquareNeo-Variable',
   },
   frozenCount: {
-    fontSize: 15,
+    fontSize: width * 0.04,
     fontWeight: 'bold',
     color: '#12A5B0',
   },
   useFrozenButton: {
     backgroundColor: '#1AA5AA',
-    paddingHorizontal: 15,
+    paddingHorizontal: width * 0.03,
+    paddingVertical: height * 0.01,
     borderRadius: 3,
-    height: 50,
-    left: 27,
     flexDirection: 'row',
-    alignItems: 'center', // 중앙 정렬 추가
-    justifyContent: 'center', // 중앙 정렬 추가
+    alignItems: 'center',
+    marginLeft: width * 0.03,
   },
   frozenText: {
     flexDirection: 'row',
-    alignItems: 'center', // 중앙 정렬 추가
+    alignItems: 'center',
   },
   useFrozenButtonText: {
     color: '#FFFFFF',
-    fontSize: 10,
+    fontSize: width * 0.035,
     fontWeight: 'bold',
     fontFamily: 'NanumSquareNeo-Variable',
   },
   freeze: {
-    right: 5,
+    width: width * 0.05,
+    height: width * 0.05,
+    resizeMode: 'contain',
+    marginRight: width * 0.01,
   },
   frozenNote: {
-    fontSize: 9,
+    fontSize: width * 0.03,
     color: '#009499',
-    marginTop: 5,
+    flexDirection: 'row', // 가로로 정렬
+    alignItems: 'center',
     fontFamily: 'NanumSquareNeo-Variable',
   },
+  setiIcon: {
+    width: width * 0.03,
+    height: height * 0.03,
+    resizeMode: 'contain',
+    marginRight: width * 0.03,
+  },
   currentDaySection: {
-    padding: 20,
-    alignItems: 'flex-start',
+    paddingHorizontal: width * 0.05,
+    marginVertical: height * 0.02,
   },
   dayCount: {
-    fontSize: 24,
+    fontSize: width * 0.08,
     color: '#009499',
     fontFamily: 'NanumSquareNeo-Variable',
     fontWeight: 'bold',
   },
   currentDayText: {
-    fontSize: 16,
+    fontSize: width * 0.05,
     fontWeight: 'bold',
     color: '#333',
     fontFamily: 'NanumSquareNeo-Variable',
   },
-  bottomNav: {
-    flexDirection: 'row',
-    justifyContent: 'space-around',
-    paddingVertical: 10,
-    backgroundColor: '#E0F7FA',
-    borderTopWidth: 1,
-    borderColor: '#ddd',
-  },
-  navItem: {
-    alignItems: 'center',
-  },
-  navText: {
-    color: '#333',
-  },
+
   // 모달 스타일
   modalOverlay: {
     flex: 1,
@@ -450,10 +446,10 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(0, 0, 0, 0.5)',
   },
   modalView: {
-    width: '80%',
+    width: width * 0.8,
     backgroundColor: 'white',
     borderRadius: 8,
-    padding: 20,
+    padding: width * 0.05,
     alignItems: 'center',
     shadowColor: '#000',
     shadowOffset: {
@@ -465,20 +461,21 @@ const styles = StyleSheet.create({
     elevation: 5,
   },
   modalText: {
-    marginBottom: 15,
+    marginBottom: height * 0.02,
     textAlign: 'center',
-    fontSize: 16,
+    fontSize: width * 0.04,
     fontWeight: '700',
     fontFamily: 'NanumSquareNeo-Variable',
   },
   closeButton: {
     backgroundColor: '#1AA5AA',
     borderRadius: 4,
-    paddingVertical: 10,
-    paddingHorizontal: 20,
+    paddingVertical: height * 0.015,
+    paddingHorizontal: width * 0.1,
   },
   closeButtonText: {
     color: 'white',
     fontWeight: 'bold',
+    fontSize: width * 0.035,
   },
 });

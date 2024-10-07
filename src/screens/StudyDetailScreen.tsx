@@ -13,6 +13,7 @@ import {
 } from 'react-native';
 import Header from '../components/Header';
 import BottomBar from '../components/BottomBar';
+import DashLine from '../components/DashLine';
 
 const {width} = Dimensions.get('window');
 
@@ -60,7 +61,7 @@ const StudyDetailScreen = () => {
 
   return (
     <>
-      <SafeAreaView style={{flex: 1, backgroundColor: '#F5F5F5'}}>
+      <SafeAreaView style={{flex: 1}}>
         <View style={styles.container}>
           <Header Title={'스터디'} />
           <ScrollView contentContainerStyle={styles.main}>
@@ -91,7 +92,7 @@ const StudyDetailScreen = () => {
             </View>
 
             {/* 점선 */}
-            <View style={styles.dashedLine} />
+            <DashLine />
 
             {/* 구성원 목록과 구성원 추가 버튼 */}
             <View style={styles.membersHeader}>

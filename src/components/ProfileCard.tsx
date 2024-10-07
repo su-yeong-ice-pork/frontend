@@ -54,6 +54,7 @@ const styles = StyleSheet.create({
   leftSection: {
     flexDirection: 'column',
     alignItems: 'center',
+    flex: 0.45,
   },
   messageBubble: {
     backgroundColor: '#DEEFEA',
@@ -71,7 +72,7 @@ const styles = StyleSheet.create({
     fontFamily: 'NanumSquareNeo-Variable',
   },
   rightSection: {
-    flex: 1,
+    flex: 0.55,
     marginLeft: 20,
     justifyContent: 'space-between',
   },

@@ -10,6 +10,7 @@ import {
   TextInput,
   Image,
   Alert,
+  FlatList,
 } from 'react-native';
 import LinearGradient from 'react-native-linear-gradient';
 import Svg, {
@@ -20,12 +21,11 @@ import Svg, {
 } from 'react-native-svg';
 import Header from '../components/Header';
 import {SafeAreaView} from 'react-native-safe-area-context';
+import DropDownPicker from 'react-native-dropdown-picker';
+
+import {collegeData} from '../constants/departData.js';
 import handleSignup from '../api/signup';
 import checkCode from '../api/checkCode';
-import DropDownPicker from 'react-native-dropdown-picker';
-import checkEmail from '../api/checkEmail';
-import checkName from '../api/checkName';
-import {collegeData} from '../constants/departData';
 
 const IMAGES = {
   backButton: require('../../assets/images/icons/backButton.png'),
@@ -40,6 +40,7 @@ const SignUpScreen = ({navigation}) => {
   const [askCode, setAskCode] = useState('코드 요청');
   const [timeLeft, setTimeLeft] = useState(300);
   const [isActive, setIsActive] = useState(false);
+  const [showCodeInput, setShowCodeInput] = useState(false);
 
   //이메일 등록
   const [emailErrorMessage, setEmailErrorMessage] = useState<string>('');
@@ -104,6 +105,7 @@ const SignUpScreen = ({navigation}) => {
 
       if (response.success) {
         setEmailErrorMessage('');
+        setShowCodeInput(true);
         setIsEmailSent(true); // 이메일 전송 상태 업데이트
         setAskCode('재요청');
         setIsActive(true); // 타이머 시작
@@ -155,6 +157,7 @@ const SignUpScreen = ({navigation}) => {
 
       if (response.success) {
         setCodeErrorMessage('인증이 완료되었습니다.');
+        setShowCodeInput(false);
         setIsEmailVerified(true);
         setIsActive(false); // 타이머 중지
       } else {
@@ -341,44 +344,49 @@ const SignUpScreen = ({navigation}) => {
                   </Text>
                 </View>
               )}
+              {isEmailVerified && (
+                <View style={styles.iconAndTextContainer}>
+                  <Image source={IMAGES.iIcon} style={styles.setiIcon} />
+                  <Text style={styles.activeText}>
+                    이메일 인증이 완료되었습니다.
+                  </Text>
+                </View>
+              )}
             </View>
 
             {/* 인증 코드 입력 */}
-            <View style={styles.inputContainer}>
-              <View
-                style={[
-                  styles.inputRow,
-                  {borderBottomWidth: 1.5, borderBottomColor: '#A9A9A9'},
-                ]}>
-                <TextInput
-                  style={{flex: 1}}
-                  placeholder="메일로 전송된 코드를 입력해주세요."
-                  value={verificationCode}
-                  placeholderTextColor="#B9B9B9"
-                  onChangeText={text => {
-                    setVerificationCode(text);
-                    setCodeErrorMessage('');
-                  }}
-                />
-                <Text style={styles.timerText}>{formatTime(timeLeft)}</Text>
-                <TouchableOpacity
-                  style={styles.verifyButton}
-                  onPress={verifyCode}>
-                  <Text style={styles.verifyButtonText}>확인</Text>
-                </TouchableOpacity>
-              </View>
-              {codeErrorMessage ? (
-                <View style={styles.iconAndTextContainer}>
-                  <Image source={IMAGES.iIcon} style={styles.setiIcon} />
-                  <Text style={styles.activeText}>{codeErrorMessage}</Text>
+            {showCodeInput && (
+              <View style={styles.inputContainer}>
+                <View
+                  style={[
+                    styles.inputRow,
+                    {borderBottomWidth: 1.5, borderBottomColor: '#A9A9A9'},
+                  ]}>
+                  <TextInput
+                    style={{flex: 1}}
+                    placeholder="메일로 전송된 코드를 입력해주세요."
+                    value={verificationCode}
+                    placeholderTextColor="#B9B9B9"
+                    onChangeText={text => {
+                      setVerificationCode(text);
+                      setCodeErrorMessage('');
+                    }}
+                  />
+                  <Text style={styles.timerText}>{formatTime(timeLeft)}</Text>
+                  <TouchableOpacity
+                    style={styles.verifyButton}
+                    onPress={verifyCode}>
+                    <Text style={styles.verifyButtonText}>확인</Text>
+                  </TouchableOpacity>
                 </View>
-              ) : null}
-              {isEmailVerified && (
-                <Text style={styles.successMessage}>
-                  이메일 인증이 완료되었습니다.
-                </Text>
-              )}
-            </View>
+                {codeErrorMessage ? (
+                  <View style={styles.iconAndTextContainer}>
+                    <Image source={IMAGES.iIcon} style={styles.setiIcon} />
+                    <Text style={styles.activeText}>{codeErrorMessage}</Text>
+                  </View>
+                ) : null}
+              </View>
+            )}
 
             {/* 학과 등록 */}
             <RegisterDepart

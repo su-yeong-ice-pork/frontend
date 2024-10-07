@@ -4,15 +4,14 @@ import {
   Text,
   Image,
   StyleSheet,
-  Animated,
   TouchableOpacity,
   ScrollView,
   Dimensions,
-  TextInput,
-  Button,
+  SafeAreaView,
 } from 'react-native';
 import LinearGradient from 'react-native-linear-gradient';
 import {launchImageLibrary} from 'react-native-image-picker';
+import Header from '../components/Header';
 
 const {width, height} = Dimensions.get('window');
 
@@ -41,41 +40,38 @@ const EditProfileScreen = ({navigation}) => {
   const [selectedBanner, setSelectedBanner] = useState(null);
 
   return (
-    <View style={styles.container}>
-      {/* 헤더 */}
-      <View style={styles.signUpHeader}>
-        <TouchableOpacity
-          style={styles.backButtonWrapper}
-          onPress={() => navigation.goBack()}>
-          <Image source={IMAGES.backButton} style={styles.setBackButton} />
-        </TouchableOpacity>
-        <Text style={styles.headerText}>프로필 / 배너 꾸미기</Text>
+    <SafeAreaView style={{flex: 1}}>
+      <View style={styles.container}>
+        {/* 헤더 */}
+        <Header Title={'프로필/배너 꾸미기'} />
+
+        <View style={styles.titleContainer}>
+          <Text style={styles.titleText}>
+            나의{' '}
+            <Text style={{color: '#00AAB0', fontWeight: '800'}}>
+              잔디 프로필
+            </Text>
+            을{'\n'}원하는 대로 예쁘게 꾸며봐요!
+          </Text>
+        </View>
+
+        <ScrollView
+          contentContainerStyle={styles.formContainer}
+          style={{backgroundColor: '#E1E6E8'}}>
+          <View style={styles.titleContainer}></View>
+
+          <ChangeProfileImage
+            selectedImage={selectedImage}
+            setSelectedImage={setSelectedImage}
+          />
+          <ChangeBannerImage
+            selectedBanner={selectedBanner}
+            setSelectedBanner={setSelectedBanner}
+          />
+        </ScrollView>
+        <SaveButton />
       </View>
-
-      <View style={styles.titleContainer}>
-        <Text style={styles.titleText}>
-          나의{' '}
-          <Text style={{color: '#00AAB0', fontWeight: '800'}}>잔디 프로필</Text>
-          을{'\n'}원하는 대로 예쁘게 꾸며봐요!
-        </Text>
-      </View>
-
-      <ScrollView
-        contentContainerStyle={styles.formContainer}
-        style={{backgroundColor: '#E1E6E8'}}>
-        <View style={styles.titleContainer}></View>
-
-        <ChangeProfileImage
-          selectedImage={selectedImage}
-          setSelectedImage={setSelectedImage}
-        />
-        <ChangeBannerImage
-          selectedBanner={selectedBanner}
-          setSelectedBanner={setSelectedBanner}
-        />
-      </ScrollView>
-      <SaveButton />
-    </View>
+    </SafeAreaView>
   );
 };
 
@@ -92,6 +88,7 @@ const ChangeProfileImage = ({selectedImage, setSelectedImage}) => {
             <Image
               source={IMAGES.chooseFromGallery1}
               style={styles.chooseImageStyle}
+              resizeMode="contain"
             />
           </TouchableOpacity>
           {defaultImages.map((image, idx) => {
@@ -106,7 +103,11 @@ const ChangeProfileImage = ({selectedImage, setSelectedImage}) => {
                     styles.imageContainer,
                     isSelected && styles.selectedImageBorder,
                   ]}>
-                  <Image source={image} style={styles.defaultImageStyle} />
+                  <Image
+                    source={image}
+                    style={styles.defaultImageStyle}
+                    resizeMode="contain"
+                  />
                 </View>
               </TouchableOpacity>
             );
@@ -142,6 +143,7 @@ const ChangeBannerImage = ({selectedBanner, setSelectedBanner}) => {
             <Image
               source={IMAGES.chooseFromGallery2}
               style={styles.chooseImageStyle}
+              resizeMode="contain"
             />
           </TouchableOpacity>
           {defaulBanners.map((banner, idx) => {
@@ -178,7 +180,7 @@ const SaveButton = () => {
             flex: 1,
             borderRadius: 30,
             justifyContent: 'center',
-            alignItems: 'center',
+            alignContent: 'center',
           }}
           start={{x: 0, y: 0}}
           end={{x: 1, y: 1}}>
@@ -194,30 +196,6 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#FFFFFF',
   },
-  signUpHeader: {
-    justifyContent: 'center',
-    marginTop: height * 0.005,
-  },
-  backButtonWrapper: {
-    position: 'absolute',
-    top: height * 0.01, // 필요한 위치에 맞게 조정하세요.
-    left: width * 0.03,
-    zIndex: 1,
-    padding: 10, // 터치 영역 확대
-  },
-  setBackButton: {
-    resizeMode: 'contain',
-    width: width * 0.05,
-    height: width * 0.05,
-  },
-  headerText: {
-    fontFamily: 'NanumSquareNeo-cBd',
-    fontSize: 17,
-    color: '#454545',
-    fontWeight: 'bold',
-    textAlign: 'center', // 텍스트를 가운데 정렬
-    marginVertical: height * 0.02,
-  },
   formContainer: {
     paddingHorizontal: width * 0.05,
   },
@@ -227,7 +205,7 @@ const styles = StyleSheet.create({
     paddingLeft: 20,
   },
   titleText: {
-    fontSize: 28,
+    fontSize: 27,
     fontWeight: '600',
   },
   buttonContainer: {
@@ -243,11 +221,11 @@ const styles = StyleSheet.create({
   signUpButtonText: {
     color: '#FFFFFF',
     justifyContent: 'center',
-    fontSize: 20,
+    fontSize: height * 0.025,
     fontWeight: 'bold',
     textAlign: 'center',
+    lineHeight: height * 0.07,
   },
-
   changeContainer: {
     marginTop: 10,
     marginBottom: 20,
@@ -260,7 +238,7 @@ const styles = StyleSheet.create({
   imageBox: {
     backgroundColor: '#FFFFFF',
     width: width,
-    height: height * 0.14,
+    height: height * 0.15,
     marginHorizontal: -width * 0.05,
   },
   buttonStyle: {
@@ -271,52 +249,51 @@ const styles = StyleSheet.create({
     marginLeft: 10,
   },
   chooseImageStyle: {
-    width: 100,
-    height: 100,
-    resizeMode: 'contain',
+    width: width * 0.25,
+    height: height * 0.125,
   },
   buttonText: {
     color: '#FFFFFF',
     fontSize: 16,
   },
   defaultImageStyle: {
-    width: 100,
-    height: 100,
-    borderRadius: 50,
+    width: width * 0.25,
+    height: width * 0.25,
+    borderRadius: (width * 0.25) / 2,
   },
   imageContainer: {
-    width: 100,
-    height: 100,
-    borderRadius: 50,
+    width: width * 0.25,
+    height: width * 0.25,
+    borderRadius: (width * 0.25) / 2,
     overflow: 'hidden',
     alignItems: 'center',
     justifyContent: 'center',
   },
   selectedImageBorder: {
-    width: 100,
-    height: 100,
-    borderRadius: 50,
+    width: width * 0.25,
+    height: width * 0.25,
+    borderRadius: (width * 0.25) / 2,
     borderWidth: 2,
     borderColor: '#00AAB0',
   },
   bannerContainer: {
-    width: 100,
-    height: 100,
+    width: width * 0.25,
+    height: height * 0.12,
     borderRadius: 10,
     overflow: 'hidden',
     alignItems: 'center',
     justifyContent: 'center',
   },
   selectedBannerBorder: {
-    width: 100,
-    height: 100,
+    width: width * 0.25,
+    height: height * 0.12,
     borderRadius: 10,
     borderWidth: 2,
     borderColor: '#00AAB0',
   },
   defaultBannerStyle: {
-    width: 100,
-    height: 100,
+    width: width * 0.25,
+    height: height * 0.12,
     borderRadius: 10,
   },
 });
