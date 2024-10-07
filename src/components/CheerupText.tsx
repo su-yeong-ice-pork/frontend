@@ -83,14 +83,8 @@ const styles = StyleSheet.create({
   textInputPlaceholder: {
     color: '#81A3A5',
     flex: 1,
-<<<<<<< HEAD
-    fontSize: width * 0.035, // 3.5% of screen width
-    marginLeft: width * 0.02, // 2% of screen width
-    fontFamily: 'NanumSquareNeo-Variable',
-=======
     fontSize: 11,
     marginLeft: 5,
->>>>>>> 409949a0dd87b70d155a0640a9d4d8d23d540897
   },
   sendButton: {
     backgroundColor: '#009499',
