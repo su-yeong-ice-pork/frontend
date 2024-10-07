@@ -1,6 +1,6 @@
 // src/screens/HomeScreen.tsx
 
-import React, {useState} from 'react';
+import React, {useState, useEffect} from 'react';
 import {
   View,
   Text,
@@ -15,16 +15,20 @@ import {
 import BottomBar from '../components/BottomBar';
 const {width, height} = Dimensions.get('window');
 import CalendarScreen from '../components/calendar';
+import {getMemberData, Member} from '../api/profile';
+import {getBadges, Badge} from '../api/badge';
 import {
   requestLocationPermission,
   getCurrentLocation,
 } from '../utils/locationUtils';
 import {SERVICE_AREA, isPointInPolygon, Coordinate} from '../utils/serviceArea';
-
+import {getItem} from '../api/asyncStorage';
 const HomeScreen = () => {
   // 모달 상태 관리
   const [modalVisible, setModalVisible] = useState<boolean>(false);
   const [modalMessage, setModalMessage] = useState<string>('');
+  const [member, setMember] = useState<Member | null>(null);
+  const [badges, setBadges] = useState<Badge[] | null>(null);
 
   const IMAGES = {
     profile: require('../../assets/images/illustration/typeThree.png'),
@@ -38,28 +42,6 @@ const HomeScreen = () => {
     iIcon: require('../../assets/images/icons/iIcon.png'),
     moreIcon: require('../../assets/images/icons/moreIcon2.png'),
   };
-
-  // 프로필 데이터 배열
-  const profiles = [
-    {
-      id: 1,
-      name: '김태영',
-      nickName: '새도의 신',
-      image: null, // 이미지가 없을 경우 기본 이미지 사용
-      badge: [
-        {image: IMAGES.badge1},
-        {image: IMAGES.badge2},
-        {image: IMAGES.badge3},
-      ],
-    },
-  ];
-
-  const freezes = [
-    {
-      num: 12,
-    },
-  ];
-
   // "혼자 인증하기" 버튼 핸들러
   const handleSelfCertify = async () => {
     const hasPermission = await requestLocationPermission();
@@ -92,6 +74,32 @@ const HomeScreen = () => {
     }
   };
 
+  useEffect(() => {
+    const fetchMember = async () => {
+      try {
+        const memberData = await getMemberData();
+        if (memberData) {
+          setMember(memberData);
+          const badgesData = await getBadges(memberData.id); // 회원 ID로 뱃지 데이터 가져오기
+          if (badgesData) {
+            setBadges(badgesData);
+          } else {
+            setModalMessage('뱃지를 불러오는 데 실패했습니다.');
+            setModalVisible(true);
+          }
+        } else {
+          setModalMessage('프로필을 불러오는 데 실패했습니다.');
+          setModalVisible(true);
+        }
+      } catch (error) {
+        setModalMessage('데이터를 불러오는 중 오류가 발생했습니다.');
+        setModalVisible(true);
+      }
+    };
+
+    fetchMember();
+  }, []);
+
   return (
     <>
       <SafeAreaView style={{flex: 1}}>
@@ -105,41 +113,54 @@ const HomeScreen = () => {
             </View>
           </View>
 
-          <View>
-            {profiles.map(profile => (
-              <View key={profile.id}>
-                <View style={styles.upperSection}>
-                  <View style={styles.profileInfo}>
-                    <Image
-                      source={
-                        profile.image ? {uri: profile.image} : IMAGES.profile
-                      } // 프로필 이미지 URL 대체 가능
-                      style={styles.profileImage}
-                    />
-                  </View>
-                </View>
-
-                <View style={styles.profileTextContainer}>
-                  <Text style={styles.nickname}>{profile.nickName}</Text>
-                  <Text style={styles.username}>{profile.name}</Text>
-                  <View style={styles.badgeContainer}>
-                    <Text style={styles.badgeText}>보유 뱃지</Text>
-                    {profile.badge.map((badge, index) => (
-                      <Image
-                        key={index}
-                        source={badge.image}
-                        style={styles.badge}
-                      />
-                    ))}
-                  </View>
-
-                  <TouchableOpacity style={styles.moreButton}>
-                    <Image style={styles.moreImage} source={IMAGES.moreIcon} />
-                  </TouchableOpacity>
+          {member && (
+            <View>
+              <View style={styles.upperSection}>
+                <View style={styles.profileInfo}>
+                  <Image
+                    source={
+                      member.profileImage
+                        ? {uri: member.profileImage}
+                        : IMAGES.profile
+                    }
+                    style={styles.profileImage}
+                  />
                 </View>
               </View>
-            ))}
-          </View>
+
+              <View style={styles.profileTextContainer}>
+                <Text style={styles.nickname}>{member.mainTitle}</Text>
+                <Text style={styles.username}>{member.name}</Text>
+                <View style={styles.badgeContainer}>
+                  <Text style={styles.badgeText}>보유 뱃지</Text>
+                  <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+                    {badges && badges.length > 0 ? (
+                      badges.map(badge => (
+                        <View key={badge.id} style={styles.badgeContainer}>
+                          <Image
+                            source={{
+                              uri: `https://your-server-url.com/images/${badge.fileName}`,
+                            }}
+                            style={styles.badge}
+                          />
+                          <Text style={styles.badgeName}>{badge.name}</Text>
+                          <Text style={styles.badgeDescription}>
+                            {badge.description}
+                          </Text>
+                        </View>
+                      ))
+                    ) : (
+                      <Text>보유한 뱃지가 없습니다.</Text>
+                    )}
+                  </ScrollView>
+                </View>
+
+                <TouchableOpacity style={styles.moreButton}>
+                  <Image style={styles.moreImage} source={IMAGES.moreIcon} />
+                </TouchableOpacity>
+              </View>
+            </View>
+          )}
 
           {/* 인증하기 버튼들 */}
           <View style={styles.buttonSection}>
@@ -157,39 +178,34 @@ const HomeScreen = () => {
           </View>
 
           {/* 보유 프리즈 및 현재 일수 */}
-          <View style={styles.frozenSection}>
-            <Text style={styles.frozenTitle}>보유 프리즈</Text>
-            <View style={styles.frozenDetailContainer}>
-              <Text style={styles.frozenDetailText}>
-                현재 총 <Text style={styles.frozenCount}>{freezes[0].num}</Text>{' '}
-                개의 프리즈를 보유하고 있습니다.
+          {member && (
+            <View style={styles.frozenSection}>
+              <Text style={styles.frozenTitle}>보유 프리즈</Text>
+              <View style={styles.frozenDetailContainer}>
+                <Text style={styles.frozenDetailText}>
+                  현재 총{' '}
+                  <Text style={styles.frozenCount}>{member.freezeCount}</Text>{' '}
+                  개의 프리즈를 보유하고 있습니다.
+                </Text>
+                <TouchableOpacity style={styles.useFrozenButton}>
+                  <View style={styles.frozenText}>
+                    <Image source={IMAGES.freeze} style={styles.freeze} />
+                    <Text style={styles.useFrozenButtonText}>
+                      프리즈 사용하기
+                    </Text>
+                  </View>
+                </TouchableOpacity>
+              </View>
+              <Text style={styles.frozenNote}>
+                <Image source={IMAGES.iIcon} style={styles.setiIcon} /> 프리즈는
+                잔디를 대신 채워줄 수 있는 잔디 채우기권입니다!
               </Text>
-              <TouchableOpacity style={styles.useFrozenButton}>
-                <View style={styles.frozenText}>
-                  <Image source={IMAGES.freeze} style={styles.freeze} />
-                  <Text style={styles.useFrozenButtonText}>
-                    프리즈 사용하기
-                  </Text>
-                </View>
-              </TouchableOpacity>
             </View>
-            <Text style={styles.frozenNote}>
-              <Image source={IMAGES.iIcon} style={styles.setiIcon} /> 프리즈는
-              잔디를 대신 채워줄 수 있는 잔디 채우기권입니다!
-            </Text>
-          </View>
-
+          )}
           {/* 현재 일수 표시 */}
-          <View style={styles.currentDaySection}>
-            <Text style={styles.currentDayText}>
-              현재<Text style={styles.dayCount}> 43</Text>일 째!
-            </Text>
-          </View>
 
           {/* 달력 부분 */}
-          <View>
-            <CalendarScreen />
-          </View>
+          <View>{member && <CalendarScreen userId={member.id} />}</View>
         </ScrollView>
         <BottomBar />
 
@@ -420,22 +436,6 @@ const styles = StyleSheet.create({
     height: height * 0.03,
     resizeMode: 'contain',
     marginRight: width * 0.03,
-  },
-  currentDaySection: {
-    paddingHorizontal: width * 0.05,
-    marginVertical: height * 0.02,
-  },
-  dayCount: {
-    fontSize: width * 0.08,
-    color: '#009499',
-    fontFamily: 'NanumSquareNeo-Variable',
-    fontWeight: 'bold',
-  },
-  currentDayText: {
-    fontSize: width * 0.05,
-    fontWeight: 'bold',
-    color: '#333',
-    fontFamily: 'NanumSquareNeo-Variable',
   },
 
   // 모달 스타일
