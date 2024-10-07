@@ -1,5 +1,5 @@
 //components/calendar.tsx
-import React, {useState} from 'react';
+import React, {useState, useEffect} from 'react';
 import {
   View,
   Text,
@@ -7,12 +7,14 @@ import {
   Image,
   StyleSheet,
   Modal,
+  Dimensions,
 } from 'react-native';
 import {Calendar, LocaleConfig} from 'react-native-calendars';
 import YearlyCalendar from './YearCalendar';
 import moment from 'moment';
 import LinearGradient from 'react-native-linear-gradient';
-
+import {getRecord} from '../api/record';
+import {getMonthlyGrass} from '../api/monthJandi';
 // Locale 설정
 LocaleConfig.locales['kr'] = {
   monthNames: [
@@ -55,7 +57,7 @@ LocaleConfig.locales['kr'] = {
   dayNamesShort: ['일', '월', '화', '수', '목', '금', '토'],
   today: '오늘',
 };
-
+const {width, height} = Dimensions.get('window');
 // 기본 로케일 설정
 LocaleConfig.defaultLocale = 'kr';
 
@@ -64,43 +66,73 @@ const IMAGES = {
   studyTime: require('../../assets/images/icons/studyTime.png'),
 };
 
-const CalendarScreen = () => {
+const CalendarScreen = ({userId}: {userId: number}) => {
   const [selectedDate, setSelectedDate] = useState('');
   const [selectedDateData, setSelectedDateData] = useState<any>(null);
   const [modalVisible, setModalVisible] = useState(false);
   const [viewMode, setViewMode] = useState<'monthly' | 'yearly'>('yearly');
+  const [grassData, setGrassData] = useState<any>({});
   const [displayedDate, setDisplayedDate] = useState(
     moment().format('YYYY-MM-DD'),
   );
+  const [record, setRecord] = useState<{
+    currentStreak: number;
+    maxStreak: number;
+    totalStudyTime: number;
+  } | null>(null);
 
-  const activityData: {
-    [key: string]: {studyTime: number; grassScore: number; color?: string};
-  } = {
-    '2024-09-10': {studyTime: 2, grassScore: 5, color: '#B5DD89'},
-    '2024-09-11': {studyTime: 4, grassScore: 10, color: '#A5DC1B'},
-    '2024-09-12': {studyTime: 0, grassScore: 0},
-    '2024-10-08': {studyTime: 3, grassScore: 7, color: '#7bc96f'}, // 예시 데이터 추가
-    // 다른 날짜 데이터를 추가하세요
+  const fetchMonthlyGrassData = async (year: number, month: number) => {
+    const grassRecords = await getMonthlyGrass(userId, year, month);
+    console.log(userId);
+    console.log(year);
+    console.log(month);
+    if (grassRecords) {
+      let newGrassData: any = {};
+      grassRecords.forEach(record => {
+        const dateKey = `${year}-${month < 10 ? `0${month}` : month}-${
+          record.day < 10 ? `0${record.day}` : record.day
+        }`;
+        newGrassData[dateKey] = {
+          studyTime: record.studyHour,
+          grassScore: record.grassScore,
+        };
+      });
+      setGrassData(newGrassData);
+      console.log(newGrassData);
+    }
   };
 
-  const statData = [
-    {
-      day: '118',
-      time: '789',
-    },
-  ];
+  useEffect(() => {
+    const year = moment(displayedDate).year();
+    const month = moment(displayedDate).month() + 1; // month() returns 0-based month index
+    fetchMonthlyGrassData(year, month);
+  }, [displayedDate]);
+
+  useEffect(() => {
+    const fetchRecordData = async () => {
+      if (userId) {
+        const recordData = await getRecord(userId); // 사용자 ID로 API 호출
+        if (recordData) {
+          setRecord(recordData);
+          console.log('Record Data:', recordData); // 디버깅을 위한 로그 추가
+        } else {
+          console.log('Record data is null');
+        }
+      }
+    };
+    fetchRecordData();
+  }, [userId]);
 
   const onDayPress = (day: any) => {
-    console.log('Selected Date:', day.dateString); // 디버깅 로그
     setSelectedDate(day.dateString);
-    setSelectedDateData(activityData[day.dateString]);
+    setSelectedDateData(grassData[day.dateString]);
     setModalVisible(true);
   };
 
   const getMarkedDates = () => {
     let markedDates: any = {};
-    for (let date in activityData) {
-      const activity = activityData[date];
+    for (let date in grassData) {
+      const activity = grassData[date];
       const color = getColorForActivity(activity.grassScore);
       markedDates[date] = {
         customStyles: {
@@ -120,32 +152,31 @@ const CalendarScreen = () => {
   const getColorForActivity = (grassScore: number) => {
     // 잔디 점수에 따른 색상 설정
     if (grassScore === 0) return '#ebedf0'; // 연한 회색
-    else if (grassScore <= 2) return '#c6e48b'; // 연한 초록
-    else if (grassScore <= 4) return '#7bc96f';
-    else if (grassScore <= 6) return '#239a3b';
-    else return '#196127'; // 진한 초록
+    else if (grassScore <= 20) return '#c6e48b'; // 연한 초록
+    else if (grassScore <= 40) return '#7bc96f'; // 중간 초록
+    else if (grassScore <= 60) return '#239a3b'; // 진한 초록
+    else return '#196127'; // 아주 진한 초록
   };
 
   const handleTabPress = (mode: 'monthly' | 'yearly') => {
     setViewMode(mode);
   };
 
-  const handlePreviousMonth = () => {
-    const newDate = moment(displayedDate)
-      .subtract(1, 'months')
-      .format('YYYY-MM-DD');
-    setDisplayedDate(newDate);
-    console.log('Month Subtracted To:', newDate); // 디버깅 로그
-  };
-
-  const handleNextMonth = () => {
-    const newDate = moment(displayedDate).add(1, 'months').format('YYYY-MM-DD');
-    setDisplayedDate(newDate);
-    console.log('Month Added To:', newDate); // 디버깅 로그
-  };
-
   return (
     <View style={styles.container}>
+      {record ? (
+        <View style={styles.currentDaySection}>
+          <Text style={styles.currentDayText}>
+            현재<Text style={styles.dayCount}> {record.currentStreak}</Text>일
+            째!
+          </Text>
+        </View>
+      ) : (
+        <Text style={styles.notDayCount}>
+          아직 기록된 스트릭 정보가 없습니다.
+        </Text>
+      )}
+
       {/* 탭 전환 및 연도 선택 부분 */}
       <View style={styles.tabContainer}>
         {/* 월간 잔디밭 탭 */}
@@ -200,37 +231,44 @@ const CalendarScreen = () => {
       </View>
 
       {viewMode === 'monthly' ? (
-        <View style={styles.calendarContainer}>
+        <View style={styles.container}>
           <Calendar
-            key={displayedDate} // key prop 추가
+            key={displayedDate}
             current={displayedDate}
             onDayPress={onDayPress}
             markedDates={getMarkedDates()}
             markingType={'custom'}
-            renderArrow={() => null} // 기본 화살표 숨기기
-            // onMonthChange는 필요 없으므로 제거하거나, 사용 시 주의
-            // onMonthChange={(date) => {
-            //   setDisplayedDate(date.dateString);
-            //   console.log('Displayed Month Changed To:', date.dateString); // 디버깅 로그
-            // }}
+            renderArrow={() => null}
             renderHeader={() => {
               return (
                 <View style={styles.calendarHeader}>
                   <View style={styles.headerLeft}>
                     <Text style={styles.headerYearText}>
-                      {moment(displayedDate).format('YYYY')}
+                      {moment(displayedDate).format('YYYY')}년
                     </Text>
-                    <Text style={styles.headerYearUnitText}>년</Text>
                     <Text style={styles.headerMonthText}>
-                      {moment(displayedDate).format('M')}
+                      {moment(displayedDate).format('M')}월
                     </Text>
-                    <Text style={styles.headerMonthUnitText}>월</Text>
                   </View>
                   <View style={styles.headerArrows}>
-                    <TouchableOpacity onPress={handlePreviousMonth}>
+                    <TouchableOpacity
+                      onPress={() =>
+                        setDisplayedDate(
+                          moment(displayedDate)
+                            .subtract(1, 'months')
+                            .format('YYYY-MM-DD'),
+                        )
+                      }>
                       <Text style={styles.arrowText}>{'<'}</Text>
                     </TouchableOpacity>
-                    <TouchableOpacity onPress={handleNextMonth}>
+                    <TouchableOpacity
+                      onPress={() =>
+                        setDisplayedDate(
+                          moment(displayedDate)
+                            .add(1, 'months')
+                            .format('YYYY-MM-DD'),
+                        )
+                      }>
                       <Text style={styles.arrowText}>{'>'}</Text>
                     </TouchableOpacity>
                   </View>
@@ -245,18 +283,30 @@ const CalendarScreen = () => {
             firstDay={0}
           />
           <View style={styles.statsContainer}>
-            {statData.map((id, index) => (
-              <View key={index}>
-                <Text style={styles.statsText}>
-                  <Image source={IMAGES.calendar} />
-                  최장 <Text style={styles.highlight}>{id.day}</Text>일 유지
-                </Text>
-                <Text style={styles.statsText}>
-                  <Image source={IMAGES.studyTime} style={styles.statsTime} />총
-                  공부시간 <Text style={styles.highlight}>{id.time}</Text>시간
-                </Text>
+            {record ? (
+              <View>
+                <View key={record.maxStreak}>
+                  <Text style={styles.statsText}>
+                    <Image source={IMAGES.calendar} />
+                    최장{' '}
+                    <Text style={styles.highlight}>{record.maxStreak}</Text>일
+                    유지
+                  </Text>
+                  <Text style={styles.statsText}>
+                    <Image source={IMAGES.studyTime} style={styles.statsTime} />
+                    총 공부시간{' '}
+                    <Text style={styles.highlight}>
+                      {Math.floor(record.totalStudyTime / 60)}
+                    </Text>
+                    시간
+                  </Text>
+                </View>
               </View>
-            ))}
+            ) : (
+              <View>
+                <Text>스트릭 정보가 없습니다. 첫 기록을 시작해보세요!</Text>
+              </View>
+            )}
           </View>
         </View>
       ) : (
@@ -264,18 +314,16 @@ const CalendarScreen = () => {
           {/* 연간 잔디밭 구현 */}
           <YearlyCalendar />
           <View style={styles.statsContainer}>
-            {statData.map((id, index) => (
-              <View key={index}>
-                <Text style={styles.statsText}>
-                  <Image source={IMAGES.calendar} />
-                  최장 <Text style={styles.highlight}>{id.day}</Text>일 유지
-                </Text>
-                <Text style={styles.statsText}>
-                  <Image source={IMAGES.studyTime} style={styles.statsTime} />총
-                  공부시간 <Text style={styles.highlight}>{id.time}</Text>시간
-                </Text>
-              </View>
-            ))}
+            <View>
+              <Text style={styles.statsText}>
+                <Image source={IMAGES.calendar} />
+                최장 <Text style={styles.highlight}></Text>일 유지
+              </Text>
+              <Text style={styles.statsText}>
+                <Image source={IMAGES.studyTime} style={styles.statsTime} />총
+                공부시간 <Text style={styles.highlight}></Text>시간
+              </Text>
+            </View>
           </View>
         </View>
       )}
@@ -322,6 +370,8 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#F5F5F5',
+    width: width,
+    height: height,
   },
   tabContainer: {
     flexDirection: 'row',
@@ -466,6 +516,31 @@ const styles = StyleSheet.create({
   closeButtonText: {
     color: '#fff',
     fontWeight: 'bold',
+    fontFamily: 'NanumSquareNeo-Variable',
+  },
+
+  currentDaySection: {
+    paddingHorizontal: width * 0.05,
+    marginVertical: height * 0.02,
+  },
+  notDayCount: {
+    marginTop: 10,
+    fontSize: width * 0.05,
+    marginLeft: 17,
+    color: '#009499',
+    fontFamily: 'NanumSquareNeo-Variable',
+    fontWeight: 'bold',
+  },
+  dayCount: {
+    fontSize: width * 0.08,
+    color: '#009499',
+    fontFamily: 'NanumSquareNeo-Variable',
+    fontWeight: 'bold',
+  },
+  currentDayText: {
+    fontSize: width * 0.05,
+    fontWeight: 'bold',
+    color: '#333',
     fontFamily: 'NanumSquareNeo-Variable',
   },
 });
