@@ -1,4 +1,6 @@
 import React, {useRef, useState, useEffect} from 'react';
+import authState from '../recoil/authAtom';
+import {useSetRecoilState} from 'recoil';
 import {
   View,
   Text,
@@ -11,7 +13,8 @@ import {
   TextInput,
 } from 'react-native';
 import LinearGradient from 'react-native-linear-gradient';
-import handleLogin from '../api/login';
+import handleLogin, {autoLogin} from '../api/login';
+import {setItem, getItem} from '../api/asyncStorage';
 
 const IMAGES = {
   blueGrass:
@@ -25,6 +28,7 @@ const IMAGES = {
 const {width, height} = Dimensions.get('window');
 
 const LandingScreen = ({navigation}) => {
+  const setAuthState = useSetRecoilState(authState);
   const scrollX = useRef(new Animated.Value(0)).current;
   const scrollViewRef = useRef(null);
   const [currentIndex, setCurrentIndex] = useState(0);
@@ -33,6 +37,49 @@ const LandingScreen = ({navigation}) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
 
+  useEffect(() => {
+    const checkAutoLogin = async () => {
+      const autoLoginFlag = await getItem('autoLogin');
+      const refreshToken = await getItem('refreshToken');
+      if (autoLoginFlag === 'Y' && refreshToken) {
+        const response = await autoLogin(refreshToken);
+        if (response.success) {
+          const authToken = response.headers['authorization'];
+          setAuthState({email: '사용자 이메일', authToken});
+          navigation.navigate('Home');
+        }
+      }
+    };
+    checkAutoLogin();
+  }, []);
+
+  //로그인 버튼을 누르면
+  const onLoginPress = async () => {
+    try {
+      const response = await handleLogin(email, password);
+      if (response.success) {
+        // 로그인 성공 시
+
+        const refreshToken = response.data.refreshToken;
+
+        await setItem('refreshToken', refreshToken);
+        if (isAutoLogin) {
+          // 자동 로그인 정보 저장
+          await setItem('autoLogin', 'Y');
+        } else {
+          // 자동 로그인 정보 삭제
+          await setItem('autoLogin', '');
+        }
+        const authToken = response.headers['authorization'];
+        await setItem('authToken', authToken);
+        console.log('handleLogin 응답:', response);
+        setAuthState({email, authToken});
+        navigation.navigate('Home');
+      }
+    } catch (error) {
+      console.log('오류', error.message || '로그인 중 오류가 발생했습니다.');
+    }
+  };
   const slides = [
     {
       key: 'slide1',
@@ -244,9 +291,7 @@ const LandingScreen = ({navigation}) => {
             </View>
           </View>
 
-          <TouchableOpacity
-            style={styles.loginButton}
-            onPress={() => handleLogin(email, password)}>
+          <TouchableOpacity style={styles.loginButton} onPress={onLoginPress}>
             <Text style={styles.loginButtonText}>잔디 심기</Text>
           </TouchableOpacity>
         </View>
