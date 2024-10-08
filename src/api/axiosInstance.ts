@@ -70,16 +70,6 @@ apiClient.interceptors.response.use(
         return Promise.reject(err);
       }
     } else {
-      // 다른 에러의 경우 처리
-      Alert.alert('오류로 인해 로그인 화면으로 이동됩니다.');
-      await setItem('refreshToken', '');
-      await setItem('autoLogin', '');
-      if (navigator) {
-        navigator.reset({
-          index: 0,
-          routes: [{name: 'Landing'}],
-        });
-      }
       return Promise.reject(error);
     }
   },
