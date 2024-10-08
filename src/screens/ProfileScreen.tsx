@@ -1,5 +1,3 @@
-// src/screens/ProfileScreen.tsx
-
 import React, {useState} from 'react';
 import {
   View,
@@ -47,7 +45,7 @@ const ProfileScreen = ({navigation}) => {
       id: 1,
       name: '김태영',
       nickName: '새도의 신',
-      image: null, // Use default image if null
+      image: null,
       badge: [
         {image: IMAGES.badge1},
         {image: IMAGES.badge2},
@@ -61,8 +59,6 @@ const ProfileScreen = ({navigation}) => {
       num: 12,
     },
   ];
-
-  const handleLogout = () => {};
 
   const profile = profiles[0];
 
@@ -276,7 +272,9 @@ const ProfileFooter = ({navigation}) => {
         <Image source={IMAGES.lockIcon} style={styles.footerIcon} />
         <Text
           style={styles.footerButtonText}
-          onPress={() => navigation.navigate('ChangePassword')}>
+          onPress={() =>
+            navigation.navigate('FindPassword', {title: '비밀번호 변경하기'})
+          }>
           비밀번호 변경하기
         </Text>
       </TouchableOpacity>
