@@ -18,9 +18,13 @@ import DashLine from '../components/DashLine';
 import BottomBar from '../components/BottomBar';
 import ProfileCard from '../components/ProfileCard';
 import {useNavigation} from '@react-navigation/native';
-
+import NoticeModal from '../components/NoticeModal';
 import {getMemberData, Member} from '../api/profile';
-import {getStudyTime, updateStudyTime} from '../api/studyTime';
+import {
+  getStudyTime,
+  updateStudyTime,
+  getTodayAttendance,
+} from '../api/studyTime';
 import {
   requestLocationPermission,
   getCurrentLocation,
@@ -82,8 +86,12 @@ const StudyRecordScreen = () => {
   const intervalRef = useRef<NodeJS.Timer | null>(null);
   const startTimeRef = useRef<number>(0);
   const isRecordingRef = useRef(isRecording);
-  const [isAttendanceConfirmed] = useState(true); // 출석 인증 여부
-  const [showAttendanceModal, setShowAttendanceModal] = useState(false);
+
+  // 모달 상태 변수
+  const [modalVisible, setModalVisible] = useState(false);
+  const [modalTitle, setModalTitle] = useState('');
+  const [modalMessage, setModalMessage] = useState('');
+
   const navigation = useNavigation();
 
   const locationCheckIntervalRef = useRef<NodeJS.Timer | null>(null);
@@ -105,7 +113,6 @@ const StudyRecordScreen = () => {
     const fetchStudyTimeData = async () => {
       try {
         const response = await getStudyTime();
-        console.log(response);
         if (response.success) {
           const {todayStudyTime, totalStudyTime} = response.response;
           const todayTimeMs = parseTimeStringToMilliseconds(todayStudyTime);
@@ -156,12 +163,58 @@ const StudyRecordScreen = () => {
     };
   }, [isRecording]);
 
-  const startRecording = () => {
-    if (!isAttendanceConfirmed) {
-      setShowAttendanceModal(true);
+  const startRecording = async () => {
+    // 출석 여부 확인
+    try {
+      const attendanceResponse = await getTodayAttendance();
+      if (attendanceResponse.success) {
+        const isAttended = attendanceResponse.response.attendance;
+        if (!isAttended) {
+          setModalTitle('잠시만요!\n혹시 출석 인증을 하셨나요?');
+          setModalMessage(
+            '잔디 스터디 기능을 사용하기 위해서는\n홈 화면의 출석 인증을 먼저 해주셔야 해요!',
+          );
+          setModalVisible(true);
+          return;
+        }
+      } else {
+        console.error('Failed to check attendance:', attendanceResponse.error);
+        Alert.alert('출석 정보를 가져올 수 없습니다.');
+        return;
+      }
+    } catch (error) {
+      console.error('Error checking attendance:', error);
+      Alert.alert('출석 정보를 가져올 수 없습니다.');
       return;
     }
 
+    // 위치 권한 확인 및 현재 위치 가져오기
+    const hasPermission = await requestLocationPermission();
+    if (!hasPermission) {
+      Alert.alert('위치 권한이 필요합니다.');
+      return;
+    }
+
+    try {
+      const location = await getCurrentLocation();
+      const isInLibrary = isPointInPolygon(
+        {latitude: 35.2358, longitude: 129.0814}, //임시 값
+        SERVICE_AREA,
+      );
+      if (!isInLibrary) {
+        // 모달을 표시하고 타이머 시작 중지
+        setModalTitle('도서관이 아닌 곳입니다.\n');
+        setModalMessage('잔디 스터디 기능은 도서관 내에서만 이용 가능합니다.');
+        setModalVisible(true);
+        return;
+      }
+    } catch (error) {
+      console.error('Error getting location:', error);
+      Alert.alert('위치 정보를 가져올 수 없습니다.');
+      return;
+    }
+
+    // 타이머 시작
     setIsRecording(true);
     startTimeRef.current = Date.now();
     intervalRef.current = setInterval(() => {
@@ -190,7 +243,7 @@ const StudyRecordScreen = () => {
     try {
       const response = await updateStudyTime(todayStudyTimeString);
       if (response.success) {
-        setTodayStudyTime(todayStudyTime);
+        setTodayStudyTime(parseTimeStringToMilliseconds(todayStudyTimeString));
       } else {
         console.error('Failed to update study time:', response.error);
       }
@@ -244,7 +297,12 @@ const StudyRecordScreen = () => {
         const location = await getCurrentLocation();
         const isInLibrary = isPointInPolygon(location, SERVICE_AREA);
         if (!isInLibrary) {
-          Alert.alert('도서관 밖입니다. 공부가 중지됩니다.');
+          // 모달을 표시하고 타이머 중지
+          setModalTitle('도서관 밖입니다.\n공부가 중지됩니다.');
+          setModalMessage(
+            '잔디 스터디 기능은 도서관 내에서만 이용 가능합니다.',
+          );
+          setModalVisible(true);
           stopRecording();
         }
       } catch (error) {
@@ -252,7 +310,7 @@ const StudyRecordScreen = () => {
         Alert.alert('위치 정보를 가져올 수 없습니다.');
         stopRecording();
       }
-    }, 10 * 60 * 1000); // 10분마다 실행
+    }, 10 * 1000 * 60);
   };
 
   // 위치 확인 인터벌 중지
@@ -377,40 +435,12 @@ const StudyRecordScreen = () => {
             </View>
           </ScrollView>
         </View>
-        <Modal
-          visible={showAttendanceModal}
-          transparent={true}
-          animationType="fade">
-          <View style={styles.modalBackground}>
-            <View style={styles.modalContainer}>
-              {/* 닫기 버튼 */}
-              <TouchableOpacity
-                style={styles.modalCloseButton}
-                onPress={() => setShowAttendanceModal(false)}>
-                <Image
-                  source={require('../../assets/images/icons/closeButton.png')}
-                  style={styles.modalCloseIcon}
-                />
-              </TouchableOpacity>
-
-              <View style={styles.modalHeader}>
-                <Image
-                  source={require('../../assets/images/icons/attendance.png')}
-                  style={styles.modalIcon}
-                />
-                <Text style={styles.modalTitle}>
-                  잠시만요!{'\n'}
-                  혹시 <Text style={styles.modalHighlightText}>출석 인증</Text>
-                  을 하셨나요?
-                </Text>
-              </View>
-              <Text style={styles.modalSubtitle}>
-                잔디 스터디 기능을 사용하기 위해서는{'\n'}홈 화면의 출석 인증을
-                먼저 해주셔야 해요!
-              </Text>
-            </View>
-          </View>
-        </Modal>
+        <NoticeModal
+          visible={modalVisible}
+          onClose={() => setModalVisible(false)}
+          title={modalTitle}
+          message={modalMessage}
+        />
       </SafeAreaView>
       <BottomBar />
     </>
