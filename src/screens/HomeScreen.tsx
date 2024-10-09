@@ -22,7 +22,7 @@ import {
   getCurrentLocation,
 } from '../utils/locationUtils';
 import {SERVICE_AREA, isPointInPolygon, Coordinate} from '../utils/serviceArea';
-import {getItem} from '../api/asyncStorage';
+import {getItem, setItem} from '../api/asyncStorage';
 const HomeScreen = () => {
   // 모달 상태 관리
   const [modalVisible, setModalVisible] = useState<boolean>(false);

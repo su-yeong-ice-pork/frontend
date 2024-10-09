@@ -26,6 +26,8 @@ import DropDownPicker from 'react-native-dropdown-picker';
 import {collegeData} from '../constants/departData.js';
 import handleSignup from '../api/signup';
 import checkCode from '../api/checkCode';
+import checkEmail from '../api/checkEmail';
+import checkName from '../api/checkName';
 
 const IMAGES = {
   backButton: require('../../assets/images/icons/backButton.png'),

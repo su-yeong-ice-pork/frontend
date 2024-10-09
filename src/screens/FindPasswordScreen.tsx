@@ -1,4 +1,5 @@
-import React, {useRef, useState, useEffect} from 'react';
+// FindPassword.tsx
+import React, {useState, useEffect} from 'react';
 import {
   View,
   Text,
@@ -11,6 +12,10 @@ import {
   SafeAreaView,
 } from 'react-native';
 import LinearGradient from 'react-native-linear-gradient';
+import checkCode from '../api/checkCode';
+import checkPasswordEmail from '../api/checkPasswordEmail';
+import resetPassword from '../api/resetPassword';
+import {NAME_REGEX, EMAIL_REGEX, PASSWORD_REGEX} from '../constants/regex';
 
 const IMAGES = {
   backButton: require('../../assets/images/icons/backButton.png'),
@@ -20,54 +25,91 @@ const IMAGES = {
 
 const {width, height} = Dimensions.get('window');
 
-const FindPassword = ({navigation}) => {
-  const [email, setEmail] = useState('');
-  const [askCode, setAskCode] = useState('코드 요청');
-  const [timeLeft, setTimeLeft] = useState(300);
-  const [isActive, setIsActive] = useState(false);
+interface FindPasswordProps {
+  navigation: any;
+  route: any;
+}
+
+const FindPassword: React.FC<FindPasswordProps> = ({navigation, route}) => {
+  const [email, setEmail] = useState<string>('');
+  const [askCode, setAskCode] = useState<string>('코드 요청');
+  const [timeLeft, setTimeLeft] = useState<number>(300);
+  const [isActive, setIsActive] = useState<boolean>(false);
 
   // 기존 이름
-  const [name, inputName] = useState('');
+  const [name, setName] = useState<string>('');
 
   // 이메일 인증 완료 확인 변수
-  const [chkEmail, setChkEmail] = useState(false);
+  const [chkEmail, setChkEmail] = useState<boolean>(false);
 
   // 비밀번호 재설정
-  const [resetPassword, setResetPassword] = useState('');
-  const [errorMessage, setErrorMessage] = useState('');
+  const [resetPasswordInput, setResetPasswordInput] = useState<string>('');
+  const [errorMessage, setErrorMessage] = useState<string>('');
+
+  // 인증 코드
+  const [code, setCode] = useState<string>('');
+  const [isCodeVerified, setIsCodeVerified] = useState<boolean>(false);
+
+  // 이름 유효성 검사 결과
+  const [nameError, setNameError] = useState<string>('');
+  // 이메일 유효성 검사 결과
+  const [emailError, setEmailError] = useState<string>('');
+
+  // 헤더 제목 설정
+  const headerTitle = route.params?.title || '비밀번호 찾기';
 
   // 기존 이름 입력
-  const handleNameChange = name => {
-    inputName(name);
+  const handleNameChange = (text: string) => {
+    setName(text);
+    if (!NAME_REGEX.test(text)) {
+      setNameError('이름을 입력해주세요.');
+    } else {
+      setNameError('');
+    }
   };
 
-  // 기본 이름 지우기
+  // 기존 이름 지우기
   const deleteName = () => {
-    inputName('');
+    setName('');
+    setNameError('이름을 입력해주세요.');
   };
 
-  // 다시 잔디 심으러 가기 버튼 클릭
-  const submitSignUp = () => {};
-
-  // 이메일 인증 완료 -> 비밀번호 재설정
-  const verifiedEmail = () => {
-    setChkEmail(true);
+  // 이메일 입력
+  const handleEmailChange = (text: string) => {
+    setEmail(text);
+    if (!EMAIL_REGEX.test(text)) {
+      setEmailError('유효한 부산대 이메일을 입력해주세요.');
+    } else {
+      setEmailError('');
+    }
   };
 
-  // 비밀번호 재설정
-  const handleResetPassword = password => {
-    setResetPassword(password);
-    validationPassword(password); // 비밀번호 재설정 조건 확인
+  // 이메일 지우기
+  const deleteEmail = () => {
+    setEmail('');
+    setEmailError('유효한 부산대 이메일을 입력해주세요.');
   };
+
+  // 인증 코드 입력
+  const handleCodeChange = (text: string) => {
+    setCode(text);
+  };
+
+  // 비밀번호 재설정 입력
+  const handleResetPasswordChange = (password: string) => {
+    setResetPasswordInput(password);
+    validationPassword(password);
+  };
+
   // 비밀번호 지우기
   const deletePassword = () => {
-    setResetPassword('');
+    setResetPasswordInput('');
+    setErrorMessage('비밀번호를 다시 설정해주세요!');
   };
+
   // 비밀번호 조건 확인
-  const validationPassword = password => {
-    const passwordRegex =
-      /^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*#?&])[A-Za-z\d@$!%*#?&]{8,16}$/;
-    if (!passwordRegex.test(password)) {
+  const validationPassword = (password: string) => {
+    if (!PASSWORD_REGEX.test(password)) {
       setErrorMessage('비밀번호를 다시 설정해주세요!');
     } else {
       setErrorMessage('');
@@ -75,7 +117,7 @@ const FindPassword = ({navigation}) => {
   };
 
   useEffect(() => {
-    let timer;
+    let timer: NodeJS.Timeout;
     if (isActive && timeLeft > 0) {
       timer = setInterval(() => {
         setTimeLeft(prevTime => prevTime - 1);
@@ -89,7 +131,7 @@ const FindPassword = ({navigation}) => {
   }, [isActive, timeLeft]);
 
   // 초를 분:초 형식으로 변환하는 함수
-  const formatTime = seconds => {
+  const formatTime = (seconds: number) => {
     const minutes = Math.floor(seconds / 60);
     const secs = seconds % 60;
     return `${String(minutes).padStart(2, '0')}:${String(secs).padStart(
@@ -98,10 +140,67 @@ const FindPassword = ({navigation}) => {
     )}`;
   };
 
-  const handleRequire = () => {
-    setAskCode('재요청');
-    setIsActive(true); // 타이머 시작
-    setTimeLeft(300); // 타이머 리셋
+  const handleRequire = async () => {
+    if (nameError || emailError || !name || !email) {
+      setErrorMessage('이름과 이메일을 올바르게 입력해주세요.');
+      return;
+    }
+
+    try {
+      const response = await checkPasswordEmail({name, email});
+      if (response.success) {
+        setAskCode('재요청');
+        setIsActive(true); // 타이머 시작
+        setTimeLeft(300); // 타이머 리셋
+        setErrorMessage('');
+      } else {
+        setErrorMessage('이름 또는 이메일을 확인해주세요.');
+      }
+    } catch (error: any) {
+      setErrorMessage(error.message || '에러가 발생했습니다.');
+    }
+  };
+
+  const verifiedEmail = async () => {
+    if (timeLeft <= 0) {
+      setErrorMessage('인증 시간이 만료되었습니다. 코드를 재요청해주세요.');
+      return;
+    }
+    try {
+      const response = await checkCode({email, code});
+      if (response.success) {
+        setChkEmail(true);
+        setIsCodeVerified(true);
+        setErrorMessage('');
+      } else {
+        setErrorMessage('인증 코드가 올바르지 않습니다.');
+      }
+    } catch (error: any) {
+      setErrorMessage(error.message || '에러가 발생했습니다.');
+    }
+  };
+
+  // 비밀번호 재설정 API 호출
+  const submitResetPassword = async () => {
+    if (errorMessage || !resetPasswordInput) {
+      // 에러 메시지가 있을 경우 진행하지 않음
+      return;
+    }
+    try {
+      const response = await resetPassword({
+        name,
+        email,
+        password: resetPasswordInput,
+      });
+      if (response.success) {
+        // 비밀번호 재설정 성공 시 로그인 페이지로 이동
+        navigation.navigate('Landing');
+      } else {
+        setErrorMessage('비밀번호 재설정에 실패했습니다.');
+      }
+    } catch (error: any) {
+      setErrorMessage(error.message || '에러가 발생했습니다.');
+    }
   };
 
   return (
@@ -114,7 +213,7 @@ const FindPassword = ({navigation}) => {
             onPress={() => navigation.goBack()}>
             <Image source={IMAGES.backButton} style={styles.setBackButton} />
           </TouchableOpacity>
-          <Text style={styles.headerText}>비밀번호 찾기</Text>
+          <Text style={styles.headerText}>{headerTitle}</Text>
         </View>
 
         {/* 입력 폼 */}
@@ -131,13 +230,23 @@ const FindPassword = ({navigation}) => {
                 style={styles.inputBox}
                 placeholder="기존에 가입되어있던 이름을 입력해주세요."
                 placeholderTextColor="#B9B9B9"
-                value={inputName}
+                value={name}
                 onChangeText={handleNameChange}
               />
-              <TouchableOpacity style={styles.resetButton} onPress={deleteName}>
-                <Image source={IMAGES.resetButton} style={styles.clearIcon} />
-              </TouchableOpacity>
+              {name.length > 0 && (
+                <TouchableOpacity
+                  style={styles.resetButton}
+                  onPress={deleteName}>
+                  <Image source={IMAGES.resetButton} style={styles.clearIcon} />
+                </TouchableOpacity>
+              )}
             </View>
+            {nameError ? (
+              <View style={styles.iconAndTextContainer}>
+                <Image source={IMAGES.iIcon} style={styles.setiIcon} />
+                <Text style={styles.activeText}>{nameError}</Text>
+              </View>
+            ) : null}
           </View>
 
           {/* 이메일 입력 */}
@@ -151,14 +260,27 @@ const FindPassword = ({navigation}) => {
                 placeholder="학교 이메일을 입력해주세요."
                 placeholderTextColor="#B9B9B9"
                 value={email}
-                onChangeText={setEmail}
+                onChangeText={handleEmailChange}
               />
+              {email.length > 0 && (
+                <TouchableOpacity
+                  style={styles.resetButton}
+                  onPress={deleteEmail}>
+                  <Image source={IMAGES.resetButton} style={styles.clearIcon} />
+                </TouchableOpacity>
+              )}
               <TouchableOpacity
                 style={styles.codeButton}
                 onPress={handleRequire}>
                 <Text style={styles.requestCodeButtonText}>{askCode}</Text>
               </TouchableOpacity>
             </View>
+            {emailError ? (
+              <View style={styles.iconAndTextContainer}>
+                <Image source={IMAGES.iIcon} style={styles.setiIcon} />
+                <Text style={styles.activeText}>{emailError}</Text>
+              </View>
+            ) : null}
             {isActive && (
               <View style={styles.iconAndTextContainer}>
                 <Image source={IMAGES.iIcon} style={styles.setiIcon} />
@@ -170,27 +292,38 @@ const FindPassword = ({navigation}) => {
           </View>
 
           {/* 인증 코드 입력 */}
-          <View style={styles.inputContainer}>
-            <View
-              style={[
-                styles.inputRow,
-                {borderBottomWidth: 1.5, borderBottomColor: '#A9A9A9'},
-              ]}>
-              <TextInput
-                style={{flex: 1}}
-                placeholder="메일로 전송된 코드를 입력해주세요."
-                placeholderTextColor="#B9B9B9"
-              />
-              <Text style={styles.timerText}>{formatTime(timeLeft)}</Text>
-              <TouchableOpacity style={styles.verifyButton}>
-                <Text style={styles.verifyButtonText} onPress={verifiedEmail}>
-                  확인
-                </Text>
-              </TouchableOpacity>
+          {isActive && (
+            <View style={styles.inputContainer}>
+              <View
+                style={[
+                  styles.inputRow,
+                  {borderBottomWidth: 1.5, borderBottomColor: '#A9A9A9'},
+                ]}>
+                <TextInput
+                  style={{flex: 1}}
+                  placeholder="메일로 전송된 코드를 입력해주세요."
+                  placeholderTextColor="#B9B9B9"
+                  value={code}
+                  onChangeText={handleCodeChange}
+                />
+                <Text style={styles.timerText}>{formatTime(timeLeft)}</Text>
+                <TouchableOpacity
+                  style={styles.verifyButton}
+                  onPress={verifiedEmail}>
+                  <Text style={styles.verifyButtonText}>확인</Text>
+                </TouchableOpacity>
+              </View>
             </View>
-          </View>
+          )}
 
-          {askCode == '재요청' && chkEmail && (
+          {errorMessage && !errorMessage.startsWith('비밀번호') ? (
+            <View style={styles.iconAndTextContainer}>
+              <Image source={IMAGES.iIcon} style={styles.setiIcon} />
+              <Text style={styles.activeText}>{errorMessage}</Text>
+            </View>
+          ) : null}
+
+          {isCodeVerified && (
             <View style={styles.inputContainer2}>
               <Text style={styles.inputLabel}>
                 비밀번호 재설정 <Text style={styles.starmark}>*</Text>
@@ -201,30 +334,35 @@ const FindPassword = ({navigation}) => {
                   placeholder="8~16자리 입력 / 영문 대 소문자, 숫자, 특수문자 조합"
                   placeholderTextColor="#B9B9B9"
                   secureTextEntry
-                  value={resetPassword}
-                  onChangeText={handleResetPassword}
+                  value={resetPasswordInput}
+                  onChangeText={handleResetPasswordChange}
                 />
-                <TouchableOpacity
-                  style={styles.resetButton}
-                  onPress={deletePassword}>
-                  <Image source={IMAGES.resetButton} style={styles.clearIcon} />
-                </TouchableOpacity>
+                {resetPasswordInput.length > 0 && (
+                  <TouchableOpacity
+                    style={styles.resetButton}
+                    onPress={deletePassword}>
+                    <Image
+                      source={IMAGES.resetButton}
+                      style={styles.clearIcon}
+                    />
+                  </TouchableOpacity>
+                )}
               </View>
-              <View style={styles.iconAndTextContainer}>
-                {errorMessage ? (
-                  <View style={styles.iconAndTextContainer}>
-                    <Image source={IMAGES.iIcon} style={styles.setiIcon} />
-                    <Text style={styles.activeText}>{errorMessage}</Text>
-                  </View>
-                ) : null}
-              </View>
+              {errorMessage ? (
+                <View style={styles.iconAndTextContainer}>
+                  <Image source={IMAGES.iIcon} style={styles.setiIcon} />
+                  <Text style={styles.activeText}>{errorMessage}</Text>
+                </View>
+              ) : null}
             </View>
           )}
         </ScrollView>
 
         {/* 하단 버튼 */}
         <View style={styles.buttonContainer}>
-          <TouchableOpacity style={styles.signUpButton} onPress={submitSignUp}>
+          <TouchableOpacity
+            style={styles.signUpButton}
+            onPress={submitResetPassword}>
             <LinearGradient
               colors={['rgba(31, 209, 245, 1)', 'rgba(0, 255, 150, 1)']}
               style={{
@@ -247,16 +385,17 @@ const FindPassword = ({navigation}) => {
 export default FindPassword;
 
 const styles = StyleSheet.create({
+  // 기존 스타일 그대로 사용
   container: {
     flex: 1,
     backgroundColor: '#F5F5F5',
   },
   backButtonWrapper: {
     position: 'absolute',
-    top: height * 0.01, // 필요한 위치에 맞게 조정하세요.
+    top: height * 0.01,
     left: width * 0.03,
     zIndex: 1,
-    padding: 10, // 터치 영역 확대
+    padding: 10,
   },
   setBackButton: {
     resizeMode: 'contain',
@@ -272,18 +411,14 @@ const styles = StyleSheet.create({
     fontSize: 17,
     color: '#454545',
     fontWeight: 'bold',
-    textAlign: 'center', // 텍스트를 가운데 정렬
+    textAlign: 'center',
     marginVertical: height * 0.02,
   },
-
-  // 기존 이름 입력
   clearIcon: {
     width: width * 0.04,
     height: height * 0.02,
     borderRadius: 10,
   },
-
-  // 학교 이메일 인증
   formContainer: {
     paddingHorizontal: width * 0.05,
   },
@@ -331,8 +466,8 @@ const styles = StyleSheet.create({
     borderRadius: 20,
   },
   iconAndTextContainer: {
-    flexDirection: 'row', // 가로로 정렬
-    alignItems: 'center', // 이미지와 텍스트를 수직 중앙 정렬
+    flexDirection: 'row',
+    alignItems: 'center',
     marginTop: height * 0.0005,
   },
   inputWrapper: {
@@ -381,11 +516,9 @@ const styles = StyleSheet.create({
     fontSize: 12,
     textAlign: 'right',
   },
-
-  // 다시 잔디 심으러 가기 버튼
   buttonContainer: {
-    backgroundColor: '#E1E6E8', // 여백 부분에 색상 채움
-    alignItems: 'center', // 버튼을 가운데 정렬
+    backgroundColor: '#E1E6E8',
+    alignItems: 'center',
   },
   signUpButton: {
     height: height * 0.07,
