@@ -15,7 +15,7 @@ import {
 import LinearGradient from 'react-native-linear-gradient';
 import handleLogin, {autoLogin} from '../api/login';
 import {setItem, getItem} from '../api/asyncStorage';
-
+import {useRecoilValue} from 'recoil';
 const IMAGES = {
   blueGrass:
     'https://image-resource.creatie.ai/137927998611751/137927998611753/35fcb8e3152553006e3d0339a4456494.png',
@@ -36,7 +36,8 @@ const LandingScreen = ({navigation}) => {
   const [isAutoLogin, setIsAutoLogin] = useState(false); // 자동 로그인 상태
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-
+  const auth = useRecoilValue(authState);
+  console.log('Updated auth state:', auth);
   useEffect(() => {
     const checkAutoLogin = async () => {
       const autoLoginFlag = await getItem('autoLogin');
