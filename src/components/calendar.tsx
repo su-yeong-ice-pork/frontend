@@ -75,17 +75,23 @@ const CalendarScreen = ({userId}: {userId: number}) => {
   const [displayedDate, setDisplayedDate] = useState(
     moment().format('YYYY-MM-DD'),
   );
-  const [record, setRecord] = useState<{
-    currentStreak: number;
-    maxStreak: number;
-    totalStudyTime: number;
-  } | null>(null);
+  const [userRecord, setRecord] = useState<any>(null);
+
+  const fetchRecordData = async () => {
+    const userRecords = await getRecord(userId);
+
+    if (userRecords) {
+      setRecord(userRecords);
+    }
+  };
+  console.log(userRecord);
+  useEffect(() => {
+    fetchRecordData();
+  }, [userId]);
 
   const fetchMonthlyGrassData = async (year: number, month: number) => {
     const grassRecords = await getMonthlyGrass(userId, year, month);
-    console.log(userId);
-    console.log(year);
-    console.log(month);
+
     if (grassRecords) {
       let newGrassData: any = {};
       grassRecords.forEach(record => {
@@ -98,7 +104,6 @@ const CalendarScreen = ({userId}: {userId: number}) => {
         };
       });
       setGrassData(newGrassData);
-      console.log(newGrassData);
     }
   };
 
@@ -107,21 +112,6 @@ const CalendarScreen = ({userId}: {userId: number}) => {
     const month = moment(displayedDate).month() + 1; // month() returns 0-based month index
     fetchMonthlyGrassData(year, month);
   }, [displayedDate]);
-
-  useEffect(() => {
-    const fetchRecordData = async () => {
-      if (userId) {
-        const recordData = await getRecord(userId); // 사용자 ID로 API 호출
-        if (recordData) {
-          setRecord(recordData);
-          console.log('Record Data:', recordData); // 디버깅을 위한 로그 추가
-        } else {
-          console.log('Record data is null');
-        }
-      }
-    };
-    fetchRecordData();
-  }, [userId]);
 
   const onDayPress = (day: any) => {
     setSelectedDate(day.dateString);
@@ -161,14 +151,13 @@ const CalendarScreen = ({userId}: {userId: number}) => {
   const handleTabPress = (mode: 'monthly' | 'yearly') => {
     setViewMode(mode);
   };
-
   return (
     <View style={styles.container}>
-      {record ? (
+      {userRecord ? (
         <View style={styles.currentDaySection}>
           <Text style={styles.currentDayText}>
-            현재<Text style={styles.dayCount}> {record.currentStreak}</Text>일
-            째!
+            현재<Text style={styles.dayCount}> {userRecord.currentStreak}</Text>
+            일 째!
           </Text>
         </View>
       ) : (
@@ -283,20 +272,20 @@ const CalendarScreen = ({userId}: {userId: number}) => {
             firstDay={0}
           />
           <View style={styles.statsContainer}>
-            {record ? (
+            {userRecord ? (
               <View>
-                <View key={record.maxStreak}>
+                <View>
                   <Text style={styles.statsText}>
                     <Image source={IMAGES.calendar} />
                     최장{' '}
-                    <Text style={styles.highlight}>{record.maxStreak}</Text>일
-                    유지
+                    <Text style={styles.highlight}>{userRecord.maxStreak}</Text>
+                    일 유지
                   </Text>
                   <Text style={styles.statsText}>
                     <Image source={IMAGES.studyTime} style={styles.statsTime} />
                     총 공부시간{' '}
                     <Text style={styles.highlight}>
-                      {Math.floor(record.totalStudyTime / 60)}
+                      {Math.floor(userRecord.totalStudyTime / 60)}
                     </Text>
                     시간
                   </Text>

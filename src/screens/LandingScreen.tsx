@@ -36,8 +36,7 @@ const LandingScreen = ({navigation}) => {
   const [isAutoLogin, setIsAutoLogin] = useState(false); // 자동 로그인 상태
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const auth = useRecoilValue(authState);
-  console.log('Updated auth state:', auth);
+
   useEffect(() => {
     const checkAutoLogin = async () => {
       const autoLoginFlag = await getItem('autoLogin');
