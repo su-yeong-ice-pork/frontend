@@ -29,7 +29,6 @@ export const getRecord = async (id: number): Promise<Record | null> => {
     );
 
     if (response.data.success && response.data) {
-      console.log('응답:', response.data);
       return response.data.response;
     } else {
       console.error('API 에러:', response.data.error);
