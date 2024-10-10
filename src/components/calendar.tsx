@@ -1,4 +1,4 @@
-//components/calendar.tsx
+// components/calendar.tsx
 import React, {useState, useEffect} from 'react';
 import {
   View,
@@ -15,6 +15,7 @@ import moment from 'moment';
 import LinearGradient from 'react-native-linear-gradient';
 import {getRecord} from '../api/record';
 import {getMonthlyGrass} from '../api/monthJandi';
+
 // Locale 설정
 LocaleConfig.locales['kr'] = {
   monthNames: [
@@ -57,8 +58,7 @@ LocaleConfig.locales['kr'] = {
   dayNamesShort: ['일', '월', '화', '수', '목', '금', '토'],
   today: '오늘',
 };
-const {width, height} = Dimensions.get('window');
-// 기본 로케일 설정
+
 LocaleConfig.defaultLocale = 'kr';
 
 const IMAGES = {
@@ -79,25 +79,24 @@ const CalendarScreen = ({userId}: {userId: number}) => {
 
   const fetchRecordData = async () => {
     const userRecords = await getRecord(userId);
-
     if (userRecords) {
       setRecord(userRecords);
     }
   };
-  console.log(userRecord);
+
   useEffect(() => {
     fetchRecordData();
   }, [userId]);
 
   const fetchMonthlyGrassData = async (year: number, month: number) => {
     const grassRecords = await getMonthlyGrass(userId, year, month);
-
     if (grassRecords) {
       let newGrassData: any = {};
       grassRecords.forEach(record => {
         const dateKey = `${year}-${month < 10 ? `0${month}` : month}-${
           record.day < 10 ? `0${record.day}` : record.day
         }`;
+
         newGrassData[dateKey] = {
           studyTime: record.studyHour,
           grassScore: record.grassScore,
@@ -105,6 +104,7 @@ const CalendarScreen = ({userId}: {userId: number}) => {
       });
       setGrassData(newGrassData);
     }
+    console.log('월간', grassData);
   };
 
   useEffect(() => {
@@ -123,7 +123,7 @@ const CalendarScreen = ({userId}: {userId: number}) => {
     let markedDates: any = {};
     for (let date in grassData) {
       const activity = grassData[date];
-      const color = getColorForActivity(activity.grassScore);
+      const color = getColorForActivity({studyHour: activity.studyTime});
       markedDates[date] = {
         customStyles: {
           container: {
@@ -139,18 +139,20 @@ const CalendarScreen = ({userId}: {userId: number}) => {
     return markedDates;
   };
 
-  const getColorForActivity = (grassScore: number) => {
-    // 잔디 점수에 따른 색상 설정
-    if (grassScore === 0) return '#ebedf0'; // 연한 회색
-    else if (grassScore <= 20) return '#c6e48b'; // 연한 초록
-    else if (grassScore <= 40) return '#7bc96f'; // 중간 초록
-    else if (grassScore <= 60) return '#239a3b'; // 진한 초록
-    else return '#196127'; // 아주 진한 초록
+  const getColorForActivity = ({studyHour}: {studyHour: number}) => {
+    if (studyHour === 0) return '#ebedf0'; // 연한 회색
+    else if (studyHour >= 1 && studyHour <= 2) return '#c6e48b'; // 연한 초록
+    else if (studyHour >= 3 && studyHour <= 4) return '#7bc96f'; // 중간 초록
+    else if (studyHour >= 5 && studyHour <= 6) return '#239a3b'; // 진한 초록
+    else if (studyHour >= 7 && studyHour <= 8)
+      return '#196127'; // 아주 진한 초록
+    else return '#196127'; // 8시간 초과 시에도 동일한 색상
   };
 
   const handleTabPress = (mode: 'monthly' | 'yearly') => {
     setViewMode(mode);
   };
+
   return (
     <View style={styles.container}>
       {userRecord ? (
@@ -220,7 +222,7 @@ const CalendarScreen = ({userId}: {userId: number}) => {
       </View>
 
       {viewMode === 'monthly' ? (
-        <View style={styles.container}>
+        <View style={styles.monthlyContainer}>
           <Calendar
             key={displayedDate}
             current={displayedDate}
@@ -285,7 +287,7 @@ const CalendarScreen = ({userId}: {userId: number}) => {
                     <Image source={IMAGES.studyTime} style={styles.statsTime} />
                     총 공부시간{' '}
                     <Text style={styles.highlight}>
-                      {Math.floor(userRecord.totalStudyTime / 60)}
+                      {Math.floor(userRecord.totalStudyTime)}
                     </Text>
                     시간
                   </Text>
@@ -301,18 +303,32 @@ const CalendarScreen = ({userId}: {userId: number}) => {
       ) : (
         <View style={styles.yearlyView}>
           {/* 연간 잔디밭 구현 */}
-          <YearlyCalendar />
+          <YearlyCalendar memberId={userId} />
           <View style={styles.statsContainer}>
-            <View>
-              <Text style={styles.statsText}>
-                <Image source={IMAGES.calendar} />
-                최장 <Text style={styles.highlight}></Text>일 유지
-              </Text>
-              <Text style={styles.statsText}>
-                <Image source={IMAGES.studyTime} style={styles.statsTime} />총
-                공부시간 <Text style={styles.highlight}></Text>시간
-              </Text>
-            </View>
+            {userRecord ? (
+              <View>
+                <View>
+                  <Text style={styles.statsText}>
+                    <Image source={IMAGES.calendar} />
+                    최장{' '}
+                    <Text style={styles.highlight}>{userRecord.maxStreak}</Text>
+                    일 유지
+                  </Text>
+                  <Text style={styles.statsText}>
+                    <Image source={IMAGES.studyTime} style={styles.statsTime} />
+                    총 공부시간{' '}
+                    <Text style={styles.highlight}>
+                      {Math.floor(userRecord.totalStudyTime)}
+                    </Text>
+                    시간
+                  </Text>
+                </View>
+              </View>
+            ) : (
+              <View>
+                <Text>스트릭 정보가 없습니다. 첫 기록을 시작해보세요!</Text>
+              </View>
+            )}
           </View>
         </View>
       )}
@@ -357,10 +373,19 @@ const CalendarScreen = ({userId}: {userId: number}) => {
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
+    flex: 1, // 화면 전체를 사용하도록 변경
     backgroundColor: '#F5F5F5',
-    width: width,
-    height: height,
+    // width: width, // 제거
+    // height: height, // 제거
+  },
+  monthlyContainer: {
+    flex: 1, // 남은 공간을 사용하도록 설정
+    padding: 10,
+  },
+  yearlyView: {
+    flex: 1, // 남은 공간을 사용하도록 설정
+    padding: 20,
+    color: '#333',
   },
   tabContainer: {
     flexDirection: 'row',
@@ -407,15 +432,6 @@ const styles = StyleSheet.create({
     color: '#FFFFFF',
     fontFamily: 'NanumSquareNeo-Variable',
   },
-  calendarContainer: {
-    padding: 10,
-    backgroundColor: '#FFF',
-    borderRadius: 8,
-  },
-  yearlyView: {
-    padding: 20,
-    color: '#333',
-  },
   statsContainer: {
     marginTop: 20,
     padding: 15,
@@ -450,21 +466,11 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: 'bold',
   },
-  headerYearUnitText: {
-    color: 'gray',
-    fontSize: 18,
-    fontWeight: 'bold',
-  },
   headerMonthText: {
     color: '#009499',
     fontSize: 18,
     fontWeight: 'bold',
     marginLeft: 5,
-  },
-  headerMonthUnitText: {
-    color: 'gray',
-    fontSize: 18,
-    fontWeight: 'bold',
   },
   headerArrows: {
     flexDirection: 'row',
@@ -474,6 +480,7 @@ const styles = StyleSheet.create({
     color: '#009499',
     fontSize: 14,
     marginHorizontal: 5,
+    marginTop: 5,
     fontFamily: 'NanumSquareNeo-Variable',
   },
   modalBackground: {
@@ -507,27 +514,26 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     fontFamily: 'NanumSquareNeo-Variable',
   },
-
   currentDaySection: {
-    paddingHorizontal: width * 0.05,
-    marginVertical: height * 0.02,
+    paddingHorizontal: 20,
+    marginVertical: 20,
   },
   notDayCount: {
     marginTop: 10,
-    fontSize: width * 0.05,
+    fontSize: 20,
     marginLeft: 17,
     color: '#009499',
     fontFamily: 'NanumSquareNeo-Variable',
     fontWeight: 'bold',
   },
   dayCount: {
-    fontSize: width * 0.08,
+    fontSize: 32,
     color: '#009499',
     fontFamily: 'NanumSquareNeo-Variable',
     fontWeight: 'bold',
   },
   currentDayText: {
-    fontSize: width * 0.05,
+    fontSize: 20,
     fontWeight: 'bold',
     color: '#333',
     fontFamily: 'NanumSquareNeo-Variable',

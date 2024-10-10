@@ -35,10 +35,8 @@ export const getMonthlyGrass = async (
         },
       },
     );
-    console.log('API 응답 데이터:', response.data);
 
     if (response.data.success && response.data.response) {
-      console.log('가져온 Grass 데이터:', response.data.response.grass);
       return response.data.response.grass;
     } else {
       console.error('API 에러:', response.data.error);
