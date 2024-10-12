@@ -16,18 +16,18 @@ interface ApiResponse {
   error: any;
 }
 
-export const getMemberData = async (): Promise<Member | null> => {
+export const getMemberData = async (
+  authToken: string,
+): Promise<Member | null> => {
   try {
-    const token = await getItem('authToken');
-    console.log(token);
-    if (!token) {
+    if (!authToken) {
       console.error('토큰이 없습니다. 로그인이 필요합니다.');
       return null;
     }
 
     const response = await apiClient.get<ApiResponse>('/members', {
       headers: {
-        Authorization: `${token}`,
+        Authorization: `${authToken}`,
       },
     });
     if (response.data.success) {

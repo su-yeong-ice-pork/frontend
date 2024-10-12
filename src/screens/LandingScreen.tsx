@@ -15,7 +15,7 @@ import {
 import LinearGradient from 'react-native-linear-gradient';
 import handleLogin, {autoLogin} from '../api/login';
 import {setItem, getItem} from '../api/asyncStorage';
-import {useRecoilValue} from 'recoil';
+
 const IMAGES = {
   blueGrass:
     'https://image-resource.creatie.ai/137927998611751/137927998611753/35fcb8e3152553006e3d0339a4456494.png',
@@ -45,7 +45,7 @@ const LandingScreen = ({navigation}) => {
         const response = await autoLogin(refreshToken);
         if (response.success) {
           const authToken = response.headers['authorization'];
-          setAuthState({email: '사용자 이메일', authToken});
+          setAuthState({email: '', authToken});
           navigation.navigate('Home');
         }
       }
@@ -71,8 +71,6 @@ const LandingScreen = ({navigation}) => {
           await setItem('autoLogin', '');
         }
         const authToken = response.headers['authorization'];
-        await setItem('authToken', authToken);
-        console.log('handleLogin 응답:', response);
         setAuthState({email, authToken});
         navigation.navigate('Home');
       }

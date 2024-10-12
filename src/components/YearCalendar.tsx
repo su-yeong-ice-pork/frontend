@@ -1,9 +1,11 @@
 import React, {useState, useEffect} from 'react';
 import {View, StyleSheet, ScrollView, Text} from 'react-native';
 import {getYearlyGrass, GrassData} from '../api/YearJandi';
+import {useRecoilValue} from 'recoil';
+import authState from '../recoil/authAtom';
 
 const YearlyCalendar = ({memberId}: {memberId: number}) => {
-  console.log('Member ID:', memberId);
+  const authInfo = useRecoilValue(authState);
   const [weeks, setWeeks] = useState<Date[][]>([]);
   const [monthLabels, setMonthLabels] = useState<
     {index: number; month: string}[]
@@ -22,7 +24,7 @@ const YearlyCalendar = ({memberId}: {memberId: number}) => {
       const today = new Date();
       const year = today.getFullYear();
 
-      const grass = await getYearlyGrass(memberId, year);
+      const grass = await getYearlyGrass(memberId, year, authInfo.authToken);
       if (grass) {
         setGrassData(grass);
       }
@@ -53,7 +55,7 @@ const YearlyCalendar = ({memberId}: {memberId: number}) => {
 
           if (
             dateCopy.getDate() === 1 &&
-            monthsMap.every(m => m.month !== dateCopy.getMonth())
+            monthsMap.every(m => Number(m.month) !== dateCopy.getMonth())
           ) {
             monthsMap.push({
               index: weeksArray.length,
@@ -75,7 +77,7 @@ const YearlyCalendar = ({memberId}: {memberId: number}) => {
 
     fetchGrassData();
     generateDates();
-  }, [memberId]);
+  }, [authInfo.authToken, memberId]);
 
   // grassData 업데이트 시 로그 출력
   useEffect(() => {
