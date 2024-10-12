@@ -172,7 +172,7 @@ const ShowPicker = () => {
     if (res.didCancel || res.errorCode) {
       return;
     }
-    alert(res.assets[0].uri);
+    // alert(res.assets[0].uri);
     const formdata = new FormData();
     formdata.append('file', res.assets[0].uri);
     console.log(res);

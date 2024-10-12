@@ -17,6 +17,10 @@ import LinearGradient from 'react-native-linear-gradient';
 import {getMemberData, Member} from '../api/profile';
 import {getBadges, Badge} from '../api/badge';
 
+import {useRecoilState, useRecoilValue} from 'recoil';
+import userState from '../recoil/userAtom';
+import authState from '../recoil/authAtom';
+
 const {width, height} = Dimensions.get('window');
 
 const IMAGES = {
@@ -45,14 +49,18 @@ const IMAGES = {
 const ProfileScreen = ({navigation}) => {
   const [member, setMember] = useState<Member | null>(null);
   const [badges, setBadges] = useState<Badge[] | null>(null);
+  const authInfo = useRecoilValue(authState);
+  const [user, setUser] = useRecoilState(userState);
 
   useEffect(() => {
     const fetchMember = async () => {
       try {
-        const memberData = await getMemberData();
+        const memberData = await getMemberData(authInfo.authToken);
         if (memberData) {
           setMember(memberData);
-          const badgesData = await getBadges(memberData.id); // 회원 ID로 뱃지 데이터 가져오기
+          setUser(memberData);
+          const badgesData = await getBadges(memberData.id, authInfo.authToken);
+
           if (badgesData) {
             setBadges(badgesData);
           } else {
@@ -191,7 +199,7 @@ const BadgeSection = ({badges}) => {
               {badges.slice(0, 3).map(badge => (
                 <Image
                   key={badge.id}
-                  source={BADGES[badge.fileName]}
+                  source={BADGES[Number(badge.fileName)]}
                   style={styles.badge}
                 />
               ))}
