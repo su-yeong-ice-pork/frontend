@@ -1,6 +1,4 @@
-// src/screens/ProfileScreen.tsx
-
-import React, {useState} from 'react';
+import React, {useState, useEffect} from 'react';
 import {
   View,
   Text,
@@ -12,12 +10,12 @@ import {
   Dimensions,
   SafeAreaView,
 } from 'react-native';
+
 import BottomBar from '../components/BottomBar';
 import LinearGradient from 'react-native-linear-gradient';
 
 import {getMemberData, Member} from '../api/profile';
 import {getBadges, Badge} from '../api/badge';
-import {useNavigation} from '@react-navigation/native';
 
 const {width, height} = Dimensions.get('window');
 
@@ -44,38 +42,32 @@ const IMAGES = {
   iIcon: require('../../assets/images/icons/iIcon.png'),
 };
 
-const BADGES = {
-  0: require('../../assets/images/badge/badge0.png'),
-  1: require('../../assets/images/badge/badge1.png'),
-  2: require('../../assets/images/badge/badge2.png'),
-  3: require('../../assets/images/badge/badge3.png'),
-  4: require('../../assets/images/badge/badge4.png'),
-  5: require('../../assets/images/badge/badge5.png'),
-};
-
 const ProfileScreen = ({navigation}) => {
-  const [profile, setProfile] = useState<Member | null>(null);
-  const [loading, setLoading] = useState(true);
+  const [member, setMember] = useState<Member | null>(null);
+  const [badges, setBadges] = useState<Badge[] | null>(null);
 
   useEffect(() => {
-    const fetchProfileData = async () => {
-      const memberData = await getMemberData(); // API 호출
-      if (memberData) {
-        setProfile(memberData); // 데이터를 프로필 상태로 저장
+    const fetchMember = async () => {
+      try {
+        const memberData = await getMemberData();
+        if (memberData) {
+          setMember(memberData);
+          const badgesData = await getBadges(memberData.id); // 회원 ID로 뱃지 데이터 가져오기
+          if (badgesData) {
+            setBadges(badgesData);
+          } else {
+            console.log('뱃지를 불러오는 데 실패했습니다.');
+          }
+        } else {
+          console.log('프로필을 불러오는 데 실패했습니다.');
+        }
+      } catch (error) {
+        console.log('데이터를 불러오는 중 오류가 발생했습니다.');
       }
-      setLoading(false); // 로딩 완료
     };
 
-    fetchProfileData(); // 컴포넌트가 마운트될 때 데이터 가져오기
+    fetchMember();
   }, []);
-
-  if (!profile) {
-    return (
-      <SafeAreaView style={{flex: 1}}>
-        <Text>프로필 정보를 불러올 수 없습니다.</Text> {/* 오류 처리 */}
-      </SafeAreaView>
-    );
-  }
 
   return (
     <SafeAreaView style={{flex: 1}}>
@@ -99,11 +91,7 @@ const ProfileScreen = ({navigation}) => {
             </TouchableOpacity>
             <View style={styles.profileInfo}>
               <Image
-                source={
-                  profile.profileImage
-                    ? {uri: profile.profileImage}
-                    : IMAGES.profile
-                } // 프로필 이미지 URL 대체 가능
+                source={member?.image ? {uri: member.image} : IMAGES.profile} // 프로필 이미지 URL 대체 가능
                 style={styles.profileImage}
               />
               <TouchableOpacity
@@ -114,8 +102,8 @@ const ProfileScreen = ({navigation}) => {
           </View>
 
           <View style={styles.profileTextContainer}>
-            <Text style={styles.nickname}>{profile.mainTitle}</Text>
-            <Text style={styles.username}>{profile.name}</Text>
+            <Text style={styles.nickname}>{member?.mainTitle}</Text>
+            <Text style={styles.username}>{member?.name}</Text>
           </View>
 
           <View style={styles.content}>
@@ -135,9 +123,9 @@ const ProfileScreen = ({navigation}) => {
               buttonSrc={IMAGES.groupsIcon}
               buttonText="그룹목록 보기"
             />
-            <BadgeSection />
-            <FreezeSummary freezeCount={profile.freezeCount} />
-            <GrassSummary name={profile.name} totalDays={85} />
+            <BadgeSection badges={badges} />
+            <FreezeSummary freezeCount={member?.freezeCount} />
+            <GrassSummary name={member?.name} totalDays={85} />
             <GrassButton
               startDate="2024년 6월 16일"
               totalDays={85}
@@ -186,37 +174,41 @@ const InfoCard = ({iconSrc, count, text, buttonSrc, buttonText, subTitle}) => {
 };
 
 // BadgeSection Component
-const BadgeSection = () => {
-  const [badgeIds, setBadgeIds] = useState<number[]>([]);
-
-  useEffect(() => {
-    // 백엔드에서 받아온 배지 번호 데이터 예시
-    const fetchBadges = async () => {
-      // 예시: 백엔드에서 받아온 데이터 (배지 번호 배열)
-      const fetchedBadgeIds = [1, 3, 5]; // 1번, 3번, 5번 배지를 보유
-      setBadgeIds(fetchedBadgeIds); // 상태로 저장
-    };
-
-    fetchBadges();
-  }, []);
+const BadgeSection = ({badges}) => {
+  const BADGES = [
+    require('../../assets/images/badge/badge1.png'),
+    require('../../assets/images/badge/badge2.png'),
+    require('../../assets/images/badge/badge3.png'),
+  ];
 
   return (
     <View style={styles.badgeSection}>
       <Text style={styles.badgeTitle}>보유 뱃지</Text>
       <View style={styles.badgeContainer}>
-        {badgeIds.map((badgeId, index) => (
-          <View key={index} style={styles.badgeItem}>
-            <Image
-              source={BADGES[badgeId]} // 백엔드에서 받은 번호로 배지 렌더링
-              style={styles.badge}
-            />
-            <Text style={styles.badgeText}>Badge {badgeId}</Text>
-          </View>
-        ))}
-        <TouchableOpacity style={styles.moreButton}>
-          <Image style={styles.moreImage} source={IMAGES.moreIcon} />
-          <Text style={styles.moreText}>더보기</Text>
-        </TouchableOpacity>
+        <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+          {badges && badges.length > 0 ? (
+            <>
+              {badges.slice(0, 3).map(badge => (
+                <Image
+                  key={badge.id}
+                  source={BADGES[badge.fileName]}
+                  style={styles.badge}
+                />
+              ))}
+              {badges.length > 0 && (
+                <TouchableOpacity
+                  onPress={() => {
+                    console.log('... 버튼 클릭됨');
+                  }}
+                  style={styles.moreButton}>
+                  <Text style={styles.moreText}>...</Text>
+                </TouchableOpacity>
+              )}
+            </>
+          ) : (
+            <Text>보유한 뱃지가 없습니다.</Text>
+          )}
+        </ScrollView>
       </View>
     </View>
   );
@@ -538,17 +530,6 @@ const styles = StyleSheet.create({
     height: 35,
     marginRight: 7,
     resizeMode: 'contain',
-  },
-  badgeText: {
-    fontSize: 12,
-    color: '#333',
-    textAlign: 'center',
-  },
-  badgeItem: {
-    alignItems: 'center', // 이미지와 텍스트를 수직 중앙 정렬
-    marginRight: 10, // 오른쪽 여백 추가
-    marginBottom: 20, // 아래쪽 여백 추가
-    width: 80, // 배지 아이템의 가로 크기 지정
   },
   moreButton: {
     color: '#009499',
