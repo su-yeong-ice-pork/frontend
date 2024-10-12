@@ -7,7 +7,6 @@ import {
   Image,
   StyleSheet,
   Modal,
-  Dimensions,
 } from 'react-native';
 import {Calendar, LocaleConfig} from 'react-native-calendars';
 import YearlyCalendar from './YearCalendar';
@@ -15,6 +14,8 @@ import moment from 'moment';
 import LinearGradient from 'react-native-linear-gradient';
 import {getRecord} from '../api/record';
 import {getMonthlyGrass} from '../api/monthJandi';
+import {useRecoilValue} from 'recoil';
+import authState from '../recoil/authAtom';
 
 // Locale 설정
 LocaleConfig.locales['kr'] = {
@@ -67,6 +68,7 @@ const IMAGES = {
 };
 
 const CalendarScreen = ({userId}: {userId: number}) => {
+  const authInfo = useRecoilValue(authState);
   const [selectedDate, setSelectedDate] = useState('');
   const [selectedDateData, setSelectedDateData] = useState<any>(null);
   const [modalVisible, setModalVisible] = useState(false);
@@ -78,7 +80,7 @@ const CalendarScreen = ({userId}: {userId: number}) => {
   const [userRecord, setRecord] = useState<any>(null);
 
   const fetchRecordData = async () => {
-    const userRecords = await getRecord(userId);
+    const userRecords = await getRecord(userId, authInfo.authToken);
     if (userRecords) {
       setRecord(userRecords);
     }
@@ -86,10 +88,15 @@ const CalendarScreen = ({userId}: {userId: number}) => {
 
   useEffect(() => {
     fetchRecordData();
-  }, [userId]);
+  }, []);
 
   const fetchMonthlyGrassData = async (year: number, month: number) => {
-    const grassRecords = await getMonthlyGrass(userId, year, month);
+    const grassRecords = await getMonthlyGrass(
+      userId,
+      year,
+      month,
+      authInfo.authToken,
+    );
     if (grassRecords) {
       let newGrassData: any = {};
       grassRecords.forEach(record => {

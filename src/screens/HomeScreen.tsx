@@ -22,9 +22,13 @@ import {
   getCurrentLocation,
 } from '../utils/locationUtils';
 import {SERVICE_AREA, isPointInPolygon, Coordinate} from '../utils/serviceArea';
-import {getItem, setItem} from '../api/asyncStorage';
+import {useRecoilState, useRecoilValue} from 'recoil';
+import userState from '../recoil/userAtom';
+import authState from '../recoil/authAtom';
+
 const HomeScreen = () => {
-  // 모달 상태 관리
+  const authInfo = useRecoilValue(authState);
+  const [user, setUser] = useRecoilState(userState);
   const [modalVisible, setModalVisible] = useState<boolean>(false);
   const [modalMessage, setModalMessage] = useState<string>('');
   const [member, setMember] = useState<Member | null>(null);
@@ -45,7 +49,7 @@ const HomeScreen = () => {
     require('../../assets/images/badge/badge2.png'),
     require('../../assets/images/badge/badge3.png'),
   ];
-  // "혼자 인증하기" 버튼 핸들러
+
   const handleSelfCertify = async () => {
     const hasPermission = await requestLocationPermission();
     if (!hasPermission) {
@@ -80,10 +84,11 @@ const HomeScreen = () => {
   useEffect(() => {
     const fetchMember = async () => {
       try {
-        const memberData = await getMemberData();
+        const memberData = await getMemberData(authInfo.authToken);
         if (memberData) {
           setMember(memberData);
-          const badgesData = await getBadges(memberData.id); // 회원 ID로 뱃지 데이터 가져오기
+          setUser(memberData);
+          const badgesData = await getBadges(memberData.id, authInfo.authToken);
           if (badgesData) {
             setBadges(badgesData);
           } else {
@@ -149,8 +154,6 @@ const HomeScreen = () => {
                         {badges.length > 0 && (
                           <TouchableOpacity
                             onPress={() => {
-                              console.log('... 버튼 클릭됨');
-
                               setShowModal(true);
                             }}
                             style={styles.moreButton}>
@@ -232,7 +235,7 @@ const HomeScreen = () => {
                   badges.map(badge => (
                     <View key={badge.id} style={styles.modalBadge}>
                       <Image
-                        source={BADGES[badge.fileName]}
+                        source={BADGES[Number(badge.fileName)]}
                         style={styles.modalBadgeImage}
                       />
                       <View style={styles.modalBadgeInfo}>

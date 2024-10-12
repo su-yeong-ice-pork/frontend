@@ -9,7 +9,6 @@ import {
   Dimensions,
   SafeAreaView,
   AppState,
-  Modal,
   Alert,
 } from 'react-native';
 
@@ -19,7 +18,7 @@ import BottomBar from '../components/BottomBar';
 import ProfileCard from '../components/ProfileCard';
 import {useNavigation} from '@react-navigation/native';
 import NoticeModal from '../components/NoticeModal';
-import {getMemberData, Member} from '../api/profile';
+import {Member} from '../api/profile';
 import {
   getStudyTime,
   updateStudyTime,
@@ -30,10 +29,12 @@ import {
   getCurrentLocation,
 } from '../utils/locationUtils';
 import {isPointInPolygon, SERVICE_AREA} from '../utils/serviceArea';
+import {useRecoilValue} from 'recoil';
+import userState from '../recoil/userAtom';
+import authState from '../recoil/authAtom';
 
 const {width} = Dimensions.get('window');
 
-// 더미 데이터
 const friends = [
   {
     id: 1,
@@ -77,6 +78,8 @@ const friends = [
   },
 ];
 const StudyRecordScreen = () => {
+  const user = useRecoilValue(userState);
+  const authInfo = useRecoilValue(authState);
   const [isRecording, setIsRecording] = useState(false);
   const [timeElapsed, setTimeElapsed] = useState<number>(0);
   const [todayStudyTime, setTodayStudyTime] = useState<number>(0);
@@ -98,21 +101,14 @@ const StudyRecordScreen = () => {
 
   useEffect(() => {
     // 유저 정보 가져오기
-    const fetchUserData = async () => {
-      const data = await getMemberData();
-      if (data) {
-        setUserData(data);
-      }
-    };
-
-    fetchUserData();
-  }, []);
+    setUserData(user);
+  }, [user]);
 
   useEffect(() => {
     // 공부 시간 데이터 가져오기
     const fetchStudyTimeData = async () => {
       try {
-        const response = await getStudyTime();
+        const response = await getStudyTime(authInfo.authToken);
         if (response.success) {
           const {todayStudyTime, totalStudyTime} = response.response;
           const todayTimeMs = parseTimeStringToMilliseconds(todayStudyTime);
@@ -166,7 +162,7 @@ const StudyRecordScreen = () => {
   const startRecording = async () => {
     // 출석 여부 확인
     try {
-      const attendanceResponse = await getTodayAttendance();
+      const attendanceResponse = await getTodayAttendance(authInfo.authToken);
       if (attendanceResponse.success) {
         const isAttended = attendanceResponse.response.attendance;
         if (!isAttended) {
@@ -241,7 +237,10 @@ const StudyRecordScreen = () => {
       formatMillisecondsToTimeString(newTodayStudyTime);
 
     try {
-      const response = await updateStudyTime(todayStudyTimeString);
+      const response = await updateStudyTime(
+        todayStudyTimeString,
+        authInfo.authToken,
+      );
       if (response.success) {
         setTodayStudyTime(parseTimeStringToMilliseconds(todayStudyTimeString));
       } else {
@@ -353,9 +352,9 @@ const StudyRecordScreen = () => {
                 무럭무럭 자라고 있어요!
               </Text>
               <ProfileCard
-                title={userData?.mainTitle || ''}
-                name={userData?.name || ''}
-                profileImage={userData?.profileImage || null}
+                title={user?.mainTitle || ''}
+                name={user?.name || ''}
+                profileImage={user?.profileImage || null}
                 studyMessage="기말고사 화이팅..."
                 timerValue={formatTime(currentStudyTime)}
                 totalTimeValue={formatTime(totalStudyTime)}
