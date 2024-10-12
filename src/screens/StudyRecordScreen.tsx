@@ -1,5 +1,3 @@
-// src/screens/StudyRecordScreen.tsx
-
 import React, {useEffect, useState, useRef} from 'react';
 import {
   View,
@@ -12,6 +10,7 @@ import {
   SafeAreaView,
   AppState,
   Modal,
+  Alert,
 } from 'react-native';
 
 import Header from '../components/Header';
@@ -19,6 +18,18 @@ import DashLine from '../components/DashLine';
 import BottomBar from '../components/BottomBar';
 import ProfileCard from '../components/ProfileCard';
 import {useNavigation} from '@react-navigation/native';
+import NoticeModal from '../components/NoticeModal';
+import {getMemberData, Member} from '../api/profile';
+import {
+  getStudyTime,
+  updateStudyTime,
+  getTodayAttendance,
+} from '../api/studyTime';
+import {
+  requestLocationPermission,
+  getCurrentLocation,
+} from '../utils/locationUtils';
+import {isPointInPolygon, SERVICE_AREA} from '../utils/serviceArea';
 
 const {width} = Dimensions.get('window');
 
@@ -67,42 +78,196 @@ const friends = [
 ];
 const StudyRecordScreen = () => {
   const [isRecording, setIsRecording] = useState(false);
-  const [timeElapsed, setTimeElapsed] = useState(0);
+  const [timeElapsed, setTimeElapsed] = useState<number>(0);
+  const [todayStudyTime, setTodayStudyTime] = useState<number>(0);
+  const [totalStudyTime, setTotalStudyTime] = useState<number>(0);
+  const [userData, setUserData] = useState<Member | null>(null);
+
   const intervalRef = useRef<NodeJS.Timer | null>(null);
-  const startTimeRef = useRef<number>(0); // 시작 시간을 저장하는 ref
+  const startTimeRef = useRef<number>(0);
   const isRecordingRef = useRef(isRecording);
-  const [isAttendanceConfirmed] = useState(true); // 출석 인증 여부
-  const [showAttendanceModal, setShowAttendanceModal] = useState(false);
+
+  // 모달 상태 변수
+  const [modalVisible, setModalVisible] = useState(false);
+  const [modalTitle, setModalTitle] = useState('');
+  const [modalMessage, setModalMessage] = useState('');
+
   const navigation = useNavigation();
 
-  const startRecording = () => {
-    if (!isAttendanceConfirmed) {
-      // 출석 인증을 하지 않았을 경우 모달 표시
-      setShowAttendanceModal(true);
+  const locationCheckIntervalRef = useRef<NodeJS.Timer | null>(null);
+
+  useEffect(() => {
+    // 유저 정보 가져오기
+    const fetchUserData = async () => {
+      const data = await getMemberData();
+      if (data) {
+        setUserData(data);
+      }
+    };
+
+    fetchUserData();
+  }, []);
+
+  useEffect(() => {
+    // 공부 시간 데이터 가져오기
+    const fetchStudyTimeData = async () => {
+      try {
+        const response = await getStudyTime();
+        if (response.success) {
+          const {todayStudyTime, totalStudyTime} = response.response;
+          const todayTimeMs = parseTimeStringToMilliseconds(todayStudyTime);
+          const totalTimeMs = parseTimeStringToMilliseconds(
+            totalStudyTime || '00:00:00',
+          );
+
+          setTodayStudyTime(todayTimeMs);
+          setTotalStudyTime(totalTimeMs);
+        } else {
+          console.error('Failed to fetch study time:', response.error);
+        }
+      } catch (error) {
+        console.error('Error fetching study time:', error);
+      }
+    };
+
+    fetchStudyTimeData();
+  }, []);
+
+  useEffect(() => {
+    isRecordingRef.current = isRecording;
+  }, [isRecording]);
+
+  useEffect(() => {
+    const subscription = AppState.addEventListener('change', nextAppState => {
+      if (nextAppState.match(/inactive|background/)) {
+        if (isRecordingRef.current) {
+          stopRecording();
+        }
+      }
+    });
+
+    return () => {
+      subscription.remove();
+    };
+  }, []);
+
+  useEffect(() => {
+    if (isRecording) {
+      startLocationCheckInterval();
+    } else {
+      stopLocationCheckInterval();
+    }
+
+    return () => {
+      stopLocationCheckInterval();
+    };
+  }, [isRecording]);
+
+  const startRecording = async () => {
+    // 출석 여부 확인
+    try {
+      const attendanceResponse = await getTodayAttendance();
+      if (attendanceResponse.success) {
+        const isAttended = attendanceResponse.response.attendance;
+        if (!isAttended) {
+          setModalTitle('잠시만요!\n혹시 출석 인증을 하셨나요?');
+          setModalMessage(
+            '잔디 스터디 기능을 사용하기 위해서는\n홈 화면의 출석 인증을 먼저 해주셔야 해요!',
+          );
+          setModalVisible(true);
+          return;
+        }
+      } else {
+        console.error('Failed to check attendance:', attendanceResponse.error);
+        Alert.alert('출석 정보를 가져올 수 없습니다.');
+        return;
+      }
+    } catch (error) {
+      console.error('Error checking attendance:', error);
+      Alert.alert('출석 정보를 가져올 수 없습니다.');
       return;
     }
 
+    // 위치 권한 확인 및 현재 위치 가져오기
+    const hasPermission = await requestLocationPermission();
+    if (!hasPermission) {
+      Alert.alert('위치 권한이 필요합니다.');
+      return;
+    }
+
+    try {
+      const location = await getCurrentLocation();
+      const isInLibrary = isPointInPolygon(
+        {latitude: 35.2358, longitude: 129.0814}, //임시 값
+        SERVICE_AREA,
+      );
+      if (!isInLibrary) {
+        // 모달을 표시하고 타이머 시작 중지
+        setModalTitle('도서관이 아닌 곳입니다.\n');
+        setModalMessage('잔디 스터디 기능은 도서관 내에서만 이용 가능합니다.');
+        setModalVisible(true);
+        return;
+      }
+    } catch (error) {
+      console.error('Error getting location:', error);
+      Alert.alert('위치 정보를 가져올 수 없습니다.');
+      return;
+    }
+
+    // 타이머 시작
     setIsRecording(true);
-    startTimeRef.current = Date.now() - timeElapsed; // 이전 시간부터 이어서 기록
+    startTimeRef.current = Date.now();
     intervalRef.current = setInterval(() => {
-      setTimeElapsed(Date.now() - startTimeRef.current);
+      const elapsed = Date.now() - startTimeRef.current;
+      setTimeElapsed(elapsed);
     }, 1000);
   };
 
-  const stopRecording = () => {
+  const stopRecording = async () => {
     if (intervalRef.current) {
       clearInterval(intervalRef.current);
       intervalRef.current = null;
     }
+
+    const elapsed = Date.now() - startTimeRef.current;
+    const newTodayStudyTime = todayStudyTime + elapsed;
+
     setIsRecording(false);
-    // 현재 시간과 startTimeRef.current를 사용하여 최종 경과 시간 계산
-    const finalTimeElapsed = Date.now() - startTimeRef.current;
-    console.log('Recorded time:', formatTime(finalTimeElapsed));
     setTimeElapsed(0);
     startTimeRef.current = 0;
+
+    // 서버에 공부 시간 업데이트
+    const todayStudyTimeString =
+      formatMillisecondsToTimeString(newTodayStudyTime);
+
+    try {
+      const response = await updateStudyTime(todayStudyTimeString);
+      if (response.success) {
+        setTodayStudyTime(parseTimeStringToMilliseconds(todayStudyTimeString));
+      } else {
+        console.error('Failed to update study time:', response.error);
+      }
+    } catch (error) {
+      console.error('Error updating study time:', error);
+    }
   };
 
-  const formatTime = (milliseconds: number) => {
+  const handleStudyButtonPress = () => {
+    if (isRecording) {
+      stopRecording();
+    } else {
+      startRecording();
+    }
+  };
+
+  // 시간 문자열을 밀리초로 변환
+  const parseTimeStringToMilliseconds = (timeString: string): number => {
+    const [hours, minutes, seconds] = timeString.split(':').map(Number);
+    return ((hours || 0) * 3600 + (minutes || 0) * 60 + (seconds || 0)) * 1000;
+  };
+
+  // 밀리초를 시간 문자열로 변환
+  const formatMillisecondsToTimeString = (milliseconds: number): string => {
     const totalSeconds = Math.floor(milliseconds / 1000);
     const hours = Math.floor(totalSeconds / 3600)
       .toString()
@@ -114,33 +279,50 @@ const StudyRecordScreen = () => {
     return `${hours}:${minutes}:${seconds}`;
   };
 
-  const handleStudyButtonPress = () => {
-    if (isRecording) {
-      stopRecording();
-    } else {
-      startRecording();
+  const formatTime = (milliseconds: number) => {
+    return formatMillisecondsToTimeString(milliseconds);
+  };
+
+  // 위치 확인 인터벌 시작
+  const startLocationCheckInterval = () => {
+    locationCheckIntervalRef.current = setInterval(async () => {
+      const hasPermission = await requestLocationPermission();
+      if (!hasPermission) {
+        Alert.alert('위치 권한이 필요합니다.');
+        stopRecording();
+        return;
+      }
+
+      try {
+        const location = await getCurrentLocation();
+        const isInLibrary = isPointInPolygon(location, SERVICE_AREA);
+        if (!isInLibrary) {
+          // 모달을 표시하고 타이머 중지
+          setModalTitle('도서관 밖입니다.\n공부가 중지됩니다.');
+          setModalMessage(
+            '잔디 스터디 기능은 도서관 내에서만 이용 가능합니다.',
+          );
+          setModalVisible(true);
+          stopRecording();
+        }
+      } catch (error) {
+        console.error('Error getting location:', error);
+        Alert.alert('위치 정보를 가져올 수 없습니다.');
+        stopRecording();
+      }
+    }, 10 * 1000 * 60);
+  };
+
+  // 위치 확인 인터벌 중지
+  const stopLocationCheckInterval = () => {
+    if (locationCheckIntervalRef.current) {
+      clearInterval(locationCheckIntervalRef.current);
+      locationCheckIntervalRef.current = null;
     }
   };
 
-  useEffect(() => {
-    // isRecording 상태 변경 시 ref 업데이트
-    isRecordingRef.current = isRecording;
-  }, [isRecording]);
-
-  useEffect(() => {
-    const subscription = AppState.addEventListener('change', nextAppState => {
-      if (nextAppState.match(/inactive|background/)) {
-        // 앱이 백그라운드로 전환될 때
-        if (isRecordingRef.current) {
-          stopRecording();
-        }
-      }
-    });
-
-    return () => {
-      subscription.remove();
-    };
-  }, []);
+  // 현재까지의 공부 시간 계산 (오늘 공부 시간 + 현재 세션 경과 시간)
+  const currentStudyTime = todayStudyTime + timeElapsed;
 
   return (
     <>
@@ -155,7 +337,11 @@ const StudyRecordScreen = () => {
               <TouchableOpacity style={styles.activeTab}>
                 <Text style={styles.activeTabText}>기록장</Text>
               </TouchableOpacity>
-              <TouchableOpacity style={styles.inactiveTab}>
+              <TouchableOpacity
+                style={styles.inactiveTab}
+                onPress={() => {
+                  Alert.alert('추가 예정입니다.');
+                }}>
                 <Text style={styles.inactiveTabText}>기록 랭킹</Text>
               </TouchableOpacity>
             </View>
@@ -167,11 +353,12 @@ const StudyRecordScreen = () => {
                 무럭무럭 자라고 있어요!
               </Text>
               <ProfileCard
-                title="새도의 신"
-                name="이은솔"
+                title={userData?.mainTitle || ''}
+                name={userData?.name || ''}
+                profileImage={userData?.profileImage || null}
                 studyMessage="기말고사 화이팅..."
-                timerValue={formatTime(timeElapsed)}
-                totalTimeValue="80:30:34"
+                timerValue={formatTime(currentStudyTime)}
+                totalTimeValue={formatTime(totalStudyTime)}
                 isRecording={isRecording}
                 onStudyButtonPress={handleStudyButtonPress}
               />
@@ -248,40 +435,12 @@ const StudyRecordScreen = () => {
             </View>
           </ScrollView>
         </View>
-        <Modal
-          visible={showAttendanceModal}
-          transparent={true}
-          animationType="fade">
-          <View style={styles.modalBackground}>
-            <View style={styles.modalContainer}>
-              {/* 닫기 버튼 */}
-              <TouchableOpacity
-                style={styles.modalCloseButton}
-                onPress={() => setShowAttendanceModal(false)}>
-                <Image
-                  source={require('../../assets/images/icons/closeButton.png')}
-                  style={styles.modalCloseIcon}
-                />
-              </TouchableOpacity>
-
-              <View style={styles.modalHeader}>
-                <Image
-                  source={require('../../assets/images/icons/attendance.png')}
-                  style={styles.modalIcon}
-                />
-                <Text style={styles.modalTitle}>
-                  잠시만요!{'\n'}
-                  혹시 <Text style={styles.modalHighlightText}>출석 인증</Text>
-                  을 하셨나요?
-                </Text>
-              </View>
-              <Text style={styles.modalSubtitle}>
-                잔디 스터디 기능을 사용하기 위해서는{'\n'}홈 화면의 출석 인증을
-                먼저 해주셔야 해요!
-              </Text>
-            </View>
-          </View>
-        </Modal>
+        <NoticeModal
+          visible={modalVisible}
+          onClose={() => setModalVisible(false)}
+          title={modalTitle}
+          message={modalMessage}
+        />
       </SafeAreaView>
       <BottomBar />
     </>

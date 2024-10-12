@@ -2,7 +2,7 @@
 import apiClient from './axiosInstance';
 import {getItem} from './asyncStorage';
 
-interface RecordData {
+interface Record {
   currentStreak: number;
   maxStreak: number;
   totalStudyTime: number;
@@ -11,12 +11,12 @@ interface RecordData {
 interface RecordApiResponse {
   success: boolean;
   response: {
-    record: RecordData;
-  } | null;
+    record: Record;
+  };
   error: any;
 }
 
-export const getRecord = async (id: number): Promise<RecordData | null> => {
+export const getRecord = async (id: number): Promise<Record | null> => {
   try {
     const token = await getItem('authToken');
     const response = await apiClient.get<RecordApiResponse>(
@@ -28,8 +28,8 @@ export const getRecord = async (id: number): Promise<RecordData | null> => {
       },
     );
 
-    if (response.data.success && response.data.response) {
-      return response.data.response.record;
+    if (response.data.success && response.data) {
+      return response.data.response;
     } else {
       console.error('API 에러:', response.data.error);
       return null;

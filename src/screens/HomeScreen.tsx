@@ -22,26 +22,29 @@ import {
   getCurrentLocation,
 } from '../utils/locationUtils';
 import {SERVICE_AREA, isPointInPolygon, Coordinate} from '../utils/serviceArea';
-import {getItem} from '../api/asyncStorage';
+import {getItem, setItem} from '../api/asyncStorage';
 const HomeScreen = () => {
   // 모달 상태 관리
   const [modalVisible, setModalVisible] = useState<boolean>(false);
   const [modalMessage, setModalMessage] = useState<string>('');
   const [member, setMember] = useState<Member | null>(null);
   const [badges, setBadges] = useState<Badge[] | null>(null);
-
+  const [showModal, setShowModal] = useState(false);
   const IMAGES = {
     profile: require('../../assets/images/illustration/typeThree.png'),
     logo: require('../../assets/images/illustration/logo.png'),
     self: require('../../assets/images/illustration/typeTwo.png'),
     together: require('../../assets/images/illustration/typeOne.png'),
-    badge1: require('../../assets/images/badge/badge1.png'),
-    badge2: require('../../assets/images/badge/badge2.png'),
-    badge3: require('../../assets/images/badge/badge3.png'),
     freeze: require('../../assets/images/illustration/freeze.png'),
     iIcon: require('../../assets/images/icons/iIcon.png'),
     moreIcon: require('../../assets/images/icons/moreIcon2.png'),
   };
+
+  const BADGES = [
+    require('../../assets/images/badge/badge1.png'),
+    require('../../assets/images/badge/badge2.png'),
+    require('../../assets/images/badge/badge3.png'),
+  ];
   // "혼자 인증하기" 버튼 핸들러
   const handleSelfCertify = async () => {
     const hasPermission = await requestLocationPermission();
@@ -135,29 +138,31 @@ const HomeScreen = () => {
                   <Text style={styles.badgeText}>보유 뱃지</Text>
                   <ScrollView horizontal showsHorizontalScrollIndicator={false}>
                     {badges && badges.length > 0 ? (
-                      badges.map(badge => (
-                        <View key={badge.id} style={styles.badgeContainer}>
+                      <>
+                        {badges.slice(0, 3).map(badge => (
                           <Image
-                            source={{
-                              uri: `https://your-server-url.com/images/${badge.fileName}`,
-                            }}
+                            key={badge.id}
+                            source={BADGES[badge.fileName]}
                             style={styles.badge}
                           />
-                          <Text style={styles.badgeName}>{badge.name}</Text>
-                          <Text style={styles.badgeDescription}>
-                            {badge.description}
-                          </Text>
-                        </View>
-                      ))
+                        ))}
+                        {badges.length > 0 && (
+                          <TouchableOpacity
+                            onPress={() => {
+                              console.log('... 버튼 클릭됨');
+
+                              setShowModal(true);
+                            }}
+                            style={styles.moreButton}>
+                            <Text style={styles.moreText}>...</Text>
+                          </TouchableOpacity>
+                        )}
+                      </>
                     ) : (
                       <Text>보유한 뱃지가 없습니다.</Text>
                     )}
                   </ScrollView>
                 </View>
-
-                <TouchableOpacity style={styles.moreButton}>
-                  <Image style={styles.moreImage} source={IMAGES.moreIcon} />
-                </TouchableOpacity>
               </View>
             </View>
           )}
@@ -208,7 +213,45 @@ const HomeScreen = () => {
           <View>{member && <CalendarScreen userId={member.id} />}</View>
         </ScrollView>
         <BottomBar />
-
+        <Modal
+          animationType="slide"
+          transparent={true}
+          visible={showModal}
+          onRequestClose={() => setShowModal(false)}>
+          <View style={styles.modalOverlay}>
+            <View style={styles.modalView}>
+              {/* 모달 헤더 */}
+              <View style={styles.modalHeaderContainer}>
+                <Text style={styles.modalHeaderText}>프로필 뱃지 </Text>
+                <Text style={styles.modalHeaderHighlight}>
+                  총 {badges ? badges.length : 0}개 보유 중
+                </Text>
+              </View>
+              <ScrollView style={styles.modalScrollView}>
+                {badges &&
+                  badges.map(badge => (
+                    <View key={badge.id} style={styles.modalBadge}>
+                      <Image
+                        source={BADGES[badge.fileName]}
+                        style={styles.modalBadgeImage}
+                      />
+                      <View style={styles.modalBadgeInfo}>
+                        <Text style={styles.modalBadgeName}>{badge.name}</Text>
+                        <Text style={styles.modalBadgeDescription}>
+                          {badge.description}
+                        </Text>
+                      </View>
+                    </View>
+                  ))}
+              </ScrollView>
+              <TouchableOpacity
+                style={styles.closeButton}
+                onPress={() => setShowModal(false)}>
+                <Text style={styles.closeButtonText}>닫기</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </Modal>
         {/* 인증 결과 모달 */}
         <Modal
           animationType="slide"
@@ -318,7 +361,6 @@ const styles = StyleSheet.create({
   },
   moreButton: {
     color: '#009499',
-    justifyContent: 'center',
   },
   moreImage: {
     marginTop: 8,
@@ -439,6 +481,12 @@ const styles = StyleSheet.create({
   },
 
   // 모달 스타일
+  modalHeaderContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    width: '100%',
+    marginBottom: height * 0.02,
+  },
   modalOverlay: {
     flex: 1,
     justifyContent: 'center',
@@ -447,6 +495,7 @@ const styles = StyleSheet.create({
   },
   modalView: {
     width: width * 0.8,
+    maxHeight: height * 0.6,
     backgroundColor: 'white',
     borderRadius: 8,
     padding: width * 0.05,
@@ -462,7 +511,7 @@ const styles = StyleSheet.create({
   },
   modalText: {
     marginBottom: height * 0.02,
-    textAlign: 'center',
+    textAlign: 'left',
     fontSize: width * 0.04,
     fontWeight: '700',
     fontFamily: 'NanumSquareNeo-Variable',
@@ -477,5 +526,52 @@ const styles = StyleSheet.create({
     color: 'white',
     fontWeight: 'bold',
     fontSize: width * 0.035,
+  },
+  modalBadge: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 15,
+    backgroundColor: '#E0E0E0', // 회색 네모 배경
+    borderRadius: 5,
+    padding: 10,
+  },
+  modalBadgeImage: {
+    width: 60,
+    height: 60,
+    marginRight: 10,
+    resizeMode: 'contain',
+  },
+  modalBadgeInfo: {
+    flex: 1,
+  },
+  modalBadgeName: {
+    fontSize: 14,
+    fontWeight: 'bold',
+  },
+  modalBadgeDescription: {
+    fontSize: 12,
+    marginTop: 5,
+    color: '#555',
+  },
+  modalHeaderText: {
+    fontSize: width * 0.045,
+    fontWeight: 'bold',
+    fontFamily: 'NanumSquareNeo-Variable',
+    color: '#000',
+    textAlign: 'left',
+  },
+
+  modalHeaderHighlight: {
+    fontSize: width * 0.04,
+    fontWeight: 'bold',
+    fontFamily: 'NanumSquareNeo-Variable',
+    color: '#1AA5AA',
+    paddingHorizontal: 5,
+    borderRadius: 3,
+    marginTop: 3,
+  },
+  modalScrollView: {
+    width: '100%',
+    marginBottom: height * 0.02,
   },
 });

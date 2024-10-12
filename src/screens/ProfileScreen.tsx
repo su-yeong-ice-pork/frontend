@@ -1,6 +1,6 @@
 // src/screens/ProfileScreen.tsx
 
-import React, {useState, useEffect} from 'react';
+import React, {useState} from 'react';
 import {
   View,
   Text,
@@ -310,7 +310,9 @@ const ProfileFooter = ({navigation}) => {
         <Image source={IMAGES.lockIcon} style={styles.footerIcon} />
         <Text
           style={styles.footerButtonText}
-          onPress={() => navigation.navigate('ChangePassword')}>
+          onPress={() =>
+            navigation.navigate('FindPassword', {title: '비밀번호 변경하기'})
+          }>
           비밀번호 변경하기
         </Text>
       </TouchableOpacity>

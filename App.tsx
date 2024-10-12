@@ -11,7 +11,6 @@ import HomeScreen from './src/screens/HomeScreen';
 import StudyRecordScreen from './src/screens/StudyRecordScreen';
 import FindPassword from './src/screens/FindPasswordScreen';
 import ProfileScreen from './src/screens/ProfileScreen';
-import ChangePasswordScreen from './src/screens/ChangePasswordScreen';
 import EditProfileScreen from './src/screens/EditProfileScreen';
 import FriendsProfile from './src/screens/FriendsProfile';
 
@@ -33,10 +32,6 @@ const App = () => {
           <Stack.Screen name="Log" component={StudyRecordScreen} />
           <Stack.Screen name="FindPassword" component={FindPassword} />
           <Stack.Screen name="Profile" component={ProfileScreen} />
-          <Stack.Screen
-            name="ChangePassword"
-            component={ChangePasswordScreen}
-          />
           <Stack.Screen name="EditProfile" component={EditProfileScreen} />
           <Stack.Screen name="FriendsProfile" component={FriendsProfile} />
         </Stack.Navigator>

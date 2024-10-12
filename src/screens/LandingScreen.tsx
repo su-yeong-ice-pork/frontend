@@ -15,7 +15,7 @@ import {
 import LinearGradient from 'react-native-linear-gradient';
 import handleLogin, {autoLogin} from '../api/login';
 import {setItem, getItem} from '../api/asyncStorage';
-
+import {useRecoilValue} from 'recoil';
 const IMAGES = {
   blueGrass:
     'https://image-resource.creatie.ai/137927998611751/137927998611753/35fcb8e3152553006e3d0339a4456494.png',
@@ -221,7 +221,7 @@ const LandingScreen = ({navigation}) => {
           <View style={styles.buttonsContainer}>
             <TouchableOpacity
               style={styles.rectangle4380}
-              onPress={() => navigation.navigate('Landing')}>
+              onPress={() => navigation.navigate('SignUp')}>
               <Text style={styles.signUpText}>회원가입</Text>
             </TouchableOpacity>
             <TouchableOpacity
@@ -253,9 +253,6 @@ const LandingScreen = ({navigation}) => {
               value={email}
               onChangeText={setEmail}
             />
-            <TouchableOpacity style={styles.findTextContainer}>
-              <Text style={styles.findText}>아이디 찾기</Text>
-            </TouchableOpacity>
           </View>
           <View style={styles.inputContainer}>
             <Text style={styles.inputLabel}>비밀번호</Text>
@@ -269,7 +266,9 @@ const LandingScreen = ({navigation}) => {
             />
             <TouchableOpacity
               style={styles.findTextContainer}
-              onPress={() => navigation.navigate('FindPassword')}>
+              onPress={() =>
+                navigation.navigate('FindPassword', {title: '비밀번호 찾기'})
+              }>
               <Text style={styles.findText}>비밀번호 찾기</Text>
             </TouchableOpacity>
 
