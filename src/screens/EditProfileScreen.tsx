@@ -13,6 +13,8 @@ import LinearGradient from 'react-native-linear-gradient';
 import {launchImageLibrary} from 'react-native-image-picker';
 import Header from '../components/Header';
 
+import {updateProfileImage} from '../api/profileImg';
+
 const {width, height} = Dimensions.get('window');
 
 const IMAGES = {
@@ -38,6 +40,27 @@ const defaulBanners = [
 const EditProfileScreen = ({navigation}) => {
   const [selectedImage, setSelectedImage] = useState(null);
   const [selectedBanner, setSelectedBanner] = useState(null);
+
+  const handleSave = async () => {
+    if (!selectedImage) {
+      console.log('프로필 이미지를 선택해주세요.');
+      return;
+    }
+
+    const imageBlob = {
+      uri: selectedImage.uri,
+      name: selectedImage.fileName,
+      type: selectedImage.type,
+    };
+
+    const success = await updateProfileImage(1, imageBlob);
+
+    if (success) {
+      console.log('프로필 이미지 업로드 성공');
+    } else {
+      console.error('프로필 이미지 업로드 실패');
+    }
+  };
 
   return (
     <SafeAreaView style={{flex: 1}}>
@@ -69,7 +92,7 @@ const EditProfileScreen = ({navigation}) => {
             setSelectedBanner={setSelectedBanner}
           />
         </ScrollView>
-        <SaveButton />
+        <SaveButton onSave={handleSave} />
       </View>
     </SafeAreaView>
   );
@@ -79,6 +102,30 @@ export default EditProfileScreen;
 
 // 프로필 사진 변경
 const ChangeProfileImage = ({selectedImage, setSelectedImage}) => {
+  const handleImageUpload = async res => {
+    if (res.didCancel || res.errorCode) {
+      return;
+    }
+    const imageUri = res.assets[0].uri;
+    setSelectedImage(imageUri);
+
+    // Blob 형태로 이미지 전송 준비
+    const imageBlob = {
+      uri: selectedImage.uri,
+      name: selectedImage.fileName || 'profile.jpg',
+      type: selectedImage.type || 'image/jpeg',
+    };
+
+    // 프로필 이미지 업로드 API 호출
+    const success = await updateProfileImage(1, imageBlob); // 1은 회원 ID, 실제 ID로 변경 필요
+
+    if (success) {
+      console.log('프로필 이미지 업로드 성공');
+    } else {
+      console.error('프로필 이미지 업로드 실패');
+    }
+  };
+
   return (
     <View style={styles.changeContainer}>
       <Text style={styles.textStyle}>프로필 사진 변경</Text>
@@ -170,10 +217,10 @@ const ChangeBannerImage = ({selectedBanner, setSelectedBanner}) => {
 };
 
 // 저장하기 버튼
-const SaveButton = () => {
+const SaveButton = ({onSave}) => {
   return (
     <View style={styles.buttonContainer}>
-      <TouchableOpacity style={styles.signUpButton}>
+      <TouchableOpacity style={styles.signUpButton} onPress={onSave}>
         <LinearGradient
           colors={['rgba(31, 209, 245, 1)', 'rgba(0, 255, 150, 1)']}
           style={{
