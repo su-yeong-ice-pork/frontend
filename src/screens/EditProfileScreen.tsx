@@ -13,7 +13,17 @@ import LinearGradient from 'react-native-linear-gradient';
 import {launchImageLibrary} from 'react-native-image-picker';
 import Header from '../components/Header';
 
+// 기본 이미지 or 기본 배너 가져오기
+import {GetDefaultImages, DefaultImg} from '../api/defaultImages';
+// 업로드 사진 patch 요청
 import {updateProfileImage} from '../api/profileImg';
+// 기본 이미지 patch 요청
+
+
+// recoil
+import {useRecoilState, useRecoilValue} from 'recoil';
+import userState from '../recoil/userAtom';
+import authState from '../recoil/authAtom';
 
 const {width, height} = Dimensions.get('window');
 
@@ -23,6 +33,7 @@ const IMAGES = {
   chooseFromGallery2: require('../../assets/images/icons/chooseFromGallery2.png'),
 };
 
+/*
 const defaultImages = [
   require('../../assets/images/illustration/profileImage2.png'),
   require('../../assets/images/illustration/profileImage3.png'),
@@ -36,23 +47,40 @@ const defaulBanners = [
   require('../../assets/images/illustration/bannerImage4.png'),
   require('../../assets/images/illustration/bannerImage3.png'),
 ];
+*/
 
 const EditProfileScreen = ({navigation}) => {
-  const [selectedImage, setSelectedImage] = useState(null);
-  const [selectedBanner, setSelectedBanner] = useState(null);
+  const [defaultProfile, setDefaultProfile] = useState<DefaultImg[] | null>(null);
+  const [defaultBanner, setDefaultBanner] = useState<DefaultImg[] | null>(null);
+  const [selectedProfile, setSelectedProfile] = useState(null);
+  const [selectedPofile, setSelectedBanner] = useState(null);
+  const [isUpload, setIsUpload] = useState(false); // 기본이미지 유무 판단
+  const authInfo = useRecoilValue(authState);
+  const [user, setUser] = useRecoilState(userState);
 
-  const handleSave = async () => {
-    if (!selectedImage) {
-      console.log('프로필 이미지를 선택해주세요.');
-      return;
-    }
-
-    const imageBlob = {
-      uri: selectedImage.uri,
-      name: selectedImage.fileName,
-      type: selectedImage.type,
+  useEffect(() => {
+    const showDefaultImage = async () => {
+      try {
+        const showDefaultProfile = await GetDefaultImages(authInfo.authToken, memberData.id, 'profile');
+        const showDefaultBanner = await GetDefaultImages(authInfo.authToken, memberData.id, 'banner');
+        if (showDefaultProfile) {
+          setDefaultProfile(showDefaultProfile);
+          if (showDefaultBanner) {
+            setDefaultBanner(showDefaultBanner);
+          } else {
+            console.log('뱃지를 불러오는 데 실패했습니다.');
+          }
+        } else {
+          console.log('프로필을 불러오는 데 실패했습니다.');
+        }
+      } catch (error) {
+        console.log('데이터를 불러오는 중 오류가 발생했습니다.');
+      }
     };
+    showDefaultImage();
+  }, []);
 
+  // blob로 보내는 코드인듯. ? .
     const success = await updateProfileImage(1, imageBlob);
 
     if (success) {
@@ -84,12 +112,12 @@ const EditProfileScreen = ({navigation}) => {
           <View style={styles.titleContainer}></View>
 
           <ChangeProfileImage
-            selectedImage={selectedImage}
-            setSelectedImage={setSelectedImage}
+            defaultProfile={defaultProfile}
+            setSelectedProfile={setSelectedProfile}
           />
           <ChangeBannerImage
-            selectedBanner={selectedBanner}
-            setSelectedBanner={setSelectedBanner}
+            defaultBanner={defaultBanner}
+            setSelectedBanner={seSelectedBanner}
           />
         </ScrollView>
         <SaveButton onSave={handleSave} />
@@ -101,7 +129,7 @@ const EditProfileScreen = ({navigation}) => {
 export default EditProfileScreen;
 
 // 프로필 사진 변경
-const ChangeProfileImage = ({selectedImage, setSelectedImage}) => {
+const ChangeProfileImage = ({defaultProfile, setSelectedProfile}) => {
   const handleImageUpload = async res => {
     if (res.didCancel || res.errorCode) {
       return;
@@ -138,12 +166,12 @@ const ChangeProfileImage = ({selectedImage, setSelectedImage}) => {
               resizeMode="contain"
             />
           </TouchableOpacity>
-          {defaultImages.map((image, idx) => {
-            const isSelected = selectedImage === image;
+          {defaultProfile.map((image, idx) => {
+            const isSelected = selectedImage === image.url && !isUpload;
             return (
               <TouchableOpacity
                 key={idx}
-                onPress={() => setSelectedImage(image)}
+                onPress={() => setSelectedImage(image.url)}
                 style={styles.buttonStyle}>
                 <View
                   style={[
@@ -151,7 +179,7 @@ const ChangeProfileImage = ({selectedImage, setSelectedImage}) => {
                     isSelected && styles.selectedImageBorder,
                   ]}>
                   <Image
-                    source={image}
+                    source={{uri: image.url}}
                     style={styles.defaultImageStyle}
                     resizeMode="contain"
                   />
@@ -180,7 +208,7 @@ const ShowPicker = () => {
 };
 
 // 배너 사진 변경
-const ChangeBannerImage = ({selectedBanner, setSelectedBanner}) => {
+const ChangeBannerImage = ({defaultBanner, setSelectedBanner}) => {
   return (
     <View style={styles.changeContainer}>
       <Text style={styles.textStyle}>프로필 사진 변경</Text>

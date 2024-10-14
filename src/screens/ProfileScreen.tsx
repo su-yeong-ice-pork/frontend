@@ -60,7 +60,6 @@ const ProfileScreen = ({navigation}) => {
           setMember(memberData);
           setUser(memberData);
           const badgesData = await getBadges(memberData.id, authInfo.authToken);
-
           if (badgesData) {
             setBadges(badgesData);
           } else {
@@ -619,7 +618,6 @@ const styles = StyleSheet.create({
   frozenNote: {
     fontSize: 8,
     color: '#009499',
-    marginTop: 5,
     fontWeight: '700',
     fontFamily: 'NanumSquareNeo-Variable',
   },
