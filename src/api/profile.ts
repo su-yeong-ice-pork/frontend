@@ -1,5 +1,5 @@
 import apiClient from './axiosInstance';
-import {getItem} from './asyncStorage';
+
 export interface Member {
   id: number;
   name: string;
