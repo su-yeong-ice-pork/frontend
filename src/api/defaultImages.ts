@@ -26,7 +26,7 @@ export const GetDefaultImages = async (
     }
 
     const response = await apiClient.get<ApiResponse>(
-      '/members/${id}/${Imgtype}-images',
+      `/members/${id}/${Imgtype}-images`,
       {
         headers: {
           Authorization: `${authToken}`,
@@ -34,7 +34,11 @@ export const GetDefaultImages = async (
       },
     );
     if (response.data.success) {
-      return response.data.response.profileImages;
+      if (Imgtype == 'profile') {
+        return response.data.response.profileImages;
+      } else if (Imgtype == 'banner') {
+        return response.data.response.bannerImages;
+      }
     } else {
       console.error('API 에러:', response.data.error);
       return null;

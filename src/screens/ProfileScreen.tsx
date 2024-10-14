@@ -102,7 +102,9 @@ const ProfileScreen = ({navigation}) => {
                 style={styles.profileImage}
               />
               <TouchableOpacity
-                onPress={() => navigation.navigate('EditProfile')}>
+                onPress={() =>
+                  navigation.navigate('EditProfile', {id: member?.id})
+                }>
                 <Image source={IMAGES.editProfile} style={styles.editIcon} />
               </TouchableOpacity>
             </View>
