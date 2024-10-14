@@ -17,6 +17,7 @@ const {width, height} = Dimensions.get('window');
 import CalendarScreen from '../components/calendar';
 import {getMemberData, Member} from '../api/profile';
 import {getBadges, Badge} from '../api/badge';
+import {postGrass} from '../api/grass';
 import {
   requestLocationPermission,
   getCurrentLocation,
@@ -66,10 +67,24 @@ const HomeScreen = () => {
         longitude: location.longitude,
       };
 
-      const isInside = isPointInPolygon(userCoordinate, SERVICE_AREA);
+      const isInside = isPointInPolygon(
+        {latitude: 35.2358, longitude: 129.0814},
+        SERVICE_AREA,
+      );
 
       if (isInside) {
-        setModalMessage('인증에 성공했습니다!');
+        const token = authInfo.authToken;
+        if (!token) {
+          setModalMessage('인증 토큰이 없습니다.');
+          setModalVisible(true);
+          return;
+        }
+        const response = await postGrass(token);
+        if (response.success) {
+          setModalMessage('인증에 성공했습니다!');
+        } else {
+          setModalMessage(`${response.error.error.message}`);
+        }
       } else {
         setModalMessage('서비스 지역이 아닙니다.');
       }
