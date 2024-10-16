@@ -51,7 +51,14 @@ const ProfileScreen = ({navigation}) => {
   const [badges, setBadges] = useState<Badge[] | null>(null);
   const authInfo = useRecoilValue(authState);
   const [user, setUser] = useRecoilState(userState);
+  const [modalVisible, setModalVisible] = useState(false);
+  const [modalMessage, setModalMessage] = useState('');
 
+  const handleNotUseableModal = () => {
+    setModalMessage('추가 예정인 기능입니다.');
+    setModalVisible(true);
+    return;
+  };
   useEffect(() => {
     const fetchMember = async () => {
       try {
@@ -123,6 +130,7 @@ const ProfileScreen = ({navigation}) => {
               text="의 잔디친구들과 공부 중입니다!"
               buttonSrc={IMAGES.friendsIcon}
               buttonText="친구목록 보기"
+              onButtonPress={handleNotUseableModal}
             />
             <InfoCard
               subTitle="현재 나의 잔디 스터디그룹"
@@ -131,9 +139,13 @@ const ProfileScreen = ({navigation}) => {
               text="의 잔디그룹에 소속되어있습니다!"
               buttonSrc={IMAGES.groupsIcon}
               buttonText="그룹목록 보기"
+              onButtonPress={handleNotUseableModal}
             />
             <BadgeSection badges={badges} />
-            <FreezeSummary freezeCount={member?.freezeCount} />
+            <FreezeSummary
+              freezeCount={member?.freezeCount}
+              onPress={handleNotUseableModal}
+            />
             <GrassSummary name={member?.name} totalDays={85} />
             <GrassButton
               startDate="2024년 6월 16일"
@@ -146,6 +158,23 @@ const ProfileScreen = ({navigation}) => {
           <ProfileFooter navigation={navigation} />
         </ScrollView>
         <BottomBar />
+        {/* Modal for "추가 예정인 기능입니다." */}
+        <Modal
+          animationType="slide"
+          transparent={true}
+          visible={modalVisible}
+          onRequestClose={() => setModalVisible(false)}>
+          <View style={styles.modalOverlay}>
+            <View style={styles.modalView}>
+              <Text style={styles.modalText}>{modalMessage}</Text>
+              <TouchableOpacity
+                style={styles.closeButton}
+                onPress={() => setModalVisible(false)}>
+                <Text style={styles.closeButtonText}>닫기</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </Modal>
       </View>
     </SafeAreaView>
   );
@@ -154,7 +183,15 @@ const ProfileScreen = ({navigation}) => {
 export default ProfileScreen;
 
 // InfoCard Component
-const InfoCard = ({iconSrc, count, text, buttonSrc, buttonText, subTitle}) => {
+const InfoCard = ({
+  iconSrc,
+  count,
+  text,
+  buttonSrc,
+  buttonText,
+  subTitle,
+  onButtonPress,
+}) => {
   return (
     <>
       {/* SubTitle Section */}
@@ -173,7 +210,7 @@ const InfoCard = ({iconSrc, count, text, buttonSrc, buttonText, subTitle}) => {
         </View>
 
         {/* Button Section */}
-        <TouchableOpacity style={styles.infoCardButton}>
+        <TouchableOpacity style={styles.infoCardButton} onPress={onButtonPress}>
           <Image source={buttonSrc} style={styles.infoCardButtonIcon} />
           <Text style={styles.infoCardButtonText}>{buttonText}</Text>
         </TouchableOpacity>
@@ -224,7 +261,7 @@ const BadgeSection = ({badges}) => {
 };
 
 // FreezeSummary Component
-const FreezeSummary = ({freezeCount}) => {
+const FreezeSummary = ({freezeCount, onPress}) => {
   return (
     <View style={styles.frozenSection}>
       <Text style={styles.frozenTitle}>보유 프리즈</Text>
@@ -233,7 +270,7 @@ const FreezeSummary = ({freezeCount}) => {
           현재 총 <Text style={styles.frozenCount}>{freezeCount}</Text> 개의
           프리즈를 보유하고 있습니다.
         </Text>
-        <TouchableOpacity style={styles.useFrozenButton}>
+        <TouchableOpacity style={styles.useFrozenButton} onPress={onPress}>
           <LinearGradient
             colors={['rgba(31, 209, 245, 1)', 'rgba(0, 255, 150, 1)']} // 그라데이션 색상
             style={styles.gradientStyle}
@@ -331,26 +368,34 @@ const ProfileFooter = ({navigation}) => {
         transparent={true}
         visible={showLogOut}
         onRequestClose={() => setShowLogOut(false)}>
-        <View style={styles.centeredModal}>
-          <View style={styles.upperView}>
-            <Image source={IMAGES.sleepyFaceEmoji} style={styles.sleepyEmoji} />
-            <Text style={styles.modalText}>정말 로그아웃 하실건가요?</Text>
-            <TouchableOpacity
-              onPress={() => setShowLogOut(false)}
-              style={styles.closeButton}>
-              <Image source={IMAGES.closeLogout} style={styles.closeIcon} />
-            </TouchableOpacity>
-          </View>
-          <View style={styles.lowerSection}>
-            <Text style={styles.modalDescription}>
-              조금만 더 하면 잔디가 더 푸르게 자랄 수 있어요!{'\n'}
-              잔디는 언제나 기다리고 있을게요.
-            </Text>
-            <View style={styles.buttonContainer}>
+        <View style={styles.logoutModalOverlay}>
+          <View style={styles.logoutModalView}>
+            <View style={styles.logoutModalHeader}>
+              <Image
+                source={IMAGES.sleepyFaceEmoji}
+                style={styles.logoutModalSleepyEmoji}
+              />
+              <Text style={styles.logoutModalText}>
+                정말 로그아웃 하실건가요?
+              </Text>
               <TouchableOpacity
-                style={styles.button}
+                onPress={() => setShowLogOut(false)}
+                style={styles.logoutModalCloseButton}>
+                <Image
+                  source={IMAGES.closeLogout}
+                  style={styles.logoutModalCloseIcon}
+                />
+              </TouchableOpacity>
+            </View>
+            <View style={styles.logoutModalContent}>
+              <Text style={styles.logoutModalDescription}>
+                조금만 더 하면 잔디가 더 푸르게 자랄 수 있어요!{'\n'}
+                잔디는 언제나 기다리고 있을게요.
+              </Text>
+              <TouchableOpacity
+                style={styles.logoutModalButton}
                 onPress={() => setShowLogOut(false)}>
-                <Text style={styles.textStyle}>네, 잘가요!</Text>
+                <Text style={styles.logoutModalButtonText}>네, 잘가요!</Text>
               </TouchableOpacity>
             </View>
           </View>
@@ -359,7 +404,6 @@ const ProfileFooter = ({navigation}) => {
     </View>
   );
 };
-
 // Styles
 const styles = StyleSheet.create({
   container: {
@@ -735,30 +779,12 @@ const styles = StyleSheet.create({
     height: 20,
     marginRight: 10,
   },
-  closeButton: {
-    position: 'absolute',
-    right: 10,
-  },
+
   closeIcon: {
     width: 20,
     height: 20,
   },
-  modalView: {
-    backgroundColor: '#009499',
-    width: width * 0.8,
-    alignItems: 'center',
-    borderBottomLeftRadius: 10,
-    borderBottomRightRadius: 10,
-  },
-  modalText: {
-    textAlign: 'center',
-    alignContent: 'center',
-    justifyContent: 'center',
-    color: '#FFFFFF',
-    fontSize: 13,
-    fontWeight: '700',
-    fontFamily: 'NanumSquareNeo-Variable',
-  },
+
   button: {
     backgroundColor: '#009499',
     borderRadius: 20,
@@ -803,5 +829,102 @@ const styles = StyleSheet.create({
     flexDirection: 'row', // 버튼을 수평으로 정렬
     justifyContent: 'center', // 가로 방향으로 중앙 정렬
     width: '100%', // 부모 컨테이너의 전체 너비 사용
+  },
+
+  modalOverlay: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'rgba(0,0,0,0.4)',
+  },
+  modalView: {
+    backgroundColor: 'white',
+    borderRadius: 8,
+    padding: 35,
+    alignItems: 'center',
+    width: '80%',
+    elevation: 5,
+  },
+  modalText: {
+    marginBottom: 15,
+    textAlign: 'center',
+    fontSize: 16,
+    fontWeight: '700',
+    fontFamily: 'NanumSquareNeo-Variable',
+  },
+  closeButton: {
+    backgroundColor: '#1AA5AA',
+    borderRadius: 4,
+    paddingVertical: 10,
+    paddingHorizontal: 30,
+  },
+  closeButtonText: {
+    color: '#FFFFFF',
+    fontWeight: 'bold',
+    fontSize: 14,
+  },
+
+  // Logout Modal styles
+  logoutModalOverlay: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  logoutModalView: {
+    width: width * 0.8,
+    backgroundColor: '#FFFFFF',
+    borderRadius: 10,
+  },
+  logoutModalHeader: {
+    flexDirection: 'row',
+    backgroundColor: '#009499',
+    height: 50,
+    alignItems: 'center',
+    borderTopLeftRadius: 10,
+    borderTopRightRadius: 10,
+    paddingHorizontal: 10,
+  },
+  logoutModalSleepyEmoji: {
+    width: 20,
+    height: 20,
+    marginRight: 10,
+  },
+  logoutModalText: {
+    color: '#FFFFFF',
+    fontSize: 13,
+    fontWeight: '700',
+    flex: 1,
+    textAlign: 'center',
+  },
+  logoutModalCloseButton: {
+    position: 'absolute',
+    right: 10,
+  },
+  logoutModalCloseIcon: {
+    width: 20,
+    height: 20,
+  },
+  logoutModalContent: {
+    padding: 20,
+    alignItems: 'center',
+  },
+  logoutModalDescription: {
+    fontSize: 12,
+    textAlign: 'center',
+    marginBottom: 15,
+    fontWeight: '800',
+    fontFamily: 'NanumSquareNeo-Variable',
+  },
+  logoutModalButton: {
+    backgroundColor: '#009499',
+    borderRadius: 20,
+    width: width * 0.25,
+    padding: 10,
+  },
+  logoutModalButtonText: {
+    color: 'white',
+    fontWeight: 'bold',
+    textAlign: 'center',
+    fontFamily: 'NanumSquareNeo-Variable',
   },
 });

@@ -50,7 +50,11 @@ const HomeScreen = () => {
     require('../../assets/images/badge/badge2.png'),
     require('../../assets/images/badge/badge3.png'),
   ];
-
+  const handleNotUseableModal = () => {
+    setModalMessage('추가 예정인 기능입니다.');
+    setModalVisible(true);
+    return;
+  };
   const handleSelfCertify = async () => {
     const hasPermission = await requestLocationPermission();
     if (!hasPermission) {
@@ -67,10 +71,7 @@ const HomeScreen = () => {
         longitude: location.longitude,
       };
 
-      const isInside = isPointInPolygon(
-        {latitude: 35.2358, longitude: 129.0814},
-        SERVICE_AREA,
-      );
+      const isInside = isPointInPolygon(userCoordinate, SERVICE_AREA);
 
       if (isInside) {
         const token = authInfo.authToken;
@@ -194,7 +195,9 @@ const HomeScreen = () => {
               <Image source={IMAGES.self} style={styles.buttons} />
             </TouchableOpacity>
 
-            <TouchableOpacity style={styles.certifyButton2}>
+            <TouchableOpacity
+              style={styles.certifyButton2}
+              onPress={handleNotUseableModal}>
               <Text style={styles.buttonText}>함께 인증하기</Text>
               <Image source={IMAGES.together} style={styles.buttons} />
             </TouchableOpacity>
@@ -210,7 +213,9 @@ const HomeScreen = () => {
                   <Text style={styles.frozenCount}>{member.freezeCount}</Text>{' '}
                   개의 프리즈를 보유하고 있습니다.
                 </Text>
-                <TouchableOpacity style={styles.useFrozenButton}>
+                <TouchableOpacity
+                  style={styles.useFrozenButton}
+                  onPress={handleNotUseableModal}>
                   <View style={styles.frozenText}>
                     <Image source={IMAGES.freeze} style={styles.freeze} />
                     <Text style={styles.useFrozenButtonText}>

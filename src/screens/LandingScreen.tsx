@@ -11,6 +11,7 @@ import {
   ScrollView,
   Dimensions,
   TextInput,
+  Alert,
 } from 'react-native';
 import LinearGradient from 'react-native-linear-gradient';
 import handleLogin, {autoLogin} from '../api/login';
@@ -73,6 +74,8 @@ const LandingScreen = ({navigation}) => {
         const authToken = response.headers['authorization'];
         setAuthState({email, authToken});
         navigation.navigate('Home');
+      } else if (response.error) {
+        Alert.alert(response.error.error.message);
       }
     } catch (error) {
       console.log('오류', error.message || '로그인 중 오류가 발생했습니다.');

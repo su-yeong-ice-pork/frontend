@@ -1,3 +1,4 @@
+// src/screens/StudyRecordScreen.tsx
 import React, {useEffect, useState, useRef} from 'react';
 import {
   View,
@@ -35,48 +36,6 @@ import authState from '../recoil/authAtom';
 
 const {width} = Dimensions.get('window');
 
-const friends = [
-  {
-    id: 1,
-    name: '고민석',
-    todayStudyTime: '02시간 45분',
-    message: '열심히 공부합시다!',
-    image: null,
-    isOnline: true,
-  },
-  {
-    id: 2,
-    name: '김진우',
-    todayStudyTime: '24시간 00분',
-    message: '24시간이 모자라',
-    image: null,
-    isOnline: false,
-  },
-  {
-    id: 3,
-    name: '김태영',
-    todayStudyTime: '01시간 50분',
-    message: '커피 한 잔 하면서 쉬는 중~',
-    image: null,
-    isOnline: true,
-  },
-  {
-    id: 4,
-    name: '유경미',
-    todayStudyTime: '03시간 10분',
-    message: '프로젝트 마무리!',
-    image: null,
-    isOnline: false,
-  },
-  {
-    id: 5,
-    name: '이서현',
-    todayStudyTime: '02시간 30분',
-    message: '오늘도 파이팅!',
-    image: null,
-    isOnline: true,
-  },
-];
 const StudyRecordScreen = () => {
   const user = useRecoilValue(userState);
   const authInfo = useRecoilValue(authState);
@@ -90,7 +49,7 @@ const StudyRecordScreen = () => {
   const startTimeRef = useRef<number>(0);
   const isRecordingRef = useRef(isRecording);
 
-  // 모달 상태 변수
+  // Modal state variables
   const [modalVisible, setModalVisible] = useState(false);
   const [modalTitle, setModalTitle] = useState('');
   const [modalMessage, setModalMessage] = useState('');
@@ -322,6 +281,14 @@ const StudyRecordScreen = () => {
 
   // 현재까지의 공부 시간 계산 (오늘 공부 시간 + 현재 세션 경과 시간)
   const currentStudyTime = todayStudyTime + timeElapsed;
+  let friends = '';
+
+  // handleNotUseableModal function
+  const handleNotUseableModal = () => {
+    setModalTitle('추가 예정인 기능입니다.');
+    setModalMessage('');
+    setModalVisible(true);
+  };
 
   return (
     <>
@@ -338,9 +305,7 @@ const StudyRecordScreen = () => {
               </TouchableOpacity>
               <TouchableOpacity
                 style={styles.inactiveTab}
-                onPress={() => {
-                  Alert.alert('추가 예정입니다.');
-                }}>
+                onPress={handleNotUseableModal}>
                 <Text style={styles.inactiveTabText}>기록 랭킹</Text>
               </TouchableOpacity>
             </View>
@@ -371,9 +336,7 @@ const StudyRecordScreen = () => {
               <Text style={styles.membersTitle}>친구 목록</Text>
               <TouchableOpacity
                 style={styles.addMemberButton}
-                onPress={() => {
-                  /* 친구 추가 기능 */
-                }}>
+                onPress={handleNotUseableModal}>
                 <Image
                   source={require('../../assets/images/icons/whiteUsers.png')}
                   style={styles.redStar}
@@ -385,52 +348,56 @@ const StudyRecordScreen = () => {
 
             {/* 친구 리스트 */}
             <View style={styles.membersList}>
-              {friends.map((friend, index) => (
-                <View key={friend.id}>
-                  <TouchableOpacity
-                    style={styles.memberItem}
-                    onPress={() => navigation.navigate('FriendsProfile')}>
-                    <Image
-                      source={
-                        friend.image
-                          ? {uri: friend.image}
-                          : require('../../assets/images/icons/baseIcon.png')
-                      }
-                      style={styles.memberImage}
-                      resizeMode="cover"
-                    />
-                    <View style={styles.memberInfo}>
-                      <View style={styles.nameRow}>
-                        <Text style={styles.memberName}>{friend.name}</Text>
-                        {friend.isOnline && (
-                          <View style={styles.onlineStatus}>
-                            <View style={styles.onlineDot} />
-                            <Text style={styles.onlineText}>공부 중</Text>
+              {friends
+                ? friends.map((friend, index) => (
+                    <View key={friend.id}>
+                      <TouchableOpacity
+                        style={styles.memberItem}
+                        onPress={() => navigation.navigate('FriendsProfile')}>
+                        <Image
+                          source={
+                            friend.image
+                              ? {uri: friend.image}
+                              : require('../../assets/images/icons/baseIcon.png')
+                          }
+                          style={styles.memberImage}
+                          resizeMode="cover"
+                        />
+                        <View style={styles.memberInfo}>
+                          <View style={styles.nameRow}>
+                            <Text style={styles.memberName}>{friend.name}</Text>
+                            {friend.isOnline && (
+                              <View style={styles.onlineStatus}>
+                                <View style={styles.onlineDot} />
+                                <Text style={styles.onlineText}>공부 중</Text>
+                              </View>
+                            )}
                           </View>
-                        )}
-                      </View>
-                      <Text style={styles.memberStudyTime}>
-                        오늘 공부 시간:{' '}
-                        <Text style={styles.totalStudyTimeValue}>
-                          {friend.todayStudyTime}
-                        </Text>
-                      </Text>
-                      {/* 친구의 한마디 */}
-                      <View style={styles.messageBubble}>
-                        <Text style={styles.messageText}>{friend.message}</Text>
-                      </View>
-                      <Image
-                        source={require('../../assets/images/icons/right-arrow-gray.png')}
-                        style={styles.friendInfoIconAbsolute}
-                        resizeMode="contain"
-                      />
+                          <Text style={styles.memberStudyTime}>
+                            오늘 공부 시간:{' '}
+                            <Text style={styles.totalStudyTimeValue}>
+                              {friend.todayStudyTime}
+                            </Text>
+                          </Text>
+                          {/* 친구의 한마디 */}
+                          <View style={styles.messageBubble}>
+                            <Text style={styles.messageText}>
+                              {friend.message}
+                            </Text>
+                          </View>
+                          <Image
+                            source={require('../../assets/images/icons/right-arrow-gray.png')}
+                            style={styles.friendInfoIconAbsolute}
+                            resizeMode="contain"
+                          />
+                        </View>
+                      </TouchableOpacity>
+                      {index !== friends.length - 1 && (
+                        <View style={styles.separator} />
+                      )}
                     </View>
-                  </TouchableOpacity>
-                  {index !== friends.length - 1 && (
-                    <View style={styles.separator} />
-                  )}
-                </View>
-              ))}
+                  ))
+                : ''}
             </View>
           </ScrollView>
         </View>
