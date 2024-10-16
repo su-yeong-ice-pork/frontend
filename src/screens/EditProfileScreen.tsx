@@ -14,6 +14,9 @@ import {launchImageLibrary} from 'react-native-image-picker';
 import Header from '../components/Header';
 
 import {GetDefaultImages, DefaultImg} from '../api/defaultImages';
+import sendDefaultImg from '../api/sendDefaultImg';
+
+import {updateProfileImage} from '../api/profileImg';
 
 import {useRecoilState, useRecoilValue} from 'recoil';
 import userState from '../recoil/userAtom';
@@ -27,31 +30,20 @@ const IMAGES = {
   chooseFromGallery2: require('../../assets/images/icons/chooseFromGallery2.png'),
 };
 
-/*
-const defaultImages = [
-  require('../../assets/images/illustration/profileImage2.png'),
-  require('../../assets/images/illustration/profileImage3.png'),
-  require('../../assets/images/illustration/profileImage4.png'),
-  require('../../assets/images/illustration/profileImage1.png'),
-];
-
-const defaulBanners = [
-  require('../../assets/images/illustration/bannerImage1.png'),
-  require('../../assets/images/illustration/bannerImage2.png'),
-  require('../../assets/images/illustration/bannerImage4.png'),
-  require('../../assets/images/illustration/bannerImage3.png'),
-];
-*/
-
 const EditProfileScreen = ({navigation, route}) => {
   const {id} = route.params;
   const authInfo = useRecoilValue(authState);
+
   const [defaultProfile, setDefaultProfile] = useState<DefaultImg[] | null>(
     null,
   );
   const [defaultBanner, setDefaultBanner] = useState<DefaultImg[] | null>(null);
+
   const [selectedImage, setSelectedImage] = useState(null);
+  const [isCustomImage, setIsCustomImage] = useState(false);
+
   const [selectedBanner, setSelectedBanner] = useState(null);
+  const [isCustomBanner, setIsCustomBanner] = useState(false);
 
   useEffect(() => {
     const fetchDefaultImages = async () => {
@@ -87,6 +79,27 @@ const EditProfileScreen = ({navigation, route}) => {
     fetchDefaultImages();
   }, []);
 
+  const handleDefaultImageSelect = imageUrl => {
+    setSelectedImage(imageUrl);
+    setIsCustomImage(false); // 기본 이미지임을 표시
+  };
+
+  const handleDefaultBannerSelect = bannerUrl => {
+    setSelectedBanner(bannerUrl);
+    setIsCustomBanner(false); // 기본 배너 이미지임을 표시
+  };
+
+  const ShowPicker = (setImage, setIsCustom) => {
+    launchImageLibrary({}, res => {
+      if (res.didCancel || res.errorCode) {
+        return;
+      }
+      const imageUri = res.assets[0].uri;
+      setImage(imageUri); // 선택한 이미지 설정
+      setIsCustom(true); // 사용자 업로드 이미지임을 표시
+    });
+  };
+
   return (
     <SafeAreaView style={{flex: 1}}>
       <View style={styles.container}>
@@ -111,15 +124,25 @@ const EditProfileScreen = ({navigation, route}) => {
           <ChangeProfileImage
             defaultImages={defaultProfile}
             selectedImage={selectedImage}
-            setSelectedImage={setSelectedImage}
+            handleDefaultImageSelect={handleDefaultImageSelect}
+            ShowPicker={() => ShowPicker(setSelectedImage, setIsCustomImage)}
           />
           <ChangeBannerImage
             defaultBanners={defaultBanner}
             selectedBanner={selectedBanner}
-            setSelectedBanner={setSelectedBanner}
+            handleDefaultBannerSelect={handleDefaultBannerSelect}
+            ShowPicker={() => ShowPicker(setSelectedBanner, setIsCustomBanner)}
           />
         </ScrollView>
-        <SaveButton />
+        <SaveButton
+          selectedProfile={selectedImage}
+          selectedBanner={selectedBanner}
+          isCustomImage={isCustomImage}
+          isCustomBanner={isCustomBanner}
+          setSelectedImage={setSelectedImage}
+          setSelectedBanner={setSelectedBanner}
+          id={id}
+        />
       </View>
     </SafeAreaView>
   );
@@ -131,7 +154,8 @@ export default EditProfileScreen;
 const ChangeProfileImage = ({
   defaultImages,
   selectedImage,
-  setSelectedImage,
+  handleDefaultImageSelect,
+  ShowPicker,
 }) => {
   return (
     <View style={styles.changeContainer}>
@@ -151,7 +175,7 @@ const ChangeProfileImage = ({
               return (
                 <TouchableOpacity
                   key={idx}
-                  onPress={() => setSelectedImage(image.url)}
+                  onPress={() => handleDefaultImageSelect(image.url)}
                   style={styles.buttonStyle}>
                   <View
                     style={[
@@ -173,29 +197,16 @@ const ChangeProfileImage = ({
   );
 };
 
-// 사용자 앨범 접근
-const ShowPicker = () => {
-  launchImageLibrary({}, res => {
-    // 사용자가 취소하거나 에러가 발생한 경우 처리
-    if (res.didCancel || res.errorCode) {
-      return;
-    }
-    alert(res.assets[0].uri);
-    const formdata = new FormData();
-    formdata.append('file', res.assets[0].uri);
-    console.log(res);
-  });
-};
-
 // 배너 사진 변경
 const ChangeBannerImage = ({
   defaultBanners,
   selectedBanner,
-  setSelectedBanner,
+  handleDefaultBannerSelect,
+  ShowPicker,
 }) => {
   return (
     <View style={styles.changeContainer}>
-      <Text style={styles.textStyle}>프로필 사진 변경</Text>
+      <Text style={styles.textStyle}>배너 사진 변경</Text>
       <View style={styles.imageBox}>
         <ScrollView horizontal={true} showsHorizontalScrollIndicator={false}>
           <TouchableOpacity onPress={ShowPicker} style={styles.buttonStyle}>
@@ -211,7 +222,7 @@ const ChangeBannerImage = ({
               return (
                 <TouchableOpacity
                   key={idx}
-                  onPress={() => setSelectedBanner(banner.url)}
+                  onPress={() => handleDefaultBannerSelect(banner.url)}
                   style={styles.buttonStyle}>
                   <View
                     style={[
@@ -233,10 +244,103 @@ const ChangeBannerImage = ({
 };
 
 // 저장하기 버튼
-const SaveButton = () => {
+const SaveButton = ({
+  selectedProfile,
+  selectedBanner,
+  isCustomImage,
+  isCustomBanner,
+  setSelectedImage,
+  setSelectedBanner,
+  id,
+}) => {
+  const authInfo = useRecoilValue(authState);
+
+  const submitDefaultImage = async () => {
+    console.log('submitDefaultImage called');
+    const authToken = authInfo.authToken;
+
+    // 프로필 이미지 업로드
+    if (selectedProfile) {
+      if (isCustomImage) {
+        // 사용자 업로드 이미지인 경우 Blob 코드로 전송
+        try {
+          const success = await updateProfileImage(id, authToken, 'image', {
+            uri: selectedProfile,
+            name: 'profile.jpg',
+            type: 'image/jpeg',
+          });
+
+          if (success) {
+            console.log('사용자 업로드 프로필 이미지 업로드 성공');
+            setSelectedImage(null);
+          } else {
+            console.log('프로필 이미지 업로드 실패');
+          }
+        } catch (error) {
+          console.log('에러 발생: ', error);
+        }
+      } else {
+        // 프로필 기본 이미지
+        try {
+          const response = await sendDefaultImg(id, authToken, 'profile', {
+            url: selectedProfile,
+          });
+          if (response.success) {
+            console.log('프로필 기본 이미지 업로드 성공');
+            setSelectedImage(null);
+          } else {
+            console.log('프로필 기본 이미지 업로드 실패');
+          }
+        } catch (error) {
+          console.log('error: ', error);
+        }
+      }
+    }
+
+    // 배너 이미지 선택
+    if (selectedBanner) {
+      if (isCustomBanner) {
+        // 사용자 업로드 이미지인 경우 Blob 코드로 전송
+        try {
+          const success = await updateProfileImage(id, authToken, 'banner', {
+            uri: selectedBanner,
+            name: 'banner.jpg',
+            type: 'image/jpeg',
+          });
+
+          if (success) {
+            console.log('사용자 업로드 배너 이미지 업로드 성공');
+            setSelectedBanner(null);
+          } else {
+            console.log('배너 이미지 업로드 실패');
+          }
+        } catch (error) {
+          console.log('에러 발생: ', error);
+        }
+      } else {
+        // 배너 기본 이미지
+        try {
+          const response = await sendDefaultImg(id, authToken, 'banner', {
+            url: selectedBanner,
+          });
+          if (response.success) {
+            console.log('배너 기본 이미지 업로드 성공');
+            setSelectedBanner(null);
+          } else {
+            console.log('배너 기본 이미지 업로드 실패');
+          }
+        } catch (error) {
+          console.log('error: ', error);
+        }
+      }
+    }
+  };
+
   return (
     <View style={styles.buttonContainer}>
-      <TouchableOpacity style={styles.signUpButton}>
+      <TouchableOpacity
+        style={styles.signUpButton}
+        onPress={submitDefaultImage}>
         <LinearGradient
           colors={['rgba(31, 209, 245, 1)', 'rgba(0, 255, 150, 1)']}
           style={{

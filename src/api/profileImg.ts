@@ -14,27 +14,26 @@ interface ApiResponse {
 // 프로필 이미지 업데이트 함수
 export const updateProfileImage = async (
   id: number,
+  authToken: string,
+  type: string, // 'image' or 'banner'
   imageBlob: Blob,
 ): Promise<boolean> => {
   try {
     // 토큰 가져오기
-    const token = await getItem('authToken');
-    if (!token) {
-      console.error('토큰이 없습니다.');
-      return false;
-    }
+    // const token = await getItem('authToken');
 
     // FormData로 이미지 Blob 설정
     const formData = new FormData();
-    formData.append('profileImage', imageBlob);
+    const fieldName = type === 'banner' ? 'bannerImage' : 'profileImage';
+    formData.append(fieldName, imageBlob);
 
     // PATCH 요청
     const response = await apiClient.patch<ApiResponse>(
-      `/members/${id}/profile-image`,
+      `/members/${id}/profile-${type}`,
       formData,
       {
         headers: {
-          Authorization: `Token ${token}`,
+          Authorization: `${authToken}`,
           'Content-Type': 'multipart/form-data', // FormData를 보낼 때 Content-Type 설정
         },
       },
