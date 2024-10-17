@@ -47,7 +47,10 @@ const LandingScreen = ({navigation}) => {
         if (response.success) {
           const authToken = response.headers['authorization'];
           setAuthState({email: '', authToken});
-          navigation.navigate('Home');
+          navigation.reset({
+            index: 0,
+            routes: [{name: 'Home'}],
+          });
         }
       }
     };
@@ -73,7 +76,10 @@ const LandingScreen = ({navigation}) => {
         }
         const authToken = response.headers['authorization'];
         setAuthState({email, authToken});
-        navigation.navigate('Home');
+        navigation.reset({
+          index: 0,
+          routes: [{name: 'Home'}],
+        });
       } else if (response.error) {
         Alert.alert(response.error.error.message);
       }

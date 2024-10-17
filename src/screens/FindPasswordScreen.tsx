@@ -446,6 +446,7 @@ const styles = StyleSheet.create({
     borderRadius: 6,
     paddingHorizontal: 10,
     justifyContent: 'center',
+    color: '#000000',
   },
   inputRow: {
     flexDirection: 'row',

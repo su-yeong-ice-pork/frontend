@@ -240,36 +240,31 @@ const CalendarScreen = ({userId}: {userId: number}) => {
             renderHeader={() => {
               return (
                 <View style={styles.calendarHeader}>
-                  <View style={styles.headerLeft}>
-                    <Text style={styles.headerYearText}>
-                      {moment(displayedDate).format('YYYY')}년
-                    </Text>
-                    <Text style={styles.headerMonthText}>
-                      {moment(displayedDate).format('M')}월
-                    </Text>
-                  </View>
-                  <View style={styles.headerArrows}>
-                    <TouchableOpacity
-                      onPress={() =>
-                        setDisplayedDate(
-                          moment(displayedDate)
-                            .subtract(1, 'months')
-                            .format('YYYY-MM-DD'),
-                        )
-                      }>
-                      <Text style={styles.arrowText}>{'<'}</Text>
-                    </TouchableOpacity>
-                    <TouchableOpacity
-                      onPress={() =>
-                        setDisplayedDate(
-                          moment(displayedDate)
-                            .add(1, 'months')
-                            .format('YYYY-MM-DD'),
-                        )
-                      }>
-                      <Text style={styles.arrowText}>{'>'}</Text>
-                    </TouchableOpacity>
-                  </View>
+                  <TouchableOpacity
+                    onPress={() =>
+                      setDisplayedDate(
+                        moment(displayedDate)
+                          .subtract(1, 'months')
+                          .format('YYYY-MM-DD'),
+                      )
+                    }
+                    style={styles.arrowButton}>
+                    <Text style={styles.arrowText}>{'<'}</Text>
+                  </TouchableOpacity>
+                  <Text style={styles.headerTitle}>
+                    {moment(displayedDate).format('YYYY년 M월')}
+                  </Text>
+                  <TouchableOpacity
+                    onPress={() =>
+                      setDisplayedDate(
+                        moment(displayedDate)
+                          .add(1, 'months')
+                          .format('YYYY-MM-DD'),
+                      )
+                    }
+                    style={styles.arrowButton}>
+                    <Text style={styles.arrowText}>{'>'}</Text>
+                  </TouchableOpacity>
                 </View>
               );
             }}
@@ -360,8 +355,12 @@ const CalendarScreen = ({userId}: {userId: number}) => {
             </Text>
             {selectedDateData ? (
               <>
-                <Text>공부 시간: {selectedDateData.studyTime} 시간</Text>
-                <Text>잔디 점수: {selectedDateData.grassScore}</Text>
+                <Text style={styles.modalDesc}>
+                  공부 시간: {selectedDateData.studyTime} 시간
+                </Text>
+                <Text style={styles.modalDesc}>
+                  잔디 점수: {selectedDateData.grassScore}
+                </Text>
               </>
             ) : (
               <Text>데이터가 없습니다.</Text>
@@ -457,13 +456,7 @@ const styles = StyleSheet.create({
     color: '#1AA5AA',
     fontWeight: 'bold',
   },
-  calendarHeader: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    paddingHorizontal: 10,
-    marginBottom: 10,
-  },
+
   headerLeft: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -483,13 +476,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
   },
-  arrowText: {
-    color: '#009499',
-    fontSize: 14,
-    marginHorizontal: 5,
-    marginTop: 5,
-    fontFamily: 'NanumSquareNeo-Variable',
-  },
+
   modalBackground: {
     flex: 1,
     backgroundColor: 'rgba(0,0,0,0.5)',
@@ -508,6 +495,14 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     marginBottom: 10,
     fontFamily: 'NanumSquareNeo-Variable',
+    color: '#000000',
+  },
+  modalDesc: {
+    fontSize: 12,
+    marginBottom: 10,
+    fontWeight: '700',
+    fontFamily: 'NanumSquareNeo-Variable',
+    color: '#000000',
   },
   closeButton: {
     marginTop: 20,
@@ -543,6 +538,28 @@ const styles = StyleSheet.create({
     fontSize: 20,
     fontWeight: 'bold',
     color: '#333',
+    fontFamily: 'NanumSquareNeo-Variable',
+  },
+  calendarHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingHorizontal: 10,
+    marginBottom: 10,
+  },
+  arrowButton: {
+    padding: 10,
+  },
+  arrowText: {
+    color: '#009499',
+    fontSize: 24,
+    fontFamily: 'NanumSquareNeo-Variable',
+    fontWeight: 'bold',
+  },
+  headerTitle: {
+    color: '#009499',
+    fontSize: 18,
+    fontWeight: 'bold',
     fontFamily: 'NanumSquareNeo-Variable',
   },
 });

@@ -1,4 +1,3 @@
-import {getItem} from './asyncStorage';
 import apiClient from './axiosInstance';
 
 export interface StudyTimeResponse {

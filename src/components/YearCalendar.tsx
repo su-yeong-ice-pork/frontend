@@ -1,4 +1,4 @@
-import React, {useState, useEffect} from 'react';
+import React, {useState, useEffect, useRef} from 'react';
 import {View, StyleSheet, ScrollView, Text} from 'react-native';
 import {getYearlyGrass, GrassData} from '../api/YearJandi';
 import {useRecoilValue} from 'recoil';
@@ -13,11 +13,11 @@ const YearlyCalendar = ({memberId}: {memberId: number}) => {
   const [grassData, setGrassData] = useState<GrassData[]>([]);
   const dayLabels = ['일', '월', '화', '수', '목', '금', '토'];
 
+  const scrollViewRef = useRef<ScrollView>(null);
+
   const START_DATE = new Date();
-  START_DATE.setDate(
-    START_DATE.getDate() - (((START_DATE.getDay() + 2) % 7) + 1),
-  );
-  START_DATE.setHours(0, 0, 0, 0);
+  START_DATE.setHours(0, 0, 0, 0); // 자정으로 설정
+  START_DATE.setDate(START_DATE.getDate() - 365); // 1년 전으로 이동
 
   useEffect(() => {
     const fetchGrassData = async () => {
@@ -55,7 +55,7 @@ const YearlyCalendar = ({memberId}: {memberId: number}) => {
 
           if (
             dateCopy.getDate() === 1 &&
-            monthsMap.every(m => Number(m.month) !== dateCopy.getMonth())
+            monthsMap.every(m => m.month !== dateCopy.getMonth())
           ) {
             monthsMap.push({
               index: weeksArray.length,
@@ -77,7 +77,7 @@ const YearlyCalendar = ({memberId}: {memberId: number}) => {
 
     fetchGrassData();
     generateDates();
-  }, [authInfo.authToken, memberId]);
+  }, [memberId]);
 
   // grassData 업데이트 시 로그 출력
   useEffect(() => {
@@ -89,7 +89,6 @@ const YearlyCalendar = ({memberId}: {memberId: number}) => {
   };
 
   const getColorForActivity = (studyHour: number) => {
-    console.log('StudyHour:', studyHour);
     if (studyHour === 0) return '#ebedf0'; // 연한 회색
     else if (studyHour >= 1 && studyHour <= 2) return '#c6e48b'; // 연한 초록
     else if (studyHour >= 3 && studyHour <= 4) return '#7bc96f'; // 중간 초록
@@ -109,15 +108,11 @@ const YearlyCalendar = ({memberId}: {memberId: number}) => {
     const day = date.getDate();
 
     const grassEntry = grassData.find(
-      entry => entry.month === month && entry.day === day,
+      entry => Number(entry.month) === month && Number(entry.day) === day,
     );
 
     const studyHour = grassEntry ? grassEntry.studyHour : 0;
-    console.log(
-      `Date: ${date.getFullYear()}-${String(month).padStart(2, '0')}-${String(
-        day,
-      ).padStart(2, '0')}, StudyHour: ${studyHour}`,
-    );
+
     return getColorForActivity(studyHour);
   };
 
@@ -152,8 +147,27 @@ const YearlyCalendar = ({memberId}: {memberId: number}) => {
     </View>
   );
 
+  // 스크롤 위치 계산 함수
+  const scrollToToday = () => {
+    if (scrollViewRef.current && weeks.length > 0) {
+      const today = new Date();
+      const daysFromStart = Math.floor(
+        (today.getTime() - START_DATE.getTime()) / (1000 * 60 * 60 * 24),
+      );
+      const weekIndex = Math.floor(daysFromStart / 7);
+      const dayBoxWidth = styles.dayBox.width || 12;
+      const dayBoxMargin = styles.dayBox.margin || 2;
+      const scrollToX = weekIndex * (dayBoxWidth + dayBoxMargin * 2) - 100; // 100은 약간 왼쪽으로 여유를 주기 위해 뺌
+
+      scrollViewRef.current.scrollTo({x: scrollToX, animated: false});
+    }
+  };
+
   return (
-    <ScrollView horizontal>
+    <ScrollView
+      horizontal
+      ref={scrollViewRef}
+      onContentSizeChange={scrollToToday}>
       <View style={styles.container}>
         {renderMonthLabels()}
         <View style={{flexDirection: 'row'}}>
@@ -187,8 +201,6 @@ const styles = StyleSheet.create({
   calendarContainer: {
     backgroundColor: '#F5F5F5',
     flexDirection: 'row',
-    // 고정 높이 설정
-    height: 100,
   },
   weekColumn: {
     flexDirection: 'column',

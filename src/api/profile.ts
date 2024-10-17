@@ -6,6 +6,9 @@ export interface Member {
   profileImage: string | null;
   mainTitle: string;
   freezeCount: number;
+  mainBanner?: string;
+  friendCount?: number;
+  studyCount?: number;
 }
 
 interface ApiResponse {

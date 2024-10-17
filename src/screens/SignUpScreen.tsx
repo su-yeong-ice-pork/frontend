@@ -769,6 +769,7 @@ const styles = StyleSheet.create({
     fontFamily: 'NanumSquareNeo-Variable',
     fontWeight: '600',
     fontSize: 12,
+    color: '#000000',
   },
   placeholderText: {
     color: '#B9B9B9',

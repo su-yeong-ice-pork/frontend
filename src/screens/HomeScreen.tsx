@@ -538,6 +538,7 @@ const styles = StyleSheet.create({
     fontSize: width * 0.04,
     fontWeight: '700',
     fontFamily: 'NanumSquareNeo-Variable',
+    color: '#000000',
   },
   closeButton: {
     backgroundColor: '#1AA5AA',

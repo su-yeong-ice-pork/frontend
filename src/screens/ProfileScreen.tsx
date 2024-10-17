@@ -16,10 +16,12 @@ import LinearGradient from 'react-native-linear-gradient';
 
 import {getMemberData, Member} from '../api/profile';
 import {getBadges, Badge} from '../api/badge';
+import {getMyPageRecord} from '../api/myPageRecord';
 
-import {useRecoilState, useRecoilValue} from 'recoil';
+import {useRecoilState, useRecoilValue, useSetRecoilState} from 'recoil';
 import userState from '../recoil/userAtom';
 import authState from '../recoil/authAtom';
+import {setItem} from '../api/asyncStorage';
 
 const {width, height} = Dimensions.get('window');
 
@@ -53,6 +55,9 @@ const ProfileScreen = ({navigation}) => {
   const [user, setUser] = useRecoilState(userState);
   const [modalVisible, setModalVisible] = useState(false);
   const [modalMessage, setModalMessage] = useState('');
+  const [totalDays, setTotalDays] = useState<number>(0);
+  const [totalTime, setTotalTime] = useState<number>(0);
+  const [createDate, setCreateDate] = useState<string>('');
 
   const handleNotUseableModal = () => {
     setModalMessage('추가 예정인 기능입니다.');
@@ -71,6 +76,14 @@ const ProfileScreen = ({navigation}) => {
             setBadges(badgesData);
           } else {
             console.log('뱃지를 불러오는 데 실패했습니다.');
+          }
+          const recordData = await getMyPageRecord(authInfo.authToken);
+          if (recordData && recordData.success) {
+            setTotalDays(recordData.response.totalStreak);
+            setTotalTime(recordData.response.totalStudyTime);
+            setCreateDate(recordData.response.createdDate);
+          } else {
+            console.log('기록을 불러오는 데 실패했습니다.');
           }
         } else {
           console.log('프로필을 불러오는 데 실패했습니다.');
@@ -126,7 +139,7 @@ const ProfileScreen = ({navigation}) => {
             <InfoCard
               subTitle="현재 나의 잔디 친구"
               iconSrc={IMAGES.coloredFriendsIcon}
-              count={5}
+              count={user.friendCount}
               text="의 잔디친구들과 공부 중입니다!"
               buttonSrc={IMAGES.friendsIcon}
               buttonText="친구목록 보기"
@@ -135,7 +148,7 @@ const ProfileScreen = ({navigation}) => {
             <InfoCard
               subTitle="현재 나의 잔디 스터디그룹"
               iconSrc={IMAGES.coloredGroupIcon}
-              count={3}
+              count={user.studyCount}
               text="의 잔디그룹에 소속되어있습니다!"
               buttonSrc={IMAGES.groupsIcon}
               buttonText="그룹목록 보기"
@@ -146,11 +159,11 @@ const ProfileScreen = ({navigation}) => {
               freezeCount={member?.freezeCount}
               onPress={handleNotUseableModal}
             />
-            <GrassSummary name={member?.name} totalDays={85} />
+            <GrassSummary name={member?.name} totalDays={totalDays} />
             <GrassButton
-              startDate="2024년 6월 16일"
-              totalDays={85}
-              totalTime={342}
+              startDate={createDate}
+              totalDays={totalDays}
+              totalTime={totalTime}
               ImgSrc1={IMAGES.jandi1}
               ImgSrc2={IMAGES.jandi2}
             />
@@ -158,7 +171,6 @@ const ProfileScreen = ({navigation}) => {
           <ProfileFooter navigation={navigation} />
         </ScrollView>
         <BottomBar />
-        {/* Modal for "추가 예정인 기능입니다." */}
         <Modal
           animationType="slide"
           transparent={true}
@@ -313,7 +325,7 @@ const GrassButton = ({startDate, totalDays, totalTime, ImgSrc1, ImgSrc2}) => {
     <View style={styles.cardContainer}>
       <View style={styles.card}>
         <Text style={styles.dateText}>
-          <Text style={{fontWeight: '800'}}>{startDate}</Text>에 시작하여{' '}
+          <Text style={{fontWeight: '800'}}>{startDate}</Text>에 시작하여
           지금까지 총{' '}
           <Text style={{fontSize: 15, color: '#009499', fontWeight: '500'}}>
             {totalDays}
@@ -341,6 +353,18 @@ const GrassButton = ({startDate, totalDays, totalTime, ImgSrc1, ImgSrc2}) => {
 // ProfileFooter Component
 const ProfileFooter = ({navigation}) => {
   const [showLogOut, setShowLogOut] = useState(false);
+  const setAuthState = useSetRecoilState(authState);
+  const handleLogout = async () => {
+    try {
+      await setItem('refreshToken', '');
+      await setItem('autoLogin', 'N');
+      setAuthState({email: '', authToken: ''});
+      setShowLogOut(false);
+      navigation.navigate('Landing');
+    } catch (error) {
+      console.error('Error during logout:', error);
+    }
+  };
 
   return (
     <View style={styles.footer}>
@@ -394,7 +418,7 @@ const ProfileFooter = ({navigation}) => {
               </Text>
               <TouchableOpacity
                 style={styles.logoutModalButton}
-                onPress={() => setShowLogOut(false)}>
+                onPress={handleLogout}>
                 <Text style={styles.logoutModalButtonText}>네, 잘가요!</Text>
               </TouchableOpacity>
             </View>
@@ -571,7 +595,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     backgroundColor: '#FFFFFF',
     alignItems: 'center',
-    height: height * 0.07,
+    height: height * 0.08,
     width: width * 0.65,
     paddingHorizontal: width * 0.06,
     paddingVertical: height * 0.02,
@@ -622,7 +646,7 @@ const styles = StyleSheet.create({
   },
   frozenDetailText: {
     flex: 1, // 텍스트가 남은 공간을 차지하도록 설정
-    fontSize: 10,
+    fontSize: 13,
     color: '#333',
     fontWeight: '700',
     fontFamily: 'NanumSquareNeo-Variable',
@@ -662,9 +686,10 @@ const styles = StyleSheet.create({
     marginRight: width * 0.01,
   },
   frozenNote: {
-    fontSize: 8,
+    fontSize: width * 0.03,
     color: '#009499',
-    fontWeight: '700',
+    flexDirection: 'row', // 가로로 정렬
+    alignItems: 'center',
     fontFamily: 'NanumSquareNeo-Variable',
   },
   setiIcon: {
@@ -710,6 +735,7 @@ const styles = StyleSheet.create({
     marginBottom: -height * 0.01,
     fontFamily: 'NanumSquareNeo-Variable',
     fontWeight: '700',
+    color: '#000000',
   },
   timeText: {
     fontSize: width * 0.03,
@@ -718,6 +744,7 @@ const styles = StyleSheet.create({
     marginBottom: -height * 0.01,
     fontFamily: 'NanumSquareNeo-Variable',
     fontWeight: '700',
+    color: '#000000',
   },
   image: {
     width: width * 0.25,
@@ -851,6 +878,7 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: '700',
     fontFamily: 'NanumSquareNeo-Variable',
+    color: '#000000',
   },
   closeButton: {
     backgroundColor: '#1AA5AA',
@@ -914,6 +942,7 @@ const styles = StyleSheet.create({
     marginBottom: 15,
     fontWeight: '800',
     fontFamily: 'NanumSquareNeo-Variable',
+    color: '#000000',
   },
   logoutModalButton: {
     backgroundColor: '#009499',

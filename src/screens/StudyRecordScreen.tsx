@@ -96,7 +96,12 @@ const StudyRecordScreen = () => {
     const subscription = AppState.addEventListener('change', nextAppState => {
       if (nextAppState.match(/inactive|background/)) {
         if (isRecordingRef.current) {
-          stopRecording();
+          stopRecording(true); // 백그라운드로 갈 때는 플래그를 전달
+        }
+      } else if (nextAppState === 'active') {
+        // 앱이 포그라운드로 돌아왔을 때
+        if (isRecordingRef.current) {
+          resumeRecording();
         }
       }
     });
@@ -117,6 +122,14 @@ const StudyRecordScreen = () => {
       stopLocationCheckInterval();
     };
   }, [isRecording]);
+
+  const resumeRecording = () => {
+    startTimeRef.current = Date.now();
+    intervalRef.current = setInterval(() => {
+      const elapsed = Date.now() - startTimeRef.current;
+      setTimeElapsed(elapsed);
+    }, 1000);
+  };
 
   const startRecording = async () => {
     // 출석 여부 확인
@@ -152,10 +165,7 @@ const StudyRecordScreen = () => {
 
     try {
       const location = await getCurrentLocation();
-      const isInLibrary = isPointInPolygon(
-        {latitude: 35.2358, longitude: 129.0814}, //임시 값
-        SERVICE_AREA,
-      );
+      const isInLibrary = isPointInPolygon(location, SERVICE_AREA);
       if (!isInLibrary) {
         // 모달을 표시하고 타이머 시작 중지
         setModalTitle('도서관이 아닌 곳입니다.\n');
@@ -169,16 +179,21 @@ const StudyRecordScreen = () => {
       return;
     }
 
-    // 타이머 시작
     setIsRecording(true);
     startTimeRef.current = Date.now();
+    isRecordingRef.current = true;
     intervalRef.current = setInterval(() => {
       const elapsed = Date.now() - startTimeRef.current;
       setTimeElapsed(elapsed);
     }, 1000);
   };
 
-  const stopRecording = async () => {
+  const stopRecording = async (isAppBackground = false) => {
+    if (startTimeRef.current === 0) {
+      console.error('Start time is zero, cannot calculate elapsed time.');
+      return;
+    }
+
     if (intervalRef.current) {
       clearInterval(intervalRef.current);
       intervalRef.current = null;
@@ -187,7 +202,11 @@ const StudyRecordScreen = () => {
     const elapsed = Date.now() - startTimeRef.current;
     const newTodayStudyTime = todayStudyTime + elapsed;
 
-    setIsRecording(false);
+    if (!isAppBackground) {
+      setIsRecording(false);
+      isRecordingRef.current = false; // 즉시 업데이트
+    }
+
     setTimeElapsed(0);
     startTimeRef.current = 0;
 
@@ -281,6 +300,7 @@ const StudyRecordScreen = () => {
 
   // 현재까지의 공부 시간 계산 (오늘 공부 시간 + 현재 세션 경과 시간)
   const currentStudyTime = todayStudyTime + timeElapsed;
+  const currentTotalStudyTime = totalStudyTime + timeElapsed;
   let friends = '';
 
   // handleNotUseableModal function
@@ -320,9 +340,9 @@ const StudyRecordScreen = () => {
                 title={user?.mainTitle || ''}
                 name={user?.name || ''}
                 profileImage={user?.profileImage || null}
-                studyMessage="기말고사 화이팅..."
+                studyMessage="중간고사 화이팅..."
                 timerValue={formatTime(currentStudyTime)}
-                totalTimeValue={formatTime(totalStudyTime)}
+                totalTimeValue={formatTime(currentTotalStudyTime)}
                 isRecording={isRecording}
                 onStudyButtonPress={handleStudyButtonPress}
               />
