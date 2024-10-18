@@ -6,6 +6,7 @@ import {
   Text,
   TouchableOpacity,
   Dimensions,
+  ImageBackground,
   Image,
   StyleSheet,
   ScrollView,
@@ -131,6 +132,7 @@ const HomeScreen = () => {
           style={styles.container}
           contentContainerStyle={{paddingBottom: 80}}>
           {/* 상단 프로필 영역 */}
+
           <View style={styles.logoSection}>
             <View style={styles.logoInfo}>
               <Image source={IMAGES.logo} style={styles.logoImage} />
@@ -139,7 +141,10 @@ const HomeScreen = () => {
 
           {member && (
             <View>
-              <View style={styles.upperSection}>
+              <ImageBackground
+                source={{uri: member?.mainBanner}}
+                style={styles.upperSection}
+                resizeMode="cover">
                 <View style={styles.profileInfo}>
                   <Image
                     source={
@@ -150,7 +155,7 @@ const HomeScreen = () => {
                     style={styles.profileImage}
                   />
                 </View>
-              </View>
+              </ImageBackground>
 
               <View style={styles.profileTextContainer}>
                 <Text style={styles.nickname}>{member.mainTitle}</Text>
@@ -338,6 +343,7 @@ const styles = StyleSheet.create({
     height: 100,
     marginTop: 50,
     left: 30,
+    borderRadius: 50,
   },
   profileTextContainer: {
     marginLeft: 15,

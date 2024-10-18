@@ -4,6 +4,7 @@ import {
   Text,
   Image,
   Modal,
+  ImageBackground,
   TouchableOpacity,
   StyleSheet,
   ScrollView,
@@ -107,28 +108,67 @@ const ProfileScreen = ({navigation}) => {
               <Image source={IMAGES.logo} style={styles.logoImage} />
             </View>
           </View>
-          <View style={styles.upperSection}>
-            <TouchableOpacity
-              style={styles.backButtonWrapper}
-              onPress={() => navigation.goBack()}>
-              <Image
-                source={IMAGES.profileBackButton}
-                style={styles.profileBackButton}
-              />
-            </TouchableOpacity>
-            <View style={styles.profileInfo}>
-              <Image
-                source={member?.image ? {uri: member.image} : IMAGES.profile} // 프로필 이미지 URL 대체 가능
-                style={styles.profileImage}
-              />
+
+          {member?.mainBanner ? (
+            // 배너 이미지가 있을 때 ImageBackground를 렌더링
+            <ImageBackground
+              source={{uri: member.mainBanner}}
+              style={styles.upperSection}
+              resizeMode="cover">
               <TouchableOpacity
-                onPress={() =>
-                  navigation.navigate('EditProfile', {id: member?.id})
-                }>
-                <Image source={IMAGES.editProfile} style={styles.editIcon} />
+                style={styles.backButtonWrapper}
+                onPress={() => navigation.goBack()}>
+                <Image
+                  source={IMAGES.profileBackButton}
+                  style={styles.profileBackButton}
+                />
               </TouchableOpacity>
+              <View style={styles.profileInfo}>
+                <Image
+                  source={
+                    member?.profileImage
+                      ? {uri: member.profileImage}
+                      : IMAGES.profile
+                  }
+                  style={styles.profileImage}
+                />
+                <TouchableOpacity
+                  onPress={() =>
+                    navigation.navigate('EditProfile', {id: member?.id})
+                  }>
+                  <Image source={IMAGES.editProfile} style={styles.editIcon} />
+                </TouchableOpacity>
+              </View>
+            </ImageBackground>
+          ) : (
+            // 배너 이미지가 없을 때 View를 렌더링하고 배경색을 적용
+            <View style={styles.upperSection}>
+              <TouchableOpacity
+                style={styles.backButtonWrapper}
+                onPress={() => navigation.goBack()}>
+                <Image
+                  source={IMAGES.profileBackButton}
+                  style={styles.profileBackButton}
+                />
+              </TouchableOpacity>
+              <View style={styles.profileInfo}>
+                <Image
+                  source={
+                    member?.profileImage
+                      ? {uri: member.profileImage}
+                      : IMAGES.profile
+                  }
+                  style={styles.profileImage}
+                />
+                <TouchableOpacity
+                  onPress={() =>
+                    navigation.navigate('EditProfile', {id: member?.id})
+                  }>
+                  <Image source={IMAGES.editProfile} style={styles.editIcon} />
+                </TouchableOpacity>
+              </View>
             </View>
-          </View>
+          )}
 
           <View style={styles.profileTextContainer}>
             <Text style={styles.nickname}>{member?.mainTitle}</Text>
@@ -455,10 +495,11 @@ const styles = StyleSheet.create({
     resizeMode: 'contain',
   },
   upperSection: {
+    width: '100%',
+    height: 100, // 배너의 높이를 원하는 대로 조절하세요
     position: 'relative',
     flexDirection: 'row',
     alignItems: 'center',
-    padding: 50,
     backgroundColor: '#86C0AE',
   },
   backButtonWrapper: {
@@ -484,6 +525,7 @@ const styles = StyleSheet.create({
     height: 100,
     marginTop: 50,
     left: 30,
+    borderRadius: 50,
   },
   editIcon: {
     position: 'absolute',
