@@ -298,9 +298,12 @@ const StudyRecordScreen = () => {
     }
   };
 
-  // 현재까지의 공부 시간 계산 (오늘 공부 시간 + 현재 세션 경과 시간)
-  const currentStudyTime = todayStudyTime + timeElapsed;
-  const currentTotalStudyTime = totalStudyTime + timeElapsed;
+  let currentStudyTime = todayStudyTime;
+  let currentTotalStudyTime = totalStudyTime;
+  if (timeElapsed !== 0) {
+    currentStudyTime = todayStudyTime + timeElapsed;
+    currentTotalStudyTime = totalStudyTime + timeElapsed;
+  }
   let friends = '';
 
   // handleNotUseableModal function
